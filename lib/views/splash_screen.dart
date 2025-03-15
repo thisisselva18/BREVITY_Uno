@@ -72,7 +72,7 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                 );
               },
             ),
-
+      
             Center(
               child: ScaleTransition(
                 scale: _logoAnimation,
@@ -133,7 +133,7 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                 ),
               ),
             ),
-
+      
             // Progress Bar
             Align(
               alignment: Alignment.bottomCenter,
