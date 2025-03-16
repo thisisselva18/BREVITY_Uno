@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
 import 'package:newsai/views/auth/auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
+import 'package:newsai/firebase_options.dart';
 import 'package:newsai/views/splash_screen.dart';
 
 final _routes = GoRouter(
@@ -27,6 +29,9 @@ final _routes = GoRouter(
 );
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   SystemChrome.setPreferredOrientations([
