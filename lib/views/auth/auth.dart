@@ -27,7 +27,7 @@ class AuthScreenState extends State<AuthScreen> {
     _pageController.animateToPage(
       0,
       duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      curve: Curves.easeOutQuad,
     );
   }
 
@@ -35,7 +35,7 @@ class AuthScreenState extends State<AuthScreen> {
     _pageController.animateToPage(
       1,
       duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      curve: Curves.easeOutQuad,
     );
   }
 
