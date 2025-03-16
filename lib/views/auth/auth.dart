@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:newsai/views/auth/signup.dart';
+import 'package:newsai/views/auth/login.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -8,8 +10,18 @@ class AuthScreen extends StatefulWidget {
 }
 
 class AuthScreenState extends State<AuthScreen> {
-  final PageController _pageController = PageController();
-  final List<Widget> _pages = [const LoginScreen(), const SignupScreen()];
+  late PageController _pageController;
+  late List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _pages = [
+      LoginScreen(goToSignupPage: goToSignupPage),
+      SignupScreen(goToLoginPage: goToLoginPage),
+    ];
+  }
 
   void goToLoginPage() {
     _pageController.animateToPage(
@@ -30,33 +42,11 @@ class AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: PageView(
-          controller: _pageController,
-          physics: const NeverScrollableScrollPhysics(),
-          children: _pages,
-        ),
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        children: _pages,
       ),
     );
-  }
-}
-
-// Placeholder LoginScreen - You should implement this properly
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
-// Placeholder SignupScreen - You should implement this properly
-class SignupScreen extends StatelessWidget {
-  const SignupScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }
