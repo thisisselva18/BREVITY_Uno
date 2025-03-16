@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "627461571018",
+    "project_id": "news-ai-914981",
+    "storage_bucket": "news-ai-914981.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:627461571018:android:c000c9d300277cdeff8f33",
+        "android_client_info": {
+          "package_name": "com.example.newsai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCdTg_6cWfqkTiv4VJuhs3VovUQfpLBdw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
