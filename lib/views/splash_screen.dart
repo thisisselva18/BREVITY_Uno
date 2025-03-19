@@ -22,14 +22,14 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
       duration: const Duration(seconds: 3),
     );
 
-    _logoAnimation = Tween(begin: 0.0, end: 1.0).animate(
+    _logoAnimation = Tween(begin: 10.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeInOut),
+        curve: const Interval(0.0, 0.25, curve: Curves.easeOutCubic),
       ),
     );
 
-    _particleAnimation = Tween(begin: 0.0, end: 1.0).animate(
+    _particleAnimation = Tween(begin: 0.0, end: 10.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.2, 1.0, curve: Curves.easeOut),
@@ -72,7 +72,7 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                 );
               },
             ),
-      
+            
             Center(
               child: ScaleTransition(
                 scale: _logoAnimation,
@@ -83,20 +83,25 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                     Container(
                       width: 120,
                       height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: const Color(0xFF00F5D4),
-                          width: 3,
-                        ),
-                      ),
+                      // decoration: BoxDecoration(
+                      //   shape: BoxShape.circle,
+                      //   border: Border.all(
+                      //     color: const Color(0xFF00F5D4),
+                      //     width: 3,
+                      //   ),
+                      // ),
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          const Icon(
-                            Icons.remove_red_eye,
-                            size: 60,
-                            color: Color(0xFF00F5D4),
+                          // const Icon(
+                          //   Icons.remove_red_eye,
+                          //   size: 60,
+                          //   color: Color(0xFF00F5D4),
+                          // ),
+                          CircleAvatar(
+                            backgroundImage: AssetImage("assets/logos/applogo.png"),
+                            backgroundColor: Colors.transparent,
+                            radius: 70,
                           ),
                           CustomPaint(
                             painter: CircuitPainter(),
@@ -111,7 +116,7 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                         colors: [Color(0xFF00F5D4), Colors.white],
                       ).createShader(bounds),
                       child: const Text(
-                        'Luminai',
+                        'Brevity',
                         style: TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.bold,

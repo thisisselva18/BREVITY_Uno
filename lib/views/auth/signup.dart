@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:newsai/controller/services/auth_service.dart';
+
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key, required this.goToLoginPage});
-  final void Function() goToLoginPage; 
+  final void Function() goToLoginPage;
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -10,6 +12,8 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   PasswordStrength _passwordStrength = PasswordStrength.weak;
@@ -24,11 +28,12 @@ class _SignupScreenState extends State<SignupScreen> {
       bool hasUppercase = value.contains(RegExp(r'[A-Z]'));
       bool hasDigits = value.contains(RegExp(r'[0-9]'));
       bool hasSpecial = value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-      
+
       setState(() {
-        _passwordStrength = (hasUppercase && hasDigits && hasSpecial) 
-            ? PasswordStrength.strong 
-            : PasswordStrength.medium;
+        _passwordStrength =
+            (hasUppercase && hasDigits && hasSpecial)
+                ? PasswordStrength.strong
+                : PasswordStrength.medium;
       });
     }
   }
@@ -59,12 +64,13 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: Image.asset('assets/logos/applogo.png'),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Title
                   ShaderMask(
-                    shaderCallback: (bounds) => const LinearGradient(
-                      colors: [Color(0xFF00F5D4), Colors.white],
-                    ).createShader(bounds),
+                    shaderCallback:
+                        (bounds) => const LinearGradient(
+                          colors: [Color(0xFF00F5D4), Colors.white],
+                        ).createShader(bounds),
                     child: const Text(
                       'Create Account',
                       style: TextStyle(
@@ -79,10 +85,17 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   // Name Field
                   TextFormField(
-                    style: const TextStyle(color: Colors.white, fontFamily: 'Poppins'),
+                    controller: _nameController,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Full Name',
-                      hintStyle: TextStyle(color: Colors.white54, fontFamily: 'Poppins'),
+                      hintStyle: TextStyle(
+                        color: Colors.white54,
+                        fontFamily: 'Poppins',
+                      ),
                       prefixIcon: Icon(Icons.person, color: Colors.white54),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -104,10 +117,17 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   // Email Field
                   TextFormField(
-                    style: const TextStyle(color: Colors.white, fontFamily: 'Poppins'),
+                    controller: _emailController,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Email Address',
-                      hintStyle: TextStyle(color: Colors.white54, fontFamily: 'Poppins'),
+                      hintStyle: TextStyle(
+                        color: Colors.white54,
+                        fontFamily: 'Poppins',
+                      ),
                       prefixIcon: Icon(Icons.email, color: Colors.white54),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -122,7 +142,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
                       }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                      if (!RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      ).hasMatch(value)) {
                         return 'Please enter a valid email';
                       }
                       return null;
@@ -134,14 +156,22 @@ class _SignupScreenState extends State<SignupScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
-                    style: const TextStyle(color: Colors.white, fontFamily: 'Poppins'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Password',
-                      hintStyle: TextStyle(color: Colors.white54, fontFamily: 'Poppins'),
+                      hintStyle: TextStyle(
+                        color: Colors.white54,
+                        fontFamily: 'Poppins',
+                      ),
                       prefixIcon: Icon(Icons.lock, color: Colors.white54),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                          _obscurePassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                           color: Colors.white54,
                         ),
                         onPressed: () {
@@ -169,16 +199,20 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                   ),
                   const SizedBox(height: 10),
-                  
+
                   // Password Strength Indicator
                   PasswordStrengthIndicator(strength: _passwordStrength),
                   const SizedBox(height: 30),
 
                   // Sign Up Button
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        // Handle sign up
+                        await AuthService().signUpWithEmail(
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                          userName: _nameController.text,
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -217,12 +251,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       minimumSize: const Size(double.infinity, 50),
                     ),
-                    onPressed: () {
-
-                    },
+                    onPressed: () {},
                   ),
                   const SizedBox(height: 20),
-
 
                   TextButton(
                     onPressed: () {
@@ -231,7 +262,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: const Text.rich(
                       TextSpan(
                         text: 'Already have an account? ',
-                        style: TextStyle(color: Colors.white70, fontFamily: 'Poppins'),
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontFamily: 'Poppins',
+                        ),
                         children: [
                           TextSpan(
                             text: 'Login',

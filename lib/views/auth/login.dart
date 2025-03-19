@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newsai/controller/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.goToSignupPage});
@@ -10,6 +11,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
@@ -40,9 +43,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 20),
                   // Title
                   ShaderMask(
-                    shaderCallback: (bounds) => const LinearGradient(
-                      colors: [Color(0xFF00F5D4), Colors.white],
-                    ).createShader(bounds),
+                    shaderCallback:
+                        (bounds) => const LinearGradient(
+                          colors: [Color(0xFF00F5D4), Colors.white],
+                        ).createShader(bounds),
                     child: const Text(
                       'Welcome Back!',
                       style: TextStyle(
@@ -57,10 +61,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Email Field
                   TextFormField(
-                    style: const TextStyle(color: Colors.white, fontFamily: 'Poppins'),
+                    controller: _emailController,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Email Address',
-                      hintStyle: TextStyle(color: Colors.white54, fontFamily: 'Poppins'),
+                      hintStyle: TextStyle(
+                        color: Colors.white54,
+                        fontFamily: 'Poppins',
+                      ),
                       prefixIcon: Icon(Icons.email, color: Colors.white54),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -75,7 +86,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
                       }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                      if (!RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      ).hasMatch(value)) {
                         return 'Please enter a valid email';
                       }
                       return null;
@@ -85,15 +98,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Password Field
                   TextFormField(
+                    controller: _passwordController,
                     obscureText: _obscurePassword,
-                    style: const TextStyle(color: Colors.white, fontFamily: 'Poppins'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Password',
-                      hintStyle: TextStyle(color: Colors.white54, fontFamily: 'Poppins'),
+                      hintStyle: TextStyle(
+                        color: Colors.white54,
+                        fontFamily: 'Poppins',
+                      ),
                       prefixIcon: Icon(Icons.lock, color: Colors.white54),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                          _obscurePassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                           color: Colors.white54,
                         ),
                         onPressed: () {
@@ -117,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 10),
-                  
+
                   // Forgot Password
                   Align(
                     alignment: Alignment.centerRight,
@@ -141,6 +163,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         // Handle login
+                        AuthService().loginWithEmail(
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -193,7 +219,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text.rich(
                       TextSpan(
                         text: 'Don\'t have an account? ',
-                        style: TextStyle(color: Colors.white70, fontFamily: 'Poppins'),
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontFamily: 'Poppins',
+                        ),
                         children: [
                           TextSpan(
                             text: 'Sign Up',
@@ -219,10 +248,11 @@ class _LoginScreenState extends State<LoginScreen> {
 class CircuitPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF00F5D4)
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = const Color(0xFF00F5D4)
+          ..strokeWidth = 1.5
+          ..style = PaintingStyle.stroke;
 
     Path path = Path();
     path.moveTo(size.width * 0.3, size.height * 0.4);

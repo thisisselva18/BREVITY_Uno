@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Singleton instance
@@ -14,20 +16,45 @@ class AuthService {
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
   /// Email & Password Authentication  ///
-  
+
   Future<User?> signUpWithEmail({
     required String email,
     required String password,
+    required String userName,
   }) async {
     try {
-      final UserCredential userCredential = 
-          await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      );
-      return userCredential.user;
+      // 1. Create user in Firebase Auth
+      final UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(
+            email: email.trim(),
+            password: password.trim(),
+          );
+
+      // 2. Safely get user reference
+      final User? user = userCredential.user;
+      if (user == null) throw Exception('User creation failed');
+
+      // 3. Create user document in Firestore
+      await _firestore.collection('users').doc(user.uid).set({
+        'uid': user.uid,
+        'displayName': userName,
+        'email': user.email ?? email.trim(), // Prefer verified email
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'emailVerified': false,
+        // Removed password storage (security risk)
+      });
+
+      // 4. Send email verification (recommended)
+      await user.sendEmailVerification();
+
+      return user;
     } on FirebaseAuthException catch (e) {
       throw _handleFirebaseError(e);
+    } on FirebaseException catch (e) {
+      throw Exception('Firestore error: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error: $e');
     }
   }
 
@@ -36,11 +63,11 @@ class AuthService {
     required String password,
   }) async {
     try {
-      final UserCredential userCredential = 
-          await _firebaseAuth.signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      );
+      final UserCredential userCredential = await _firebaseAuth
+          .signInWithEmailAndPassword(
+            email: email.trim(),
+            password: password.trim(),
+          );
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       throw _handleFirebaseError(e);
@@ -48,13 +75,13 @@ class AuthService {
   }
 
   /// Google Authentication  ///
-  
+
   Future<User?> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return null;
 
-      final GoogleSignInAuthentication googleAuth = 
+      final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
       final OAuthCredential credential = GoogleAuthProvider.credential(
@@ -62,9 +89,9 @@ class AuthService {
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential userCredential = 
-          await _firebaseAuth.signInWithCredential(credential);
-          
+      final UserCredential userCredential = await _firebaseAuth
+          .signInWithCredential(credential);
+
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       throw _handleFirebaseError(e);
@@ -74,7 +101,7 @@ class AuthService {
   }
 
   /// Common Methods  ///
-  
+
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
     await _googleSignIn.signOut();
@@ -83,7 +110,7 @@ class AuthService {
   User? get currentUser => _firebaseAuth.currentUser;
 
   /// Error Handling  ///
-  
+
   Exception _handleFirebaseError(FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-email':
