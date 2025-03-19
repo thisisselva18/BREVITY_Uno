@@ -22,14 +22,14 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
       duration: const Duration(seconds: 3),
     );
 
-    _logoAnimation = Tween(begin: 0.0, end: 1.0).animate(
+    _logoAnimation = Tween(begin: 10.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeInOut),
+        curve: const Interval(0.0, 0.25, curve: Curves.easeOutCubic),
       ),
     );
 
-    _particleAnimation = Tween(begin: 0.0, end: 1.0).animate(
+    _particleAnimation = Tween(begin: 0.0, end: 10.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.2, 1.0, curve: Curves.easeOut),
@@ -72,7 +72,7 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                 );
               },
             ),
-      
+            
             Center(
               child: ScaleTransition(
                 scale: _logoAnimation,
