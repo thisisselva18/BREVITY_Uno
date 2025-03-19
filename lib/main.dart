@@ -8,7 +8,7 @@ import 'package:newsai/firebase_options.dart';
 import 'package:newsai/views/splash_screen.dart';
 
 final _routes = GoRouter(
-  initialLocation: '/auth',
+  initialLocation: '/splash',
   routes: [
     GoRoute(
       path: '/splash',
