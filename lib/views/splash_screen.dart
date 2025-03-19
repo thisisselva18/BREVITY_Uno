@@ -37,7 +37,7 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
     );
 
     _controller.forward().then((_) {
-      // Navigator.pushReplacementNamed(context, '/home');
+       Navigator.pushReplacementNamed(context, '/auth');
     });
   }
 
@@ -79,44 +79,18 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // AI Eye Logo
-                    Container(
-                      width: 120,
-                      height: 120,
-                      // decoration: BoxDecoration(
-                      //   shape: BoxShape.circle,
-                      //   border: Border.all(
-                      //     color: const Color(0xFF00F5D4),
-                      //     width: 3,
-                      //   ),
-                      // ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // const Icon(
-                          //   Icons.remove_red_eye,
-                          //   size: 60,
-                          //   color: Color(0xFF00F5D4),
-                          // ),
-                          CircleAvatar(
-                            backgroundImage: AssetImage("assets/logos/applogo.png"),
-                            backgroundColor: Colors.transparent,
-                            radius: 70,
-                          ),
-                          CustomPaint(
-                            painter: CircuitPainter(),
-                          ),
-                        ],
-                      ),
+                    CircleAvatar(
+                      radius: 70,
+                      backgroundColor: Colors.transparent,
+                      child: Image.asset('assets/logos/applogo.png'),
                     ),
-                    const SizedBox(height: 30),
-                    // App Name
+                    const SizedBox(height: 20),
                     ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
                         colors: [Color(0xFF00F5D4), Colors.white],
                       ).createShader(bounds),
                       child: const Text(
-                        'Brevity',
+                        'BREVITY',
                         style: TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
@@ -127,7 +101,7 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                     ),
                     const SizedBox(height: 10),
                     const Text(
-                      'Understand the News, Powered by AI',
+                      'Short, Smart, Straight to the point',
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
@@ -162,28 +136,6 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
       ),
     );
   }
-}
-
-class CircuitPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF00F5D4)
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke;
-
-    Path path = Path();
-    path.moveTo(size.width * 0.3, size.height * 0.4);
-    path.lineTo(size.width * 0.7, size.height * 0.4);
-    path.moveTo(size.width * 0.5, size.height * 0.3);
-    path.lineTo(size.width * 0.5, size.height * 0.7);
-    path.moveTo(size.width * 0.4, size.height * 0.6);
-    path.lineTo(size.width * 0.6, size.height * 0.6);
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
 
 class Particle {
