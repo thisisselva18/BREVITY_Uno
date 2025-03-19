@@ -138,28 +138,6 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
   }
 }
 
-class CircuitPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF00F5D4)
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke;
-
-    Path path = Path();
-    path.moveTo(size.width * 0.3, size.height * 0.4);
-    path.lineTo(size.width * 0.7, size.height * 0.4);
-    path.moveTo(size.width * 0.5, size.height * 0.3);
-    path.lineTo(size.width * 0.5, size.height * 0.7);
-    path.moveTo(size.width * 0.4, size.height * 0.6);
-    path.lineTo(size.width * 0.6, size.height * 0.6);
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
-}
-
 class Particle {
   late double x;
   late double y;

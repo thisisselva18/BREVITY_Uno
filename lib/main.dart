@@ -5,10 +5,11 @@ import 'package:newsai/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:newsai/firebase_options.dart';
+import 'package:newsai/views/intro_screen.dart';
 import 'package:newsai/views/splash_screen.dart';
 
 final _routes = GoRouter(
-  initialLocation: '/splash',
+  initialLocation: '/intro',
   routes: [
     GoRoute(
       path: '/splash',
@@ -22,6 +23,13 @@ final _routes = GoRouter(
       name: 'auth',
       builder: (context, state) {
         return const AuthScreen();
+      },
+    ),
+    GoRoute(
+      path: '/intro',
+      name: 'intro',
+      builder: (context, state) {
+        return const IntroductionScreen();
       },
     ),
     
