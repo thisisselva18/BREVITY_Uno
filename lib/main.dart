@@ -6,10 +6,11 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'package:newsai/firebase_options.dart';
 import 'package:newsai/views/intro_screen.dart';
+import 'package:newsai/views/side_page.dart';
 import 'package:newsai/views/splash_screen.dart';
 
 final _routes = GoRouter(
-  initialLocation: '/intro',
+  initialLocation: '/sidepage',
   routes: [
     GoRoute(
       path: '/splash',
@@ -30,6 +31,13 @@ final _routes = GoRouter(
       name: 'intro',
       builder: (context, state) {
         return const IntroductionScreen();
+      },
+    ),
+    GoRoute(
+      path: '/sidepage',
+      name: 'sidepage',
+      builder: (context, state) {
+        return SidePage();
       },
     ),
     
