@@ -15,7 +15,7 @@ import 'package:newsai/views/nav_screen/side_page.dart';
 import 'package:newsai/views/splash_screen.dart';
 
 final _routes = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/sidepage',
   routes: [
     GoRoute(
       path: '/splash',

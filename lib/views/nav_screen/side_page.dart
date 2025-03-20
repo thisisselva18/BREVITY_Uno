@@ -10,6 +10,7 @@ class SidePage extends StatelessWidget {
     final textScaler = MediaQuery.textScalerOf(context);
 
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 236, 236, 236),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(screenWidth * 0.04),
@@ -24,7 +25,7 @@ class SidePage extends StatelessWidget {
                     radius: screenWidth * 0.05,
                     child: IconButton(
                       color: Colors.black,
-                      icon: Icon(Icons.person,size: screenWidth * 0.06),
+                      icon: Icon(Icons.person, size: screenWidth * 0.06),
                       onPressed: () {},
                     ),
                   ),
@@ -34,12 +35,12 @@ class SidePage extends StatelessWidget {
                     icon: Text(
                       'MY FEED',
                       style: TextStyle(
-                        fontSize: textScaler.scale(15),
+                        fontSize: textScaler.scale(14),
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
-                    label: Icon(Icons.arrow_forward,size: screenWidth * 0.06),
+                    label: Icon(Icons.arrow_forward, size: screenWidth * 0.05),
                   ),
                 ],
               ),
@@ -52,7 +53,7 @@ class SidePage extends StatelessWidget {
                   isDense: true,
                   hintText: 'Search...',
                   hintStyle: TextStyle(fontSize: textScaler.scale(16)),
-                  prefixIcon: Icon(Icons.search,size: screenWidth * 0.06),
+                  prefixIcon: Icon(Icons.search, size: screenWidth * 0.06),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(screenWidth * 0.07),
                     borderSide: BorderSide.none,
@@ -62,7 +63,7 @@ class SidePage extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: screenHeight * 0.02),
+              SizedBox(height: screenHeight * 0.01),
 
               SizedBox(
                 height: screenHeight * 0.15,
@@ -71,19 +72,22 @@ class SidePage extends StatelessWidget {
                   shrinkWrap: true,
                   children: [
                     _buildMenuButton('My Feed', Icons.home, context),
-                    _buildMenuButton('Top Stories', Icons.trending_up,context),
-                    _buildMenuButton('Bookmarks', Icons.bookmark,context),
-                    _buildMenuButton('Setting', Icons.settings,context),
-                    _buildMenuButton('Unread', Icons.markunread,context),
-                    _buildMenuButton('Unseen', Icons.visibility_off,context),
+                    _buildMenuButton('Top Stories', Icons.trending_up, context),
+                    _buildMenuButton('Bookmarks', Icons.bookmark, context),
+                    _buildMenuButton('Setting', Icons.settings, context),
+                    _buildMenuButton('Unread', Icons.markunread, context),
+                    _buildMenuButton('Unseen', Icons.visibility_off, context),
                   ],
                 ),
               ),
-              SizedBox(height: screenHeight * 0.03),
+              SizedBox(height: screenHeight * 0.01),
 
               Text(
                 'TOP NEWS',
-                style: TextStyle(fontSize: textScaler.scale(18), fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: textScaler.scale(18),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               SizedBox(height: screenHeight * 0.01),
               _buildNewsItem(context),
@@ -97,33 +101,40 @@ class SidePage extends StatelessWidget {
                 children: [
                   Text(
                     'TOPICS',
-                    style: TextStyle(fontSize: textScaler.scale(18), fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: textScaler.scale(18),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: screenHeight * 0.02),
                   GridView.count(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     crossAxisCount: 2,
-                    mainAxisSpacing: screenHeight * 0.02,
-                    crossAxisSpacing: screenWidth * 0.01,
-                    childAspectRatio: screenWidth < 600 ? 1.4 : 1.6,
+                    mainAxisSpacing: screenHeight * 0.015,
+                    crossAxisSpacing: screenWidth * 0.001,
+                    childAspectRatio: 1.65,
                     padding: EdgeInsets.zero,
                     children: [
                       _buildImageContainer(
                         'Technology',
-                        'https://www.simplilearn.com/ice9/free_resources_article_thumb/Technology_Trends.jpg',context
+                        'https://www.simplilearn.com/ice9/free_resources_article_thumb/Technology_Trends.jpg',
+                        context,
                       ),
                       _buildImageContainer(
                         'Politics',
-                        'https://www.livemint.com/lm-img/img/2025/01/30/600x338/-FILES--US-President-Donald-Trump--L--shakes-hands_1738253783512_1738253792847.jpg',context
+                        'https://www.livemint.com/lm-img/img/2025/01/30/600x338/-FILES--US-President-Donald-Trump--L--shakes-hands_1738253783512_1738253792847.jpg',
+                        context,
                       ),
                       _buildImageContainer(
                         'Sports',
-                        'https://student-cms.prd.timeshighereducation.com/sites/default/files/styles/default/public/different_sports.jpg?itok=CW5zK9vp',context
+                        'https://student-cms.prd.timeshighereducation.com/sites/default/files/styles/default/public/different_sports.jpg?itok=CW5zK9vp',
+                        context,
                       ),
                       _buildImageContainer(
                         'Entertainment',
-                        'https://www.jansatta.com/wp-content/uploads/2025/03/ENT-NEWS-LIVE-2.jpg?w=440',context
+                        'https://www.jansatta.com/wp-content/uploads/2025/03/ENT-NEWS-LIVE-2.jpg?w=440',
+                        context,
                       ),
                     ],
                   ),
@@ -138,20 +149,24 @@ class SidePage extends StatelessWidget {
   }
 
   Widget _buildMenuButton(String text, IconData icon, BuildContext context) {
-     final screenWidth = MediaQuery.of(context).size.width;
-     final textScaler = MediaQuery.textScalerOf(context);
-    
+    final screenWidth = MediaQuery.of(context).size.width;
+    final textScaler = MediaQuery.textScalerOf(context);
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon,  size: screenWidth * 0.12, color: const Color.fromARGB(255, 39, 100, 149)),
+          Icon(
+            icon,
+            size: screenWidth * 0.11,
+            color: const Color.fromARGB(255, 39, 100, 149),
+          ),
           SizedBox(height: screenWidth * 0.02),
           Text(
             text,
             style: TextStyle(
-              fontSize: textScaler.scale(13),
+              fontSize: textScaler.scale(12),
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
@@ -165,12 +180,12 @@ class SidePage extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     final textScaler = MediaQuery.textScalerOf(context);
     return Container(
-      margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.01),
+      margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.011),
       child: Row(
         children: [
           Container(
-            width: screenSize.width * 0.25,
-            height: screenSize.height * 0.12,
+            width: screenSize.width * 0.22,
+            height: screenSize.height * 0.10,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(screenSize.width * 0.03),
               image: DecorationImage(
@@ -188,15 +203,20 @@ class SidePage extends StatelessWidget {
               children: [
                 Text(
                   'News Headline Here',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: textScaler.scale(15),),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: textScaler.scale(14),
+                  ),
                 ),
-                SizedBox(height: screenSize.height * 0.005),
+                SizedBox(height: screenSize.height * 0.003),
                 Text(
                   'News description text goes here with 3-4 lines of sample text to fill up the space with some amazing and best use of AI ...',
                   maxLines: 3,
-
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.grey[600],fontSize: textScaler.scale(13),),
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: textScaler.scale(12),
+                  ),
                 ),
               ],
             ),
@@ -206,15 +226,18 @@ class SidePage extends StatelessWidget {
     );
   }
 
-  Widget _buildImageContainer(String text, String imageUrl, BuildContext context) {
-     final screenWidth = MediaQuery.of(context).size.width;
+  Widget _buildImageContainer(
+    String text,
+    String imageUrl,
+    BuildContext context,
+  ) {
+    final screenWidth = MediaQuery.of(context).size.width;
     final textScaler = MediaQuery.textScalerOf(context);
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.013),
       child: Container(
-        width: screenWidth * 0.45,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(screenWidth * 0.04),
+          borderRadius: BorderRadius.circular(screenWidth * 0.03),
           image: DecorationImage(
             image: NetworkImage(imageUrl),
             fit: BoxFit.cover,
@@ -226,7 +249,7 @@ class SidePage extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
-              fontSize: textScaler.scale(20),
+              fontSize: textScaler.scale(19),
               fontWeight: FontWeight.bold,
               shadows: [
                 Shadow(
