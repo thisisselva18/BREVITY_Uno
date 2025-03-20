@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
+import 'package:newsai/controller/bloc/news_scroll_bloc.dart';
+import 'package:newsai/controller/bloc/news_scroll_event.dart';
+import 'package:newsai/controller/services/news_services.dart';
 import 'package:newsai/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:newsai/firebase_options.dart';
-import 'package:newsai/views/intro_screen.dart';
-import 'package:newsai/views/side_page.dart';
+import 'package:newsai/views/intro_screen/intro_screen.dart';
+import 'package:newsai/views/nav_screen/home.dart';
+import 'package:newsai/views/nav_screen/side_page.dart';
 import 'package:newsai/views/splash_screen.dart';
 
 final _routes = GoRouter(
-  initialLocation: '/sidepage',
+  initialLocation: '/home',
   routes: [
     GoRoute(
       path: '/splash',
@@ -40,21 +45,39 @@ final _routes = GoRouter(
         return SidePage();
       },
     ),
-    
+    GoRoute(
+      path: '/home',
+      name: 'home',
+      builder: (context, state) {
+        return HomeScreen();
+      },
+    ),
   ],
 );
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+  // Create NewsService instance
+  final newsService = NewsService();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(const MyApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create:
+              (context) =>
+                  NewsBloc(newsService: newsService)..add(FetchInitialNews()),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
