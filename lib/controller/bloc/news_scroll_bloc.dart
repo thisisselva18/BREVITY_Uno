@@ -23,7 +23,7 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
   ) async {
     try {
       emit(NewsLoading());
-      final articles = await newsService.fetchRandomArticles(page: 1, pageSize: _pageSize);
+      final articles = await newsService.fetchGeneralNews(page: 1, pageSize: _pageSize);
       emit(NewsLoaded(
         articles: articles,
         hasReachedMax: articles.length < _pageSize,
@@ -43,7 +43,7 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
     try {
       emit(currentState.copyWith(isLoadingMore: true));
       
-      final newArticles = await newsService.fetchRandomArticles(
+      final newArticles = await newsService.fetchGeneralNews(
         page: _page + 1,
         pageSize: _pageSize,
       );
