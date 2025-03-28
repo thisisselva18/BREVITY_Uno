@@ -9,6 +9,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newsai/controller/bloc/news_scroll_bloc.dart';
 import 'package:newsai/controller/bloc/news_scroll_event.dart';
 import 'package:newsai/controller/bloc/news_scroll_state.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc.dart';
+import 'package:newsai/controller/bloc/bookmark_state.dart';
+import 'package:newsai/controller/bloc/bookmark_event.dart';
 import 'package:newsai/models/article_model.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -63,10 +66,7 @@ class HomeScreen extends StatelessWidget {
             }
             return true;
           },
-          allowedSwipeDirection: const AllowedSwipeDirection.only(
-            up: true,
-            down: true,
-          ),
+          allowedSwipeDirection: const AllowedSwipeDirection.only(up: true),
           duration: const Duration(milliseconds: 400),
           scale: 1.0,
           padding: EdgeInsets.zero,
@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
             child: Row(
               children: [
                 const Text(
-                  'Luminai',
+                  'Brevity',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -95,7 +95,7 @@ class HomeScreen extends StatelessWidget {
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.info_outline, color: Colors.white),
-                  onPressed: () => _showAppInfo(context),
+                  onPressed: () {},
                 ),
               ],
             ),
@@ -125,31 +125,15 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _showAppInfo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('About Luminai'),
-        content: const Text(
-          'Stay informed with AI-curated news\nSwipe vertically to browse\nSwipe left to open article'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
   Future<void> _launchArticleUrl(String url, BuildContext context) async {
     try {
       if (await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open article: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not open article: $e')));
     }
   }
 }
@@ -161,7 +145,6 @@ class _NewsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
@@ -182,10 +165,14 @@ class _NewsCard extends StatelessWidget {
               imageUrl: article.urlToImage,
               fit: BoxFit.cover,
               placeholder: (context, url) => Container(color: Colors.grey[200]),
-              errorWidget: (context, url, error) => Container(
-                color: const Color.fromRGBO(128, 128, 128, 0.8),
-                child: const Icon(Icons.broken_image, color: Colors.white54),
-              ),
+              errorWidget:
+                  (context, url, error) => Container(
+                    color: const Color.fromRGBO(128, 128, 128, 0.8),
+                    child: const Icon(
+                      Icons.broken_image,
+                      color: Colors.white54,
+                    ),
+                  ),
             ),
             Container(
               decoration: BoxDecoration(
@@ -193,10 +180,10 @@ class _NewsCard extends StatelessWidget {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    const Color.fromRGBO(0, 0, 0, 0.9),
+                    const Color.fromARGB(230, 4, 4, 4),
                     Colors.transparent,
                   ],
-                  stops: const [0.1, 0.5],
+                  stops: const [0.1, 0.7],
                 ),
               ),
             ),
@@ -229,7 +216,9 @@ class _NewsCard extends StatelessWidget {
                       ),
                       const Gap(12),
                       Text(
-                        DateFormat('MMM dd, y • h:mm a').format(article.publishedAt),
+                        DateFormat(
+                          'MMM dd, y • h:mm a',
+                        ).format(article.publishedAt),
                         style: TextStyle(
                           color: Colors.white.withAlpha(229),
                           fontSize: 14,
@@ -238,17 +227,7 @@ class _NewsCard extends StatelessWidget {
                     ],
                   ),
                   const Gap(20),
-                  Text(
-                    article.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.w700,
-                      height: 1.3,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  _TappableHeadline(title: article.title, article: article),
                   const Gap(16),
                   Text(
                     article.description,
@@ -257,7 +236,7 @@ class _NewsCard extends StatelessWidget {
                       fontSize: 16,
                       height: 1.4,
                     ),
-                    maxLines: 3,
+                    maxLines: 7,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const Gap(24),
@@ -283,7 +262,8 @@ class _NewsCard extends StatelessWidget {
                           color: Colors.white,
                           size: 28,
                         ),
-                        onPressed: () => _launchArticleUrl(article.url, context),
+                        onPressed:
+                            () => _launchArticleUrl(article.url, context),
                       ),
                     ],
                   ),
@@ -302,8 +282,37 @@ class _NewsCard extends StatelessWidget {
         await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open article: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not open article: $e')));
     }
+  }
+}
+
+class _TappableHeadline extends StatelessWidget {
+  final String title;
+  final Article article;
+  const _TappableHeadline({required this.title, required this.article});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BookmarkBloc, BookmarkState>(
+      builder: (context, state) {        
+        final isBookmarked = state is BookmarksLoaded 
+            ? state.bookmarks.any((a) => a.url == article.url)
+            : false;
+        return GestureDetector(
+          onTap: () => context.read<BookmarkBloc>().add(ToggleBookmarkEvent(article)),
+          child: Text(
+            title,
+            style: TextStyle(
+              color: isBookmarked ? Colors.blue : Colors.white,
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        );
+      },
+    );
   }
 }
