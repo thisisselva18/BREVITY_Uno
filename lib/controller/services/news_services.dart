@@ -1,10 +1,11 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:newsai/models/article_model.dart';
 
 class NewsService {
 
-  static const String _apiKey = '6772b7582e9d48b6b72277239f5df490';
+  static final String _apiKey = dotenv.env['NEWS_API_KEY']!;
   static const String _topHeadlinesUrl = 'https://newsapi.org/v2/top-headlines';
   static const String _everythingUrl = 'https://newsapi.org/v2/everything';
 

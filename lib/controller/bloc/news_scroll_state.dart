@@ -49,6 +49,7 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:newsai/models/article_model.dart';
+import 'package:newsai/models/news_category.dart';
 
 abstract class NewsState extends Equatable {
   const NewsState();
@@ -65,31 +66,31 @@ class NewsLoaded extends NewsState {
   final List<Article> articles;
   final bool hasReachedMax;
   final bool isLoadingMore;
-  final String currentCategory;
+  final NewsCategory category;
 
   const NewsLoaded({
     required this.articles,
     this.hasReachedMax = false,
     this.isLoadingMore = false,
-    this.currentCategory = 'my_feed',
+    required this.category,
   });
 
   NewsLoaded copyWith({
     List<Article>? articles,
     bool? hasReachedMax,
     bool? isLoadingMore,
-    String? currentCategory,
+    NewsCategory? category,
   }) {
     return NewsLoaded(
       articles: articles ?? this.articles,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
-      currentCategory: currentCategory ?? this.currentCategory,
+      category: category ?? this.category,
     );
   }
 
   @override
-  List<Object> get props => [articles, hasReachedMax, isLoadingMore, currentCategory];
+  List<Object> get props => [articles, hasReachedMax, isLoadingMore, category];
 }
 
 class NewsError extends NewsState {

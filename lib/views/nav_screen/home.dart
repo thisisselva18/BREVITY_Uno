@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
+import 'package:newsai/controller/services/news_services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:gap/gap.dart';
@@ -13,14 +15,42 @@ import 'package:newsai/controller/bloc/bookmark_bloc.dart';
 import 'package:newsai/controller/bloc/bookmark_state.dart';
 import 'package:newsai/controller/bloc/bookmark_event.dart';
 import 'package:newsai/models/article_model.dart';
+import 'package:newsai/models/news_category.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final NewsCategory category;
+
+  const HomeScreen({super.key, this.category = NewsCategory.general});
+
+  @override
+  Widget build(BuildContext context) {
+    return RepositoryProvider.value(
+      value: RepositoryProvider.of<NewsService>(context), // Explicitly provide NewsService
+      child: BlocProvider(
+        create: (context) => NewsBloc(
+          newsService: RepositoryProvider.of<NewsService>(context)
+        )..add(FetchInitialNews(category: category)),
+        child: Scaffold(body: _HomeScreenContent(category: category)),
+      ),
+    );
+  }
+}
+
+class _HomeScreenContent extends StatelessWidget {
+  final NewsCategory category;
+  const _HomeScreenContent({this.category = NewsCategory.general});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocBuilder<NewsBloc, NewsState>(
+        buildWhen: (previous, current) {
+          // Only rebuild if category matches
+          if (current is NewsLoaded) {
+            return current.category == category;
+          }
+          return true;
+        },
         builder: (context, state) {
           if (state is NewsLoading) {
             return _buildLoadingShimmer();
@@ -53,16 +83,26 @@ class HomeScreen extends StatelessWidget {
             final article = articles[index];
             return GestureDetector(
               onHorizontalDragEnd: (details) {
+                // Right to left swipe (open SidePage)
+                if (details.primaryVelocity! > 5) {
+                  context.goNamed('sidepage');
+                }
+
                 if (details.primaryVelocity! < 0) {
                   _launchArticleUrl(article.url, context);
                 }
               },
+              behavior: HitTestBehavior.opaque,
+
               child: _NewsCard(article: article),
             );
           },
+
           onSwipe: (previousIndex, currentIndex, direction) {
             if (currentIndex != null && currentIndex >= articles.length - 3) {
-              context.read<NewsBloc>().add(FetchNextPage(currentIndex));
+              context.read<NewsBloc>().add(
+                FetchNextPage(currentIndex, category),
+              );
             }
             return true;
           },
@@ -122,6 +162,23 @@ class HomeScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _showAppInfo(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('About Luminai'),
+        content: const Text(
+          'Stay informed with AI-curated news\nSwipe vertically to browse\nSwipe left to open article'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -305,6 +362,8 @@ class _TappableHeadline extends StatelessWidget {
           onTap: () => context.read<BookmarkBloc>().add(ToggleBookmarkEvent(article)),
           child: Text(
             title,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: isBookmarked ? Colors.blue : Colors.white,
               fontSize: 26,
