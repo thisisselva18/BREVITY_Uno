@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:newsai/models/bookmark_repo.dart';
+import 'package:newsai/controller/services/bookmark_services.dart';
 import 'bookmark_event.dart';
 import 'bookmark_state.dart';
 
 class BookmarkBloc extends Bloc<BookmarkEvent, BookmarkState> {
-  final BookmarkRepository repository;
+  final BookmarkServices repository;
 
   BookmarkBloc(this.repository) : super(BookmarkInitial()) {
     on<ToggleBookmarkEvent>(_onToggleBookmark);

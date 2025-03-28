@@ -6,13 +6,13 @@ import 'package:newsai/controller/bloc/news_scroll_bloc.dart';
 import 'package:newsai/controller/bloc/news_scroll_event.dart';
 import 'package:newsai/controller/services/news_services.dart';
 import 'package:newsai/controller/bloc/bookmark_bloc.dart';
-import 'package:newsai/models/bookmark_repo.dart'; 
+import 'package:newsai/controller/services/bookmark_services.dart'; 
 import 'package:newsai/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:newsai/firebase_options.dart';
 import 'package:newsai/views/intro_screen/intro_screen.dart';
-import 'package:newsai/views/nav_screen/bookmark.dart';
+import 'package:newsai/views/inner_screens/bookmark.dart';
 import 'package:newsai/views/nav_screen/home.dart';
 import 'package:newsai/views/nav_screen/side_page.dart';
 import 'package:newsai/views/splash_screen.dart';
@@ -69,7 +69,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-  final bookmarkRepository = BookmarkRepository();
+  final bookmarkRepository = BookmarkServices();
   await bookmarkRepository.initialize();
   final newsService = NewsService();
 

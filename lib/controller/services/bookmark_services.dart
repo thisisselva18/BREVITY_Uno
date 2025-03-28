@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:newsai/models/article_model.dart';
 import 'dart:convert';
 
-class BookmarkRepository {
+class BookmarkServices {
   static const _bookmarkKey = 'user_bookmarks';
   late SharedPreferences _prefs;
 
