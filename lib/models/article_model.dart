@@ -39,6 +39,20 @@ class Article {
     );
   }
 
+   Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'description': description,
+      'url': url,
+      'urlToImage': urlToImage,
+      'publishedAt': publishedAt.toIso8601String(),
+      'source': {'name': sourceName},
+      'author': author,
+      'content': content,
+      'timeAgo': timeAgo,
+    };
+  }
+
   static String _getTimeAgo(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);

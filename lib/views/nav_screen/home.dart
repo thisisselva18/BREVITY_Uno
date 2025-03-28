@@ -11,6 +11,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newsai/controller/bloc/news_scroll_bloc.dart';
 import 'package:newsai/controller/bloc/news_scroll_event.dart';
 import 'package:newsai/controller/bloc/news_scroll_state.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc.dart';
+import 'package:newsai/controller/bloc/bookmark_state.dart';
+import 'package:newsai/controller/bloc/bookmark_event.dart';
 import 'package:newsai/models/article_model.dart';
 import 'package:newsai/models/news_category.dart';
 
@@ -21,12 +24,14 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create:
-          (context) =>
-              NewsBloc(newsService: RepositoryProvider.of<NewsService>(context))
-                ..add(FetchInitialNews(category: category)),
-      child: Scaffold(body: _HomeScreenContent(category: category)),
+    return RepositoryProvider.value(
+      value: RepositoryProvider.of<NewsService>(context), // Explicitly provide NewsService
+      child: BlocProvider(
+        create: (context) => NewsBloc(
+          newsService: RepositoryProvider.of<NewsService>(context)
+        )..add(FetchInitialNews(category: category)),
+        child: Scaffold(body: _HomeScreenContent(category: category)),
+      ),
     );
   }
 }
@@ -101,10 +106,7 @@ class _HomeScreenContent extends StatelessWidget {
             }
             return true;
           },
-          allowedSwipeDirection: const AllowedSwipeDirection.only(
-            up: true,
-            down: true,
-          ),
+          allowedSwipeDirection: const AllowedSwipeDirection.only(up: true),
           duration: const Duration(milliseconds: 400),
           scale: 1.0,
           padding: EdgeInsets.zero,
@@ -115,7 +117,7 @@ class _HomeScreenContent extends StatelessWidget {
             child: Row(
               children: [
                 const Text(
-                  'Luminai',
+                  'Brevity',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -133,7 +135,7 @@ class _HomeScreenContent extends StatelessWidget {
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.info_outline, color: Colors.white),
-                  onPressed: () => _showAppInfo(context),
+                  onPressed: () {},
                 ),
               ],
             ),
@@ -166,19 +168,17 @@ class _HomeScreenContent extends StatelessWidget {
   void _showAppInfo(BuildContext context) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('About Luminai'),
-            content: const Text(
-              'Stay informed with AI-curated news\nSwipe vertically to browse\nSwipe left to open article',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text('About Luminai'),
+        content: const Text(
+          'Stay informed with AI-curated news\nSwipe vertically to browse\nSwipe left to open article'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
           ),
+        ],
+      ),
     );
   }
 
@@ -202,7 +202,6 @@ class _NewsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
@@ -238,10 +237,10 @@ class _NewsCard extends StatelessWidget {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    const Color.fromRGBO(0, 0, 0, 0.9),
+                    const Color.fromARGB(230, 4, 4, 4),
                     Colors.transparent,
                   ],
-                  stops: const [0.1, 0.5],
+                  stops: const [0.1, 0.7],
                 ),
               ),
             ),
@@ -285,17 +284,7 @@ class _NewsCard extends StatelessWidget {
                     ],
                   ),
                   const Gap(20),
-                  Text(
-                    article.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.w700,
-                      height: 1.3,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  _TappableHeadline(title: article.title, article: article),
                   const Gap(16),
                   Text(
                     article.description,
@@ -304,7 +293,7 @@ class _NewsCard extends StatelessWidget {
                       fontSize: 16,
                       height: 1.4,
                     ),
-                    maxLines: 3,
+                    maxLines: 7,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const Gap(24),
@@ -354,5 +343,35 @@ class _NewsCard extends StatelessWidget {
         context,
       ).showSnackBar(SnackBar(content: Text('Could not open article: $e')));
     }
+  }
+}
+
+class _TappableHeadline extends StatelessWidget {
+  final String title;
+  final Article article;
+  const _TappableHeadline({required this.title, required this.article});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BookmarkBloc, BookmarkState>(
+      builder: (context, state) {        
+        final isBookmarked = state is BookmarksLoaded 
+            ? state.bookmarks.any((a) => a.url == article.url)
+            : false;
+        return GestureDetector(
+          onTap: () => context.read<BookmarkBloc>().add(ToggleBookmarkEvent(article)),
+          child: Text(
+            title,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: isBookmarked ? Colors.blue : Colors.white,
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        );
+      },
+    );
   }
 }

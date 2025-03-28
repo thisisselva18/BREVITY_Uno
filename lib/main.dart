@@ -7,12 +7,18 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'package:newsai/firebase_options.dart';
 import 'package:newsai/views/intro_screen/intro_screen.dart';
+import 'package:newsai/views/inner_screens/bookmark.dart';
 import 'package:newsai/views/nav_screen/home.dart';
 import 'package:newsai/views/nav_screen/side_page.dart';
 import 'package:newsai/views/splash_screen.dart';
+import 'package:newsai/controller/services/bookmark_services.dart';
+import 'package:newsai/controller/services/news_services.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _routes = GoRouter(
-  initialLocation: '/sidepage',
+  initialLocation: '/home/0', // Change initial route to home
   routes: [
     GoRoute(
       path: '/splash',
@@ -38,22 +44,29 @@ final _routes = GoRouter(
     GoRoute(
       path: '/sidepage',
       name: 'sidepage',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const SidePage(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.easeInOut;
-          return SlideTransition(
-            position: Tween(begin: begin, end: end)
-                .chain(CurveTween(curve: curve))
-                .animate(animation),
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
+      pageBuilder:
+          (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const SidePage(),
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              const begin = Offset(-1.0, 0.0); // Changed from (1.0, 0.0)
+              const end = Offset.zero;
+              const curve = Curves.easeInOut;
+              return SlideTransition(
+                position: Tween(
+                  begin: begin,
+                  end: end,
+                ).chain(CurveTween(curve: curve)).animate(animation),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 225),
+          ),
     ),
     GoRoute(
       path: '/home/:category',
@@ -66,42 +79,70 @@ final _routes = GoRouter(
           key: state.pageKey,
           child: HomeScreen(category: category),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const begin = Offset(-1.0, 0.0);
+            const begin = Offset(1.0, 0.0); // Changed from (-1.0, 0.0)
             const end = Offset.zero;
             const curve = Curves.easeInOut;
             return SlideTransition(
-              position: Tween(begin: begin, end: end)
-                  .chain(CurveTween(curve: curve))
-                  .animate(animation),
+              position: Tween(
+                begin: begin,
+                end: end,
+              ).chain(CurveTween(curve: curve)).animate(animation),
               child: child,
             );
           },
-          transitionDuration: const Duration(milliseconds: 300),
+          transitionDuration: const Duration(milliseconds: 225),
         );
+      },
+    ),
+    GoRoute(
+      path: '/bookmark',
+      name: 'bookmark',
+      builder: (context, state) {
+        return const BookmarkScreen();
       },
     ),
   ],
 );
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
+  final bookmarkRepository = BookmarkServices();
+  final newsService = NewsService(); // Create NewsService instance
+  await bookmarkRepository.initialize();
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(const MyApp());
+  await dotenv.load(fileName: ".env");
+
+  runApp(
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(
+          value: newsService,
+        ), // Add NewsService as a repository
+        RepositoryProvider.value(value: bookmarkRepository),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => BookmarkBloc(bookmarkRepository)),
+        ],
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'NewsAI',
+      title: 'Brevity',
       debugShowCheckedModeBanner: false,
       routerConfig: _routes,
     );
