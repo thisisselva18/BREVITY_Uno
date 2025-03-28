@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
-import 'package:newsai/controller/bloc/news_scroll_bloc.dart';
-import 'package:newsai/controller/bloc/news_scroll_event.dart';
-import 'package:newsai/controller/services/news_services.dart';
+import 'package:newsai/models/news_category.dart';
 import 'package:newsai/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -41,15 +38,46 @@ final _routes = GoRouter(
     GoRoute(
       path: '/sidepage',
       name: 'sidepage',
-      builder: (context, state) {
-        return SidePage();
-      },
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const SidePage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+          return SlideTransition(
+            position: Tween(begin: begin, end: end)
+                .chain(CurveTween(curve: curve))
+                .animate(animation),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
     ),
     GoRoute(
-      path: '/home',
+      path: '/home/:category',
       name: 'home',
-      builder: (context, state) {
-        return HomeScreen();
+      pageBuilder: (context, state) {
+        final category = NewsCategory.fromIndex(
+          int.parse(state.pathParameters['category'] ?? '0'),
+        );
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: HomeScreen(category: category),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(-1.0, 0.0);
+            const end = Offset.zero;
+            const curve = Curves.easeInOut;
+            return SlideTransition(
+              position: Tween(begin: begin, end: end)
+                  .chain(CurveTween(curve: curve))
+                  .animate(animation),
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
       },
     ),
   ],
@@ -59,25 +87,11 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-  // Create NewsService instance
-  final newsService = NewsService();
-
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create:
-              (context) =>
-                  NewsBloc(newsService: newsService)..add(FetchInitialNews()),
-        ),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

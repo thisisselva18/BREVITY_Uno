@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
+import 'package:newsai/controller/services/news_services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:gap/gap.dart';
@@ -10,14 +12,40 @@ import 'package:newsai/controller/bloc/news_scroll_bloc.dart';
 import 'package:newsai/controller/bloc/news_scroll_event.dart';
 import 'package:newsai/controller/bloc/news_scroll_state.dart';
 import 'package:newsai/models/article_model.dart';
+import 'package:newsai/models/news_category.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final NewsCategory category;
+
+  const HomeScreen({super.key, this.category = NewsCategory.general});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create:
+          (context) =>
+              NewsBloc(newsService: RepositoryProvider.of<NewsService>(context))
+                ..add(FetchInitialNews(category: category)),
+      child: Scaffold(body: _HomeScreenContent(category: category)),
+    );
+  }
+}
+
+class _HomeScreenContent extends StatelessWidget {
+  final NewsCategory category;
+  const _HomeScreenContent({this.category = NewsCategory.general});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocBuilder<NewsBloc, NewsState>(
+        buildWhen: (previous, current) {
+          // Only rebuild if category matches
+          if (current is NewsLoaded) {
+            return current.category == category;
+          }
+          return true;
+        },
         builder: (context, state) {
           if (state is NewsLoading) {
             return _buildLoadingShimmer();
@@ -50,16 +78,26 @@ class HomeScreen extends StatelessWidget {
             final article = articles[index];
             return GestureDetector(
               onHorizontalDragEnd: (details) {
+                // Right to left swipe (open SidePage)
+                if (details.primaryVelocity! > 5) {
+                  context.goNamed('sidepage');
+                }
+
                 if (details.primaryVelocity! < 0) {
                   _launchArticleUrl(article.url, context);
                 }
               },
+              behavior: HitTestBehavior.opaque,
+
               child: _NewsCard(article: article),
             );
           },
+
           onSwipe: (previousIndex, currentIndex, direction) {
             if (currentIndex != null && currentIndex >= articles.length - 3) {
-              context.read<NewsBloc>().add(FetchNextPage(currentIndex));
+              context.read<NewsBloc>().add(
+                FetchNextPage(currentIndex, category),
+              );
             }
             return true;
           },
@@ -128,17 +166,19 @@ class HomeScreen extends StatelessWidget {
   void _showAppInfo(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('About Luminai'),
-        content: const Text(
-          'Stay informed with AI-curated news\nSwipe vertically to browse\nSwipe left to open article'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('About Luminai'),
+            content: const Text(
+              'Stay informed with AI-curated news\nSwipe vertically to browse\nSwipe left to open article',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -148,8 +188,9 @@ class HomeScreen extends StatelessWidget {
         await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open article: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not open article: $e')));
     }
   }
 }
@@ -182,10 +223,14 @@ class _NewsCard extends StatelessWidget {
               imageUrl: article.urlToImage,
               fit: BoxFit.cover,
               placeholder: (context, url) => Container(color: Colors.grey[200]),
-              errorWidget: (context, url, error) => Container(
-                color: const Color.fromRGBO(128, 128, 128, 0.8),
-                child: const Icon(Icons.broken_image, color: Colors.white54),
-              ),
+              errorWidget:
+                  (context, url, error) => Container(
+                    color: const Color.fromRGBO(128, 128, 128, 0.8),
+                    child: const Icon(
+                      Icons.broken_image,
+                      color: Colors.white54,
+                    ),
+                  ),
             ),
             Container(
               decoration: BoxDecoration(
@@ -229,7 +274,9 @@ class _NewsCard extends StatelessWidget {
                       ),
                       const Gap(12),
                       Text(
-                        DateFormat('MMM dd, y • h:mm a').format(article.publishedAt),
+                        DateFormat(
+                          'MMM dd, y • h:mm a',
+                        ).format(article.publishedAt),
                         style: TextStyle(
                           color: Colors.white.withAlpha(229),
                           fontSize: 14,
@@ -283,7 +330,8 @@ class _NewsCard extends StatelessWidget {
                           color: Colors.white,
                           size: 28,
                         ),
-                        onPressed: () => _launchArticleUrl(article.url, context),
+                        onPressed:
+                            () => _launchArticleUrl(article.url, context),
                       ),
                     ],
                   ),
@@ -302,8 +350,9 @@ class _NewsCard extends StatelessWidget {
         await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open article: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not open article: $e')));
     }
   }
 }
