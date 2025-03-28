@@ -49,6 +49,7 @@ dependencies:
   intl: ^0.18.1        # For date formatting
   gap: ^3.0.0  
   flutter_card_swiper: ^7.0.2
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:

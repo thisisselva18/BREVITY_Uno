@@ -1,7 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:newsai/models/article_model.dart';
+import 'package:newsai/controller/services/news_services.dart';
 
-class SidePage extends StatelessWidget {
+class SidePage extends StatefulWidget {
   const SidePage({super.key});
+
+  @override
+  State<SidePage> createState() => _SidePageState();
+}
+
+class _SidePageState extends State<SidePage> {
+  final NewsService _newsService = NewsService();
+  late Future<List<Article>> _topNewsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _topNewsFuture = _newsService.fetchGeneralNews(page: 1, pageSize: 3);
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -10,7 +28,8 @@ class SidePage extends StatelessWidget {
     final textScaler = MediaQuery.textScalerOf(context);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 236, 236, 236),
+      //backgroundColor: const Color.fromARGB(255, 236, 236, 236),
+      backgroundColor: Colors.black45,
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(screenWidth * 0.04),
@@ -21,7 +40,7 @@ class SidePage extends StatelessWidget {
               Row(
                 children: [
                   CircleAvatar(
-                    backgroundColor: Colors.grey[300],
+                    backgroundColor: const Color.fromARGB(255, 207, 207, 207),
                     radius: screenWidth * 0.05,
                     child: IconButton(
                       color: Colors.black,
@@ -37,7 +56,7 @@ class SidePage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: textScaler.scale(14),
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: const Color.fromARGB(221, 249, 249, 249),
                       ),
                     ),
                     label: Icon(Icons.arrow_forward, size: screenWidth * 0.05),
@@ -85,14 +104,45 @@ class SidePage extends StatelessWidget {
               Text(
                 'TOP NEWS',
                 style: TextStyle(
+                  color: const Color.fromARGB(221, 248, 248, 248),
                   fontSize: textScaler.scale(18),
                   fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: screenHeight * 0.01),
-              _buildNewsItem(context),
-              _buildNewsItem(context),
-              _buildNewsItem(context),
+              FutureBuilder<List<Article>>(
+                future: _topNewsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Column(
+                      children: List.generate(
+                        3,
+                        (index) => _buildNewsItem(context, null),
+                      ),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: screenHeight * 0.02,
+                      ),
+                      child: Text(
+                        'Failed to load top news',
+                        style: TextStyle(
+                          fontSize: textScaler.scale(14),
+                          color: Colors.red,
+                        ),
+                      ),
+                    );
+                  }
+                  return Column(
+                    children:
+                        snapshot.data!
+                            .map((article) => _buildNewsItem(context, article))
+                            .toList(),
+                  );
+                },
+              ),
 
               SizedBox(height: screenHeight * 0.03),
 
@@ -102,6 +152,7 @@ class SidePage extends StatelessWidget {
                   Text(
                     'TOPICS',
                     style: TextStyle(
+                      color: const Color.fromARGB(221, 248, 248, 248),
                       fontSize: textScaler.scale(18),
                       fontWeight: FontWeight.bold,
                     ),
@@ -109,7 +160,7 @@ class SidePage extends StatelessWidget {
                   SizedBox(height: screenHeight * 0.02),
                   GridView.count(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: 2,
                     mainAxisSpacing: screenHeight * 0.015,
                     crossAxisSpacing: screenWidth * 0.001,
@@ -160,7 +211,7 @@ class SidePage extends StatelessWidget {
           Icon(
             icon,
             size: screenWidth * 0.11,
-            color: const Color.fromARGB(255, 39, 100, 149),
+            color: const Color.fromARGB(255, 20, 116, 195),
           ),
           SizedBox(height: screenWidth * 0.02),
           Text(
@@ -168,7 +219,7 @@ class SidePage extends StatelessWidget {
             style: TextStyle(
               fontSize: textScaler.scale(12),
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: const Color.fromARGB(221, 246, 246, 246),
             ),
           ),
         ],
@@ -176,9 +227,10 @@ class SidePage extends StatelessWidget {
     );
   }
 
-  Widget _buildNewsItem(BuildContext context) {
+  Widget _buildNewsItem(BuildContext context, Article? article) {
     final screenSize = MediaQuery.of(context).size;
     final textScaler = MediaQuery.textScalerOf(context);
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.011),
       child: Row(
@@ -189,9 +241,11 @@ class SidePage extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(screenSize.width * 0.03),
               image: DecorationImage(
-                image: NetworkImage(
-                  'https://www.hindustantimes.com/ht-img/img/2025/03/19/550x309/Israel_Gaza_ground_op_1742398771755_1742398775125.jpg',
-                ),
+                image:
+                    article?.urlToImage != null
+                        ? CachedNetworkImageProvider(article!.urlToImage)
+                        : const AssetImage('assets/logos/noimage.png')
+                            as ImageProvider,
                 fit: BoxFit.cover,
               ),
             ),
@@ -202,19 +256,23 @@ class SidePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'News Headline Here',
+                  article?.title ?? 'Error Loading News!!',
                   style: TextStyle(
+                    color: const Color.fromARGB(221, 246, 246, 246),
                     fontWeight: FontWeight.bold,
                     fontSize: textScaler.scale(14),
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: screenSize.height * 0.003),
                 Text(
-                  'News description text goes here with 3-4 lines of sample text to fill up the space with some amazing and best use of AI ...',
+                  article?.description ??
+                      'News description text goes here with 3-4 lines of sample text...',
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: const Color.fromARGB(255, 166, 166, 166),
                     fontSize: textScaler.scale(12),
                   ),
                 ),
@@ -251,7 +309,7 @@ class SidePage extends StatelessWidget {
               color: Colors.white,
               fontSize: textScaler.scale(19),
               fontWeight: FontWeight.bold,
-              shadows: [
+              shadows: const [
                 Shadow(
                   blurRadius: 15,
                   color: Colors.black,
