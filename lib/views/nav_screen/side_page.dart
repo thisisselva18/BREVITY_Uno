@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:newsai/models/article_model.dart';
 import 'package:newsai/controller/services/news_services.dart';
 import 'package:newsai/models/news_category.dart';
+import 'package:newsai/views/common_widgets/common_appbar.dart';
 
 class SidePage extends StatefulWidget {
   const SidePage({super.key});
@@ -12,15 +13,47 @@ class SidePage extends StatefulWidget {
   State<SidePage> createState() => _SidePageState();
 }
 
-class _SidePageState extends State<SidePage> {
+class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
   final NewsService _newsService = NewsService();
   late Future<List<Article>> _topNewsFuture;
   final TextEditingController _searchController = TextEditingController();
+  late Animation<double> _animation;
+  late AnimationController _animationController;
+  late AnimationController _particleAnimationController;
 
   @override
   void initState() {
     super.initState();
     _topNewsFuture = _newsService.fetchGeneralNews(page: 1, pageSize: 3);
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+
+    _particleAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..repeat();
+
+    // Only forward the animation when the widget is actually mounted
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _animationController.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _particleAnimationController.dispose();
+    super.dispose();
   }
 
   void _handleSearch() {
@@ -31,10 +64,7 @@ class _SidePageState extends State<SidePage> {
       );
       return;
     }
-    context.pushNamed(
-      'searchResults',
-      queryParameters: {'query': query},
-    );
+    context.pushNamed('searchResults', queryParameters: {'query': query});
     _searchController.clear();
   }
 
@@ -55,205 +85,303 @@ class _SidePageState extends State<SidePage> {
         }
       },
       behavior: HitTestBehavior.opaque,
-      child: Scaffold(
-        backgroundColor: Colors.black45,
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(screenWidth * 0.04),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: screenHeight * 0.01),
-                Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: const Color.fromARGB(255, 207, 207, 207),
-                      radius: screenWidth * 0.05,
-                      child: IconButton(
-                        color: Colors.black,
-                        icon: Icon(Icons.person, size: screenWidth * 0.06),
-                        onPressed: () {},
-                      ),
-                    ),
-                    const Spacer(),
-                    TextButton.icon(
-                      onPressed: () {
-                        context.goNamed(
-                          'home',
-                          pathParameters: {'category': NewsCategory.general.index.toString()},
-                        );
-                      },
-                      icon: Text(
-                        'MY FEED',
-                        style: TextStyle(
-                          fontSize: textScaler.scale(14),
-                          fontWeight: FontWeight.bold,
-                          color: const Color.fromARGB(221, 249, 249, 249),
-                        ),
-                      ),
-                      label: Icon(
-                        Icons.arrow_forward,
-                        size: screenWidth * 0.05,
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: screenHeight * 0.025),
-                TextField(
-                  controller: _searchController,
-                  style: TextStyle(fontSize: textScaler.scale(16)),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: 'Search news topics...',
-                    hintStyle: TextStyle(fontSize: textScaler.scale(16)),
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: _handleSearch,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        screenWidth * 0.07,
-                      ),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 215, 214, 214),
-                  ),
-                
-                  onSubmitted: (_) => _handleSearch(),
-                ),
-
-                SizedBox(height: screenHeight * 0.01),
-
-                SizedBox(
-                  height: screenHeight * 0.15,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    children: [
-                      _buildMenuButton('My Feed', Icons.home, context, NewsCategory.general),
-                      _buildMenuButton(
-                        'Top Stories',
-                        Icons.trending_up,
-                        context,
-                        NewsCategory.general,
-                      ),
-                      _buildMenuButton('Bookmarks', Icons.bookmark, context, null),
-                      _buildMenuButton('Setting', Icons.settings, context, null),
-                      _buildMenuButton('Unread', Icons.markunread, context, null),
-                      _buildMenuButton('Unseen', Icons.visibility_off, context, null),
-                    ],
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.01),
-
-                Text(
-                  'TOP NEWS',
-                  style: TextStyle(
-                    color: const Color.fromARGB(221, 248, 248, 248),
-                    fontSize: textScaler.scale(18),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.01),
-                FutureBuilder<List<Article>>(
-                  future: _topNewsFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Column(
-                        children: List.generate(
-                          3,
-                          (index) => _buildNewsItem(context, null),
-                        ),
-                      );
-                    }
-                    if (snapshot.hasError) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: screenHeight * 0.02,
-                        ),
-                        child: Text(
-                          'Failed to load top news',
-                          style: TextStyle(
-                            fontSize: textScaler.scale(14),
-                            color: Colors.red,
-                          ),
-                        ),
-                      );
-                    }
-                    return Column(
-                      children:
-                          snapshot.data!
-                              .map(
-                                (article) => _buildNewsItem(context, article),
-                              )
-                              .toList(),
-                    );
-                  },
-                ),
-
-                SizedBox(height: screenHeight * 0.03),
-
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'TOPICS',
-                      style: TextStyle(
-                        color: const Color.fromARGB(221, 248, 248, 248),
-                        fontSize: textScaler.scale(18),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: screenHeight * 0.015,
-                      crossAxisSpacing: screenWidth * 0.001,
-                      childAspectRatio: 1.65,
-                      padding: EdgeInsets.zero,
+      child: AppScaffold(
+        //backgroundColor: Colors.black45,
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              backgroundColor: const Color.fromARGB(210, 0, 0, 0),
+              expandedHeight: 155,
+              pinned: true,
+              elevation: 0,
+              flexibleSpace: FlexibleSpaceBar(
+                background: ParticlesHeader(
+                  title: "",
+                  themeColor: Colors.blue,
+                  particleAnimation: _particleAnimationController,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildImageContainer(
-                          'Technology',
-                          'https://www.simplilearn.com/ice9/free_resources_article_thumb/Technology_Trends.jpg',
-                          context,
-                          NewsCategory.technology,
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: const Color.fromARGB(
+                                255,
+                                207,
+                                207,
+                                207,
+                              ),
+                              radius: screenWidth * 0.05,
+                              child: IconButton(
+                                color: Colors.black,
+                                icon: Icon(
+                                  Icons.person,
+                                  size: screenWidth * 0.06,
+                                ),
+                                onPressed: () {},
+                              ),
+                            ),
+                            const Spacer(),
+                            TextButton.icon(
+                              onPressed: () {
+                                context.goNamed(
+                                  'home',
+                                  pathParameters: {
+                                    'category':
+                                        NewsCategory.general.index.toString(),
+                                  },
+                                );
+                              },
+                              icon: Text(
+                                'MY FEED',
+                                style: TextStyle(
+                                  fontSize: textScaler.scale(14),
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color.fromARGB(
+                                    221,
+                                    249,
+                                    249,
+                                    249,
+                                  ),
+                                ),
+                              ),
+                              label: Icon(
+                                Icons.arrow_forward,
+                                size: screenWidth * 0.04,
+                              ),
+                            ),
+                          ],
                         ),
-                        _buildImageContainer(
-                          'Politics',
-                          'https://www.livemint.com/lm-img/img/2025/01/30/600x338/-FILES--US-President-Donald-Trump--L--shakes-hands_1738253783512_1738253792847.jpg',
-                          context,
-                          NewsCategory.politics,
-                        ),
-                        _buildImageContainer(
-                          'Sports',
-                          'https://student-cms.prd.timeshighereducation.com/sites/default/files/styles/default/public/different_sports.jpg?itok=CW5zK9vp',
-                          context,
-                          NewsCategory.sports,
-                        ),
-                        _buildImageContainer(
-                          'Entertainment',
-                          'https://www.jansatta.com/wp-content/uploads/2025/03/ENT-NEWS-LIVE-2.jpg?w=440',
-                          context,
-                          NewsCategory.entertainment,
+                        SizedBox(height: screenHeight * 0.03),
+                        TextField(
+                          controller: _searchController,
+                          style: TextStyle(fontSize: textScaler.scale(16)),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            hintText: 'Search news topics...',
+                            hintStyle: TextStyle(
+                              fontSize: textScaler.scale(16),
+                            ),
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.search),
+                              onPressed: _handleSearch,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(
+                                screenWidth * 0.07,
+                              ),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            fillColor: const Color.fromARGB(255, 215, 214, 214),
+                          ),
+                          onSubmitted: (_) => _handleSearch(),
                         ),
                       ],
                     ),
-                    SizedBox(height: screenHeight * 0.02),
-                  ],
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
+            SliverList(
+              delegate: SliverChildListDelegate([
+                FadeTransition(
+                  opacity: _animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.1),
+                      end: Offset.zero,
+                    ).animate(_animation),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        MediaQuery.of(context).size.width * 0.05,
+                        6,
+                        MediaQuery.of(context).size.width * 0.05,
+                        20,
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: screenHeight * 0.15,
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              children: [
+                                _buildMenuButton(
+                                  'My Feed',
+                                  Icons.home,
+                                  context,
+                                  NewsCategory.general,
+                                ),
+                                _buildMenuButton(
+                                  'Top Stories',
+                                  Icons.trending_up,
+                                  context,
+                                  NewsCategory.general,
+                                ),
+                                _buildMenuButton(
+                                  'Bookmarks',
+                                  Icons.bookmark,
+                                  context,
+                                  null,
+                                ),
+                                _buildMenuButton(
+                                  'Setting',
+                                  Icons.settings,
+                                  context,
+                                  null,
+                                ),
+                                _buildMenuButton(
+                                  'Unseen',
+                                  Icons.visibility_off,
+                                  context,
+                                  null,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              'TOP NEWS',
+                              style: TextStyle(
+                                color: const Color.fromARGB(221, 248, 248, 248),
+                                fontSize: textScaler.scale(18),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: screenHeight * 0.01),
+                          FutureBuilder<List<Article>>(
+                            future: _topNewsFuture,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Column(
+                                  children: List.generate(
+                                    3,
+                                    (index) => _buildNewsItem(context, null),
+                                  ),
+                                );
+                              }
+                              if (snapshot.hasError) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: screenHeight * 0.02,
+                                  ),
+                                  child: Text(
+                                    'Failed to load top news',
+                                    style: TextStyle(
+                                      fontSize: textScaler.scale(14),
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                );
+                              }
+                              return Column(
+                                children:
+                                    snapshot.data!
+                                        .map(
+                                          (article) =>
+                                              _buildNewsItem(context, article),
+                                        )
+                                        .toList(),
+                              );
+                            },
+                          ),
+
+                          SizedBox(height: screenHeight * 0.03),
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'TOPICS',
+                                style: TextStyle(
+                                  letterSpacing: 1.05,
+                                  color: const Color.fromARGB(
+                                    221,
+                                    248,
+                                    248,
+                                    248,
+                                  ),
+                                  fontSize: textScaler.scale(18),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: screenHeight * 0.02),
+                              GridView.count(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisCount: 2,
+                                mainAxisSpacing: screenHeight * 0.015,
+                                crossAxisSpacing: screenWidth * 0.001,
+                                childAspectRatio: 1.65,
+                                padding: EdgeInsets.zero,
+                                children: [
+                                  _buildImageContainer(
+                                    'Technology',
+                                    'https://i.pinimg.com/736x/6b/8e/97/6b8e974572105a1e4096c1a8e2b6a7bc.jpg',
+                                    context,
+                                    NewsCategory.technology,
+                                  ),
+                                  _buildImageContainer(
+                                    'Politics',
+                                    'https://i.pinimg.com/736x/f2/c0/9c/f2c09c8daf5c64c92ea5738507f4ed26.jpg',
+                                    context,
+                                    NewsCategory.politics,
+                                  ),
+                                  _buildImageContainer(
+                                    'Sports',
+                                    'https://i.pinimg.com/736x/fe/67/49/fe674914b51da2170019d092e19f5440.jpg',
+                                    context,
+                                    NewsCategory.sports,
+                                  ),
+                                  _buildImageContainer(
+                                    'Entertainment',
+                                    'https://i.pinimg.com/736x/c1/f6/52/c1f6526d8499d10a45e27cee47281996.jpg',
+                                    context,
+                                    NewsCategory.entertainment,
+                                  ),
+                                  _buildImageContainer(
+                                    'Health',
+                                    'https://i.pinimg.com/736x/3d/42/04/3d42045f076135a461c62e1949a35099.jpg',
+                                    context,
+                                    NewsCategory.health,
+                                  ),
+                                  _buildImageContainer(
+                                    'Business',
+                                    'https://i.pinimg.com/736x/1c/4e/89/1c4e8918b36ea9a6e54eab713f630689.jpg',
+                                    context,
+                                    NewsCategory.business,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: screenHeight * 0.02),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildMenuButton(String text, IconData icon, BuildContext context, NewsCategory? category) {
+  Widget _buildMenuButton(
+    String text,
+    IconData icon,
+    BuildContext context,
+    NewsCategory? category,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final textScaler = MediaQuery.textScalerOf(context);
 
@@ -277,14 +405,14 @@ class _SidePageState extends State<SidePage> {
           children: [
             Icon(
               icon,
-              size: screenWidth * 0.11,
+              size: screenWidth * 0.12,
               color: const Color.fromARGB(255, 20, 116, 195),
             ),
             SizedBox(height: screenWidth * 0.02),
             Text(
               text,
               style: TextStyle(
-                fontSize: textScaler.scale(12),
+                fontSize: textScaler.scale(13),
                 fontWeight: FontWeight.w600,
                 color: const Color.fromARGB(221, 246, 246, 246),
               ),
@@ -360,12 +488,11 @@ class _SidePageState extends State<SidePage> {
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final textScaler = MediaQuery.textScalerOf(context);
-    
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.013),
       child: GestureDetector(
         onTap: () {
-          // Navigate to home with the selected category
           context.goNamed(
             'home',
             pathParameters: {'category': category.index.toString()},

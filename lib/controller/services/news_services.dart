@@ -67,15 +67,6 @@ class NewsService {
   return _handleResponse(response);
   }
 
-  // Fetch news from a specific source
-  Future<List<Article>> fetchNewsFromSource(String sourceId, {int page = 1, int pageSize = 10}) async {
-  final response = await http.get(
-    Uri.parse('$_topHeadlinesUrl?sources=$sourceId&page=$page&pageSize=$pageSize&apiKey=$_apiKey')
-  );
-  return _handleResponse(response);
-  }
-
-
   Future<List<Article>> _fetchNewsByCategory(String category, {int page = 1, int pageSize = 10}) async {
     final response = await http.get(
       Uri.parse('$_topHeadlinesUrl?country=us&category=$category&page=$page&pageSize=$pageSize&apiKey=$_apiKey')
