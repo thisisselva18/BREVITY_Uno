@@ -78,7 +78,13 @@ class _SidePageState extends State<SidePage> {
                     ),
                     const Spacer(),
                     TextButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        // Navigate to home with general category when MY FEED is pressed
+                        context.goNamed(
+                          'home',
+                          pathParameters: {'category': NewsCategory.general.index.toString()},
+                        );
+                      },
                       icon: Text(
                         'MY FEED',
                         style: TextStyle(
@@ -128,16 +134,17 @@ class _SidePageState extends State<SidePage> {
                     scrollDirection: Axis.horizontal,
                     shrinkWrap: true,
                     children: [
-                      _buildMenuButton('My Feed', Icons.home, context),
+                      _buildMenuButton('My Feed', Icons.home, context, NewsCategory.general),
                       _buildMenuButton(
                         'Top Stories',
                         Icons.trending_up,
                         context,
+                        NewsCategory.general,
                       ),
-                      _buildMenuButton('Bookmarks', Icons.bookmark, context),
-                      _buildMenuButton('Setting', Icons.settings, context),
-                      _buildMenuButton('Unread', Icons.markunread, context),
-                      _buildMenuButton('Unseen', Icons.visibility_off, context),
+                      _buildMenuButton('Bookmarks', Icons.bookmark, context, null),
+                      _buildMenuButton('Setting', Icons.settings, context, null),
+                      _buildMenuButton('Unread', Icons.markunread, context, null),
+                      _buildMenuButton('Unseen', Icons.visibility_off, context, null),
                     ],
                   ),
                 ),
@@ -215,21 +222,25 @@ class _SidePageState extends State<SidePage> {
                           'Technology',
                           'https://www.simplilearn.com/ice9/free_resources_article_thumb/Technology_Trends.jpg',
                           context,
+                          NewsCategory.technology,
                         ),
                         _buildImageContainer(
                           'Politics',
                           'https://www.livemint.com/lm-img/img/2025/01/30/600x338/-FILES--US-President-Donald-Trump--L--shakes-hands_1738253783512_1738253792847.jpg',
                           context,
+                          NewsCategory.politics,
                         ),
                         _buildImageContainer(
                           'Sports',
                           'https://student-cms.prd.timeshighereducation.com/sites/default/files/styles/default/public/different_sports.jpg?itok=CW5zK9vp',
                           context,
+                          NewsCategory.sports,
                         ),
                         _buildImageContainer(
                           'Entertainment',
                           'https://www.jansatta.com/wp-content/uploads/2025/03/ENT-NEWS-LIVE-2.jpg?w=440',
                           context,
+                          NewsCategory.entertainment,
                         ),
                       ],
                     ),
@@ -244,30 +255,45 @@ class _SidePageState extends State<SidePage> {
     );
   }
 
-  Widget _buildMenuButton(String text, IconData icon, BuildContext context) {
+  Widget _buildMenuButton(String text, IconData icon, BuildContext context, NewsCategory? category) {
     final screenWidth = MediaQuery.of(context).size.width;
     final textScaler = MediaQuery.textScalerOf(context);
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            size: screenWidth * 0.11,
-            color: const Color.fromARGB(255, 20, 116, 195),
-          ),
-          SizedBox(height: screenWidth * 0.02),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: textScaler.scale(12),
-              fontWeight: FontWeight.w600,
-              color: const Color.fromARGB(221, 246, 246, 246),
+      child: InkWell(
+        onTap: () {
+          if (category != null) {
+            // Navigate to home with selected category
+            context.goNamed(
+              'home',
+              pathParameters: {'category': category.index.toString()},
+            );
+          } else if (text == 'Bookmarks') {
+            // Navigate to bookmarks screen as a nested route of sidepage
+            context.go('/sidepage/bookmark');
+          }
+          // For other buttons without navigation yet, do nothing
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: screenWidth * 0.11,
+              color: const Color.fromARGB(255, 20, 116, 195),
             ),
-          ),
-        ],
+            SizedBox(height: screenWidth * 0.02),
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: textScaler.scale(12),
+                fontWeight: FontWeight.w600,
+                color: const Color.fromARGB(221, 246, 246, 246),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -333,34 +359,45 @@ class _SidePageState extends State<SidePage> {
     String text,
     String imageUrl,
     BuildContext context,
+    NewsCategory category,
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final textScaler = MediaQuery.textScalerOf(context);
+    
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.013),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(screenWidth * 0.03),
-          image: DecorationImage(
-            image: NetworkImage(imageUrl),
-            fit: BoxFit.cover,
+      child: GestureDetector(
+        onTap: () {
+          // Navigate to home with the selected category
+          context.goNamed(
+            'home',
+            pathParameters: {'category': category.index.toString()},
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(screenWidth * 0.03),
+            image: DecorationImage(
+              image: NetworkImage(imageUrl),
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        child: Center(
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: textScaler.scale(19),
-              fontWeight: FontWeight.bold,
-              shadows: const [
-                Shadow(
-                  blurRadius: 15,
-                  color: Colors.black,
-                  offset: Offset(2, 2),
-                ),
-              ],
+          child: Center(
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: textScaler.scale(19),
+                fontWeight: FontWeight.bold,
+                shadows: const [
+                  Shadow(
+                    blurRadius: 15,
+                    color: Colors.black,
+                    offset: Offset(2, 2),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -55,7 +55,7 @@ final _routes = GoRouter(
               secondaryAnimation,
               child,
             ) {
-              const begin = Offset(-1.0, 0.0); // Changed from (1.0, 0.0)
+              const begin = Offset(-1.0, 0.0);
               const end = Offset.zero;
               const curve = Curves.easeInOut;
               return SlideTransition(
@@ -68,6 +68,45 @@ final _routes = GoRouter(
             },
             transitionDuration: const Duration(milliseconds: 225),
           ),
+      routes: [
+        // Nested route for bookmark inside sidepage
+        GoRoute(
+          path: 'bookmark',
+          name: 'bookmark',
+          pageBuilder:
+              (context, state) => CustomTransitionPage(
+                key: state.pageKey,
+                child: const BookmarkScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  return SlideTransition(
+                    position: Tween(
+                      begin: begin,
+                      end: end,
+                    ).chain(CurveTween(curve: curve)).animate(animation),
+                    child: child,
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 225),
+              ),
+        ),
+        GoRoute(
+          path: '/searchResults',
+          name: 'searchResults',
+          builder: (context, state) {
+            return SearchResultsScreen(
+              query: state.uri.queryParameters['query']!,
+            );
+          },
+        ),
+      ],
     ),
     GoRoute(
       path: '/home/:category',
@@ -80,7 +119,7 @@ final _routes = GoRouter(
           key: state.pageKey,
           child: HomeScreen(category: category),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const begin = Offset(1.0, 0.0); // Changed from (-1.0, 0.0)
+            const begin = Offset(1.0, 0.0);
             const end = Offset.zero;
             const curve = Curves.easeInOut;
             return SlideTransition(
@@ -102,15 +141,6 @@ final _routes = GoRouter(
         return const BookmarkScreen();
       },
     ),
-    GoRoute(
-      path: '/searchResults',
-      name: 'searchResults',
-      builder: (context, state) {
-        return SearchResultsScreen(
-          query: state.uri.queryParameters['query']!,
-        );
-      },
-    ),
   ],
 );
 
@@ -120,7 +150,7 @@ void main() async {
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   final bookmarkRepository = BookmarkServices();
-  final newsService = NewsService(); // Create NewsService instance
+  final newsService = NewsService();
   await bookmarkRepository.initialize();
 
   SystemChrome.setPreferredOrientations([
@@ -132,9 +162,7 @@ void main() async {
   runApp(
     MultiRepositoryProvider(
       providers: [
-        RepositoryProvider.value(
-          value: newsService,
-        ), // Add NewsService as a repository
+        RepositoryProvider.value(value: newsService),
         RepositoryProvider.value(value: bookmarkRepository),
       ],
       child: MultiBlocProvider(
