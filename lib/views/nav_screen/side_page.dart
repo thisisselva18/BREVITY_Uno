@@ -247,8 +247,8 @@ class _SidePageState extends State<SidePage> {
               pathParameters: {'category': category.index.toString()},
             );
           } else if (text == 'Bookmarks') {
-            // Navigate to bookmarks screen if implemented
-            context.goNamed('bookmark');
+            // Navigate to bookmarks screen as a nested route of sidepage
+            context.go('/sidepage/bookmark');
           }
           // For other buttons without navigation yet, do nothing
         },
