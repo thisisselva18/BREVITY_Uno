@@ -20,7 +20,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _routes = GoRouter(
-  initialLocation: '/sidepage',
+  initialLocation: '/home/0',
   routes: [
     GoRoute(
       path: '/splash',
