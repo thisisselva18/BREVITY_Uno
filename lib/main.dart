@@ -44,38 +44,17 @@ final _routes = GoRouter(
     GoRoute(
       path: '/sidepage',
       name: 'sidepage',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const SidePage(),
-        transitionsBuilder: (
-          context,
-          animation,
-          secondaryAnimation,
-          child,
-        ) {
-          const begin = Offset(-1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.easeInOut;
-          return SlideTransition(
-            position: Tween(
-              begin: begin,
-              end: end,
-            ).chain(CurveTween(curve: curve)).animate(animation),
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 225),
-      ),
-      routes: [
-        // Nested route for bookmark inside sidepage
-        GoRoute(
-          path: 'bookmark',
-          name: 'bookmark',
-          pageBuilder: (context, state) => CustomTransitionPage(
+      pageBuilder:
+          (context, state) => CustomTransitionPage(
             key: state.pageKey,
-            child: const BookmarkScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              const begin = Offset(1.0, 0.0);
+            child: const SidePage(),
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              const begin = Offset(-1.0, 0.0);
               const end = Offset.zero;
               const curve = Curves.easeInOut;
               return SlideTransition(
@@ -88,6 +67,40 @@ final _routes = GoRouter(
             },
             transitionDuration: const Duration(milliseconds: 225),
           ),
+      routes: [
+        // Nested route for bookmark inside sidepage
+        GoRoute(
+          path: 'bookmark',
+          name: 'bookmark',
+          pageBuilder:
+              (context, state) => CustomTransitionPage(
+                key: state.pageKey,
+                child: const BookmarkScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  // Combine scale and fade animations
+                  return Align(
+                    alignment: Alignment.center,
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: ScaleTransition(
+                        scale: animation.drive(
+                          Tween<double>(
+                            begin: 0.0,
+                            end: 1.0,
+                          ).chain(CurveTween(curve: Curves.easeInOutQuad)),
+                        ),
+                        child: child,
+                      ),
+                    ),
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 225),
+              ),
         ),
       ],
     ),
@@ -139,9 +152,7 @@ void main() async {
   runApp(
     MultiRepositoryProvider(
       providers: [
-        RepositoryProvider.value(
-          value: newsService,
-        ),
+        RepositoryProvider.value(value: newsService),
         RepositoryProvider.value(value: bookmarkRepository),
       ],
       child: MultiBlocProvider(
