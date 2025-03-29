@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'package:newsai/firebase_options.dart';
 import 'package:newsai/views/inner_screens/search_result.dart';
+import 'package:newsai/views/inner_screens/settings.dart';
 import 'package:newsai/views/intro_screen/intro_screen.dart';
 import 'package:newsai/views/inner_screens/bookmark.dart';
 import 'package:newsai/views/nav_screen/home.dart';
@@ -110,6 +111,14 @@ final _routes = GoRouter(
                 query:
                     state.uri.queryParameters['query']!, // Only query parameter
               ),
+        ),
+        GoRoute(
+          path: '/settings',
+          name: 'settings',
+          builder:
+              (context, state){
+                return const SettingsScreen();
+              },
         ),
       ],
     ),

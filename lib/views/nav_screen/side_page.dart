@@ -78,7 +78,6 @@ class _SidePageState extends State<SidePage> {
                     const Spacer(),
                     TextButton.icon(
                       onPressed: () {
-                        // Navigate to home with general category when MY FEED is pressed
                         context.goNamed(
                           'home',
                           pathParameters: {'category': NewsCategory.general.index.toString()},
@@ -263,16 +262,15 @@ class _SidePageState extends State<SidePage> {
       child: InkWell(
         onTap: () {
           if (category != null) {
-            // Navigate to home with selected category
             context.goNamed(
               'home',
               pathParameters: {'category': category.index.toString()},
             );
           } else if (text == 'Bookmarks') {
-            // Navigate to bookmarks screen as a nested route of sidepage
             context.go('/sidepage/bookmark');
+          } else if (text == 'Setting') {
+            context.go('/sidepage/settings');
           }
-          // For other buttons without navigation yet, do nothing
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
