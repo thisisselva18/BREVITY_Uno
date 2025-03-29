@@ -82,15 +82,21 @@ final _routes = GoRouter(
                   secondaryAnimation,
                   child,
                 ) {
-                  const begin = Offset(1.0, 0.0);
-                  const end = Offset.zero;
-                  const curve = Curves.easeInOut;
-                  return SlideTransition(
-                    position: Tween(
-                      begin: begin,
-                      end: end,
-                    ).chain(CurveTween(curve: curve)).animate(animation),
-                    child: child,
+                  // Combine scale and fade animations
+                  return Align(
+                    alignment: Alignment.center,
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: ScaleTransition(
+                        scale: animation.drive(
+                          Tween<double>(
+                            begin: 0.0,
+                            end: 1.0,
+                          ).chain(CurveTween(curve: Curves.easeInOutQuad)),
+                        ),
+                        child: child,
+                      ),
+                    ),
                   );
                 },
                 transitionDuration: const Duration(milliseconds: 225),
@@ -99,11 +105,11 @@ final _routes = GoRouter(
         GoRoute(
           path: '/searchResults',
           name: 'searchResults',
-          builder: (context, state) {
-            return SearchResultsScreen(
-              query: state.uri.queryParameters['query']!,
-            );
-          },
+          builder:
+              (context, state) => SearchResultsScreen(
+                query:
+                    state.uri.queryParameters['query']!, // Only query parameter
+              ),
         ),
       ],
     ),

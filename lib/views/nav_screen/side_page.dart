@@ -31,7 +31,6 @@ class _SidePageState extends State<SidePage> {
       );
       return;
     }
-
     context.pushNamed(
       'searchResults',
       queryParameters: {'query': query},
