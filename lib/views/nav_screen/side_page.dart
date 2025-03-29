@@ -15,11 +15,28 @@ class SidePage extends StatefulWidget {
 class _SidePageState extends State<SidePage> {
   final NewsService _newsService = NewsService();
   late Future<List<Article>> _topNewsFuture;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _topNewsFuture = _newsService.fetchGeneralNews(page: 1, pageSize: 3);
+  }
+
+  void _handleSearch() {
+    final query = _searchController.text.trim();
+    if (query.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a search query')),
+      );
+      return;
+    }
+
+    context.pushNamed(
+      'searchResults',
+      queryParameters: {'query': query},
+    );
+    _searchController.clear();
   }
 
   @override
@@ -31,7 +48,6 @@ class _SidePageState extends State<SidePage> {
 
     return GestureDetector(
       onHorizontalDragEnd: (details) {
-        // Left to right swipe (return to Home)
         if (details.primaryVelocity! < -5) {
           context.goNamed(
             'home',
@@ -41,7 +57,6 @@ class _SidePageState extends State<SidePage> {
       },
       behavior: HitTestBehavior.opaque,
       child: Scaffold(
-        //backgroundColor: const Color.fromARGB(255, 236, 236, 236),
         backgroundColor: Colors.black45,
         body: SingleChildScrollView(
           child: Padding(
@@ -81,21 +96,28 @@ class _SidePageState extends State<SidePage> {
                 ),
 
                 SizedBox(height: screenHeight * 0.025),
-
                 TextField(
+                  controller: _searchController,
                   style: TextStyle(fontSize: textScaler.scale(16)),
                   decoration: InputDecoration(
                     isDense: true,
-                    hintText: 'Search...',
+                    hintText: 'Search news topics...',
                     hintStyle: TextStyle(fontSize: textScaler.scale(16)),
-                    prefixIcon: Icon(Icons.search, size: screenWidth * 0.06),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: _handleSearch,
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(screenWidth * 0.07),
+                      borderRadius: BorderRadius.circular(
+                        screenWidth * 0.07,
+                      ),
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
                     fillColor: const Color.fromARGB(255, 215, 214, 214),
                   ),
+                
+                  onSubmitted: (_) => _handleSearch(),
                 ),
 
                 SizedBox(height: screenHeight * 0.01),

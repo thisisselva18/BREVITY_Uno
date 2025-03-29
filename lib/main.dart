@@ -6,6 +6,7 @@ import 'package:newsai/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:newsai/firebase_options.dart';
+import 'package:newsai/views/inner_screens/search_result.dart';
 import 'package:newsai/views/intro_screen/intro_screen.dart';
 import 'package:newsai/views/inner_screens/bookmark.dart';
 import 'package:newsai/views/nav_screen/home.dart';
@@ -18,7 +19,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _routes = GoRouter(
-  initialLocation: '/home/0', // Change initial route to home
+  initialLocation: '/sidepage', // Change initial route to home
   routes: [
     GoRoute(
       path: '/splash',
@@ -99,6 +100,15 @@ final _routes = GoRouter(
       name: 'bookmark',
       builder: (context, state) {
         return const BookmarkScreen();
+      },
+    ),
+    GoRoute(
+      path: '/searchResults',
+      name: 'searchResults',
+      builder: (context, state) {
+        return SearchResultsScreen(
+          query: state.uri.queryParameters['query']!,
+        );
       },
     ),
   ],
