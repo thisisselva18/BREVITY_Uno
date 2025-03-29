@@ -29,21 +29,66 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black45,
       appBar: AppBar(
-        title: Text('Results for "${widget.query}"'),
+        backgroundColor: const Color(0xFF222222),
+        title: Text(
+          'Results for "${widget.query}"',
+          style: const TextStyle(color: Color.fromARGB(221, 249, 249, 249)),
+        ),
+        iconTheme: const IconThemeData(color: Color.fromARGB(221, 249, 249, 249)),
       ),
       body: FutureBuilder<List<Article>>(
         future: _searchResults,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.blue),
+            );
           }
           
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+              child: Text(
+                'Error: ${snapshot.error}',
+                style: const TextStyle(
+                  color: Colors.redAccent,
+                  fontSize: 16,
+                ),
+              ),
+            );
           }
 
           final results = snapshot.data ?? [];
+          
+          if (results.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.search_off, size: 70, color: Colors.grey[500]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No results found for "${widget.query}"',
+                    style: TextStyle(
+                      color: Colors.grey[300],
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Try a different search term',
+                    style: TextStyle(
+                      color: Colors.grey[400],
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
 
           return ListView.separated(
             padding: const EdgeInsets.all(16),
@@ -69,9 +114,17 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         await launchUrl(Uri.parse(url));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to open article: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: const Color(0xFF333333),
+            content: Text(
+              'Failed to open article: $e',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      }
     }
   }
 }
