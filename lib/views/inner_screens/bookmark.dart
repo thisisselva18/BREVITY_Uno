@@ -32,9 +32,15 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black45,
       appBar: AppBar(
-        title: const Text('Bookmarks'),
+        backgroundColor: const Color(0xFF222222),
+        title: const Text(
+          'Bookmarks',
+          style: TextStyle(color: Color.fromARGB(221, 249, 249, 249)),
+        ),
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Color.fromARGB(221, 249, 249, 249)),
       ),
       body: BlocBuilder<BookmarkBloc, BookmarkState>(
         builder: (context, state) {
@@ -43,7 +49,9 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                 ? _buildEmptyState()
                 : _buildBookmarksList(state.bookmarks);
           }
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.blue),
+          );
         },
       ),
     );
@@ -54,13 +62,13 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.bookmark_border, size: 100, color: Colors.grey[400]),
+          Icon(Icons.bookmark_border, size: 100, color: Colors.grey[500]),
           const SizedBox(height: 20),
           Text(
             'No Bookmarks Yet',
             style: TextStyle(
               fontSize: 22,
-              color: Colors.grey[600],
+              color: Colors.grey[300],
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -69,7 +77,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
             'Save articles to read later',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey[500],
+              color: Colors.grey[400],
             ),
           ),
         ],
@@ -111,11 +119,11 @@ class _BookmarkItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF2A2A2A),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.black.withOpacity(0.3),
               spreadRadius: 2,
               blurRadius: 5,
               offset: const Offset(0, 3),
@@ -134,10 +142,10 @@ class _BookmarkItem extends StatelessWidget {
                 width: 120,
                 height: 120,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => Container(color: Colors.grey[200]),
+                placeholder: (context, url) => Container(color: Colors.grey[800]),
                 errorWidget: (context, url, error) => Container(
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.broken_image, color: Colors.white),
+                  color: Colors.grey[700],
+                  child: const Icon(Icons.broken_image, color: Colors.grey),
                 ),
               ),
             ),
@@ -150,7 +158,7 @@ class _BookmarkItem extends StatelessWidget {
                     Text(
                       article.sourceName.toUpperCase(),
                       style: TextStyle(
-                        color: Colors.blue[700],
+                        color: Colors.blue[400],
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -163,13 +171,14 @@ class _BookmarkItem extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
+                        color: Color.fromARGB(221, 249, 249, 249),
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       DateFormat('MMM dd, y • h:mm a').format(article.publishedAt),
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: Colors.grey[400],
                         fontSize: 12,
                       ),
                     ),
@@ -178,7 +187,7 @@ class _BookmarkItem extends StatelessWidget {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
               onPressed: onRemove,
             ),
           ],
