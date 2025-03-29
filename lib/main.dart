@@ -19,7 +19,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _routes = GoRouter(
-  initialLocation: '/sidepage', // Change initial route to home
+  initialLocation: '/sidepage',
   routes: [
     GoRoute(
       path: '/splash',
@@ -69,7 +69,6 @@ final _routes = GoRouter(
             transitionDuration: const Duration(milliseconds: 225),
           ),
       routes: [
-        // Nested route for bookmark inside sidepage
         GoRoute(
           path: 'bookmark',
           name: 'bookmark',
@@ -132,13 +131,6 @@ final _routes = GoRouter(
           },
           transitionDuration: const Duration(milliseconds: 225),
         );
-      },
-    ),
-    GoRoute(
-      path: '/bookmark',
-      name: 'bookmark',
-      builder: (context, state) {
-        return const BookmarkScreen();
       },
     ),
   ],
