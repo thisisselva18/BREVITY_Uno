@@ -88,7 +88,7 @@ class _HomeScreenContent extends StatelessWidget {
                   context.goNamed('sidepage');
                 }
 
-                if (details.primaryVelocity! < 0) {
+                if (details.primaryVelocity! < -5) {
                   _launchArticleUrl(article.url, context);
                 }
               },
