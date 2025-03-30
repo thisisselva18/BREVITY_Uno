@@ -46,14 +46,19 @@ class _SignupScreenState extends State<SignupScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2D5E), Color(0xFF00F5D4)],
+          colors: [
+           Color.fromARGB(255, 4, 16, 54),
+            Color.fromARGB(255, 20, 25, 78),
+            Color.fromARGB(255, 27, 52, 105),
+          ],
+          stops: [0.0, 0.5, 1.0],
         ),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
             child: Form(
               key: _formKey,
               child: Column(
@@ -70,7 +75,10 @@ class _SignupScreenState extends State<SignupScreen> {
                   ShaderMask(
                     shaderCallback:
                         (bounds) => const LinearGradient(
-                          colors: [Color(0xFF00F5D4), Colors.white],
+                          colors: [
+                            Color.fromARGB(255, 26, 167, 255),
+                            Colors.white,
+                          ],
                         ).createShader(bounds),
                     child: const Text(
                       'Create Account',
@@ -221,7 +229,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00F5D4).withAlpha(226),
+                      backgroundColor: Color.fromARGB(
+                        255,
+                        9,
+                        121,
+                        232,
+                      ).withAlpha(225),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -250,7 +263,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF00F5D4)),
+                      side: const BorderSide(
+                        color: Color.fromARGB(255, 26, 167, 255),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -275,7 +290,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           TextSpan(
                             text: 'Login',
                             style: TextStyle(
-                              color: Color(0xFF00F5D4),
+                              color: Color.fromARGB(255, 26, 167, 255),
                               fontWeight: FontWeight.bold,
                             ),
                           ),

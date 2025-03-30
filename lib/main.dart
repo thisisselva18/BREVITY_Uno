@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:newsai/models/news_category.dart';
 import 'package:newsai/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Add this import for Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:newsai/firebase_options.dart';
 import 'package:newsai/views/inner_screens/profile.dart';
@@ -21,9 +21,7 @@ import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newsai/controller/services/firestore_service.dart';
-import 'package:newsai/models/user_model.dart';
 import 'package:newsai/controller/cubit/user_profile/user_profile_cubit.dart';
-import 'package:newsai/controller/cubit/user_profile/user_profile_state.dart';
 
 // Create a class to manage authentication state
 class AuthService {

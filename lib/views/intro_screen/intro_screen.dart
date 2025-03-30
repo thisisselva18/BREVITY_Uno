@@ -138,7 +138,12 @@ class _IntroductionScreenState extends State<IntroductionScreen>
                         onPressed: _navigateToHome,
                         child: const Text(
                           'Skip',
-                          style: TextStyle(color: Colors.white70),
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.1,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ],
@@ -149,7 +154,7 @@ class _IntroductionScreenState extends State<IntroductionScreen>
                 _PageIndicator(
                   pageCount: _pages.length,
                   currentPage: _currentPage,
-                  color: Colors.tealAccent,
+                  color: const Color.fromARGB(255, 5, 118, 218),
                 ),
 
                 // Content area
@@ -215,7 +220,7 @@ class _BackgroundImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedOpacity(
       opacity: isActive ? 1 : 0,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 500),
       child: Stack(
         fit: StackFit.expand, // This ensures the stack fills its parent
         children: [
@@ -238,9 +243,9 @@ class _BackgroundImage extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  color.withOpacity(0.9),
+                  color.withAlpha(225),
                   Colors.transparent,
-                  color.withOpacity(0.9),
+                  color.withAlpha(225),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -310,7 +315,7 @@ class _PageContent extends StatelessWidget {
                   page.description,
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withAlpha(225),
                     height: 1.4,
                     fontFamily: 'Helvetica',
                   ),
@@ -371,8 +376,7 @@ class _PageIndicator extends StatelessWidget {
             width: currentPage == index ? 24 : 8,
             height: 4,
             decoration: BoxDecoration(
-              color:
-                  currentPage == index ? color : Colors.white.withOpacity(0.3),
+              color: currentPage == index ? color : Colors.white.withAlpha(75),
               borderRadius: BorderRadius.circular(2),
             ),
           );
@@ -398,7 +402,10 @@ class _SimplerButton extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
           gradient: const LinearGradient(
-            colors: [Colors.tealAccent, Color(0xFF64FCD9)],
+            colors: [
+              Color.fromARGB(255, 35, 137, 246),
+              Color.fromARGB(255, 24, 109, 236),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

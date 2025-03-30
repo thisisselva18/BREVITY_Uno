@@ -23,7 +23,12 @@ class _LoginScreenState extends State<LoginScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2D5E), Color(0xFF00F5D4)],
+          colors: [
+            Color.fromARGB(255, 4, 16, 54),
+            Color.fromARGB(255, 20, 25, 78),
+            Color.fromARGB(255, 27, 52, 105),
+          ],
+          stops: [0.0, 0.5, 1.0],
         ),
       ),
       child: Scaffold(
@@ -45,7 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ShaderMask(
                     shaderCallback:
                         (bounds) => const LinearGradient(
-                          colors: [Color(0xFF00F5D4), Colors.white],
+                          colors: [
+                            Color.fromARGB(255, 26, 175, 255),
+                            Colors.white,
+                          ],
                         ).createShader(bounds),
                     child: const Text(
                       'Welcome Back!',
@@ -150,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'Forgot Password?',
                         style: TextStyle(
-                          color: Color(0xFF00F5D4),
+                          color: Color.fromARGB(255, 26, 167, 255),
                           fontFamily: 'Poppins',
                         ),
                       ),
@@ -161,17 +169,24 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Login Button
                   ElevatedButton(
                     onPressed: () {
+                      
                       if (_formKey.currentState!.validate()) {
                         // Handle login
+                        FocusScope.of(context).unfocus();
                         AuthService().loginWithEmail(
                           email: _emailController.text,
                           password: _passwordController.text,
                         );
-                        context.go('/home');
+                        context.go('/home/0');
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00F5D4).withAlpha(225),
+                      backgroundColor: Color.fromARGB(
+                        255,
+                        9,
+                        121,
+                        232,
+                      ).withAlpha(225),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -199,15 +214,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF00F5D4)),
+                      side: const BorderSide(
+                        color: Color.fromARGB(255, 26, 175, 255),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                       minimumSize: const Size(double.infinity, 50),
                     ),
-                    onPressed: () {
-
-                    },
+                    onPressed: () {},
                   ),
                   const SizedBox(height: 20),
 
@@ -226,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextSpan(
                             text: 'Sign Up',
                             style: TextStyle(
-                              color: Color(0xFF00F5D4),
+                              color: Color.fromARGB(255, 26, 175, 255),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -249,7 +264,7 @@ class CircuitPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint =
         Paint()
-          ..color = const Color(0xFF00F5D4)
+          ..color = Color.fromARGB(255, 26, 175, 255)
           ..strokeWidth = 1.5
           ..style = PaintingStyle.stroke;
 
