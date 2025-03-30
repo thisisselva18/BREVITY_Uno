@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:newsai/controller/services/auth_service.dart';
@@ -363,7 +363,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           SliverAppBar(
             backgroundColor: const Color.fromARGB(210, 0, 0, 0),
             expandedHeight: 220,
-            pinned: true,
+            //pinned: true,
             elevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, size: 20),

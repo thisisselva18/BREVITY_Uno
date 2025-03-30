@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:newsai/models/news_category.dart';
 import 'package:newsai/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Add this import for Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:newsai/firebase_options.dart';
 import 'package:newsai/views/inner_screens/profile.dart';
@@ -44,7 +44,7 @@ class AuthNotifier extends ChangeNotifier {
 final _authNotifier = AuthNotifier();
 final _routes = GoRouter(
   refreshListenable: _authNotifier,
-  initialLocation: '/splash',
+  initialLocation: '/intro',
   routes: [
     GoRoute(
       path: '/splash',

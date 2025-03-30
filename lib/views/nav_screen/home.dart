@@ -43,9 +43,15 @@ class _HomeScreenContent extends StatelessWidget {
   final NewsCategory category;
   const _HomeScreenContent({this.category = NewsCategory.general});
 
+  String _getCategoryName(NewsCategory category) {
+    final String name = category.toString().split('.').last;
+    return name[0].toUpperCase() + name.substring(1);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 24, 24, 24),
       body: BlocBuilder<NewsBloc, NewsState>(
         buildWhen: (previous, current) {
           if (current is NewsLoaded) {
@@ -103,9 +109,7 @@ class _HomeScreenContent extends StatelessWidget {
                   context.goNamed('sidepage');
                 }
 
-                if (details.primaryVelocity! < -5) {
-                  // _launchUrl(article.url, context);
-                }
+                if (details.primaryVelocity! < -5) {}
               },
               behavior: HitTestBehavior.opaque,
 
@@ -131,10 +135,10 @@ class _HomeScreenContent extends StatelessWidget {
             padding: const EdgeInsets.all(20.0),
             child: Row(
               children: [
-                const Text(
-                  'Brevity',
+                Text(
+                  _getCategoryName(category),
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 23,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                     fontFamily: 'Poppins',
@@ -169,13 +173,13 @@ class _HomeScreenContent extends StatelessWidget {
       itemCount: 5,
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
+          baseColor: const Color.fromARGB(255, 19, 19, 19),
+          highlightColor: const Color.fromARGB(255, 11, 11, 11),
           child: Container(
             height: MediaQuery.of(context).size.height * 0.8,
             margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color.fromARGB(255, 27, 27, 27),
               borderRadius: BorderRadius.circular(16),
             ),
           ),
@@ -184,35 +188,7 @@ class _HomeScreenContent extends StatelessWidget {
     );
   }
 
-  void _showAppInfo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('About Brevity'),
-            content: const Text(
-              'Stay informed with AI-curated news\nSwipe vertically to browse\nSwipe left to open article',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-    );
-  }
-  // Future<void> _launchArticleUrl(String url, BuildContext context) async {
-  //   try {
-  //     if (await canLaunchUrl(Uri.parse(url))) {
-  //       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-  //     }
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(
-  //       context,
-  //     ).showSnackBar(SnackBar(content: Text('Could not open article: $e')));
-  //   }
-  // }
+  void _showAppInfo(BuildContext context) {}
 }
 
 class _NewsCard extends StatelessWidget {
@@ -259,8 +235,9 @@ class _NewsCard extends StatelessWidget {
                   colors: [
                     const Color.fromARGB(230, 4, 4, 4),
                     Colors.transparent,
+                    const Color.fromARGB(230, 4, 4, 4)
                   ],
-                  stops: const [0.1, 0.7],
+                  stops: const [0.1, 0.7,1.0],
                 ),
               ),
             ),
@@ -333,14 +310,19 @@ class _NewsCard extends StatelessWidget {
                         ),
                       ),
                       const Spacer(),
+                      Image.asset(
+                        'assets/logos/ai.gif',
+                        width: 90,
+                        height: 70,
+                        fit: BoxFit.contain,
+                      ),
                       IconButton(
                         icon: const Icon(
                           Icons.open_in_new_rounded,
                           color: Colors.white,
-                          size: 28,
+                          size: 24,
                         ),
-                        onPressed:
-                            () => _launchUrl(article.url),
+                        onPressed: () => _launchUrl(article.url),
                       ),
                     ],
                   ),

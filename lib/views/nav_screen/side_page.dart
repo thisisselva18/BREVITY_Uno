@@ -93,7 +93,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
             SliverAppBar(
               backgroundColor: const Color.fromARGB(210, 0, 0, 0),
               expandedHeight: 155,
-              pinned: true,
+              //pinned: true,
               elevation: 0,
               flexibleSpace: FlexibleSpaceBar(
                 background: ParticlesHeader(
@@ -442,8 +442,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                 image:
                     article?.urlToImage != null
                         ? CachedNetworkImageProvider(article!.urlToImage)
-                        : const AssetImage('assets/logos/no_image.png')
-                            as ImageProvider,
+                        : CachedNetworkImageProvider("https://static.vecteezy.com/system/resources/thumbnails/008/174/698/original/animation-loading-circle-icon-loading-gif-loading-screen-gif-loading-spinner-gif-loading-animation-loading-on-black-background-free-video.jpg"),
                 fit: BoxFit.cover,
               ),
             ),
@@ -454,7 +453,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  article?.title ?? 'Error Loading News!!',
+                  article?.title ?? 'Loading News!!',
                   style: TextStyle(
                     color: const Color.fromARGB(221, 246, 246, 246),
                     fontWeight: FontWeight.bold,
@@ -466,7 +465,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                 SizedBox(height: screenSize.height * 0.003),
                 Text(
                   article?.description ??
-                      'News description text goes here with 3-4 lines of sample text...',
+                      'News description text will come here with 3-4 lines of sample text...',
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
