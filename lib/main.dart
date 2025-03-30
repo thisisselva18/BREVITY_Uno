@@ -164,6 +164,38 @@ final _routes = GoRouter(
               ),
         ),
         GoRoute(
+          path: '/profile',
+          name: 'profile',
+          pageBuilder:
+              (context, state) => CustomTransitionPage(
+                key: state.pageKey,
+                child: const ProfileScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  return Align(
+                    alignment: Alignment.center,
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: ScaleTransition(
+                        scale: animation.drive(
+                          Tween<double>(
+                            begin: 0.0,
+                            end: 1.0,
+                          ).chain(CurveTween(curve: Curves.easeInOutQuad)),
+                        ),
+                        child: child,
+                      ),
+                    ),
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 225),
+              ),
+        ),
+        GoRoute(
           path: '/searchResults',
           name: 'searchResults',
           pageBuilder:
@@ -200,11 +232,6 @@ final _routes = GoRouter(
                 },
                 transitionDuration: const Duration(milliseconds: 225),
               ),
-        ),
-        GoRoute(
-          path: '/profile',
-          name: 'profile',
-          builder: (context, state) => ProfileScreen(),
         ),
       ],
     ),
