@@ -15,7 +15,7 @@ import 'package:newsai/views/nav_screen/side_page.dart';
 import 'package:newsai/views/splash_screen.dart';
 import 'package:newsai/controller/services/bookmark_services.dart';
 import 'package:newsai/controller/services/news_services.dart';
-import 'package:newsai/controller/bloc/bookmark_bloc.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

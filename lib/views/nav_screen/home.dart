@@ -8,12 +8,12 @@ import 'package:shimmer/shimmer.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:newsai/controller/bloc/news_scroll_bloc.dart';
-import 'package:newsai/controller/bloc/news_scroll_event.dart';
-import 'package:newsai/controller/bloc/news_scroll_state.dart';
-import 'package:newsai/controller/bloc/bookmark_bloc.dart';
-import 'package:newsai/controller/bloc/bookmark_state.dart';
-import 'package:newsai/controller/bloc/bookmark_event.dart';
+import 'package:newsai/controller/bloc/news_scroll_bloc/news_scroll_bloc.dart';
+import 'package:newsai/controller/bloc/news_scroll_bloc/news_scroll_event.dart';
+import 'package:newsai/controller/bloc/news_scroll_bloc/news_scroll_state.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_state.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_event.dart';
 import 'package:newsai/models/article_model.dart';
 import 'package:newsai/models/news_category.dart';
 
@@ -25,11 +25,14 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
-      value: RepositoryProvider.of<NewsService>(context), // Explicitly provide NewsService
+      value: RepositoryProvider.of<NewsService>(
+        context,
+      ), // Explicitly provide NewsService
       child: BlocProvider(
-        create: (context) => NewsBloc(
-          newsService: RepositoryProvider.of<NewsService>(context)
-        )..add(FetchInitialNews(category: category)),
+        create:
+            (context) => NewsBloc(
+              newsService: RepositoryProvider.of<NewsService>(context),
+            )..add(FetchInitialNews(category: category)),
         child: Scaffold(body: _HomeScreenContent(category: category)),
       ),
     );
@@ -45,7 +48,6 @@ class _HomeScreenContent extends StatelessWidget {
     return Scaffold(
       body: BlocBuilder<NewsBloc, NewsState>(
         buildWhen: (previous, current) {
-          // Only rebuild if category matches
           if (current is NewsLoaded) {
             return current.category == category;
           }
@@ -57,13 +59,27 @@ class _HomeScreenContent extends StatelessWidget {
           } else if (state is NewsLoaded) {
             return _buildNewsSwiper(context, state.articles);
           } else if (state is NewsError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  state.message,
-                  style: const TextStyle(fontSize: 18, color: Colors.red),
-                  textAlign: TextAlign.center,
+            return Container(
+              color: const Color.fromARGB(255, 15, 15, 15),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(40.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/logos/dog.png'),
+                      SizedBox(height: 20),
+                      Text(
+                        "Failed To Load News :(",
+                        style: const TextStyle(
+                          fontSize: 25,
+                          color: Color.fromARGB(255, 194, 34, 23),
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -83,7 +99,6 @@ class _HomeScreenContent extends StatelessWidget {
             final article = articles[index];
             return GestureDetector(
               onHorizontalDragEnd: (details) {
-                // Right to left swipe (open SidePage)
                 if (details.primaryVelocity! > 5) {
                   context.goNamed('sidepage');
                 }
@@ -119,13 +134,13 @@ class _HomeScreenContent extends StatelessWidget {
                 const Text(
                   'Brevity',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                     fontFamily: 'Poppins',
                     shadows: [
                       Shadow(
-                        blurRadius: 10.0,
+                        blurRadius: 15.0,
                         color: Color.fromRGBO(0, 0, 0, 0.5),
                         offset: Offset(2.0, 2.0),
                       ),
@@ -134,8 +149,12 @@ class _HomeScreenContent extends StatelessWidget {
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.info_outline, color: Colors.white),
-                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.info_outline,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                  onPressed: () => _showAppInfo(context),
                 ),
               ],
             ),
@@ -168,17 +187,19 @@ class _HomeScreenContent extends StatelessWidget {
   void _showAppInfo(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('About Luminai'),
-        content: const Text(
-          'Stay informed with AI-curated news\nSwipe vertically to browse\nSwipe left to open article'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('About Brevity'),
+            content: const Text(
+              'Stay informed with AI-curated news\nSwipe vertically to browse\nSwipe left to open article',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
   // Future<void> _launchArticleUrl(String url, BuildContext context) async {
@@ -264,7 +285,7 @@ class _NewsCard extends StatelessWidget {
                           article.sourceName.toUpperCase(),
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.2,
                           ),
@@ -347,19 +368,23 @@ class _TappableHeadline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BookmarkBloc, BookmarkState>(
-      builder: (context, state) {        
-        final isBookmarked = state is BookmarksLoaded 
-            ? state.bookmarks.any((a) => a.url == article.url)
-            : false;
+      builder: (context, state) {
+        final isBookmarked =
+            state is BookmarksLoaded
+                ? state.bookmarks.any((a) => a.url == article.url)
+                : false;
         return GestureDetector(
-          onTap: () => context.read<BookmarkBloc>().add(ToggleBookmarkEvent(article)),
+          onTap:
+              () => context.read<BookmarkBloc>().add(
+                ToggleBookmarkEvent(article),
+              ),
           child: Text(
             title,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: isBookmarked ? Colors.blue : Colors.white,
-              fontSize: 26,
+              fontSize: 24,
               fontWeight: FontWeight.w700,
             ),
           ),

@@ -1,7 +1,7 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:ui';
+import 'package:newsai/views/common_widgets/common_appbar.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -132,7 +132,6 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   Widget _buildLanguageOption(String language) {
     final isSelected = _selectedLanguage == language;
-
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -354,246 +353,208 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [const Color(0xFF121212), const Color(0xFF1E1E1E)],
-          ),
-        ),
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            SliverAppBar(
-              backgroundColor: Colors.transparent,
-              expandedHeight: 220,
-              pinned: true,
-              elevation: 0,
-              flexibleSpace: FlexibleSpaceBar(
-                background: _buildProfileHeader(),
+    return AppScaffold(
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            backgroundColor: const Color.fromARGB(210, 0, 0, 0),
+            expandedHeight: 220,
+            pinned: true,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+              color: Colors.white70,
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: ParticlesHeader(
+                title: "",
+                themeColor: _selectedThemeColor,
+                particleAnimation: _particleAnimationController,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [_selectedThemeColor, Colors.purpleAccent],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _selectedThemeColor.withAlpha(125),
+                            blurRadius: 20,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: const CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.white,
+                        backgroundImage: NetworkImage(
+                          'https://a0.anyrgb.com/pngimg/1140/162/user-profile-login-avatar-heroes-user-blue-icons-circle-symbol-logo-thumbnail.png',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'John Doe',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        shadows: [Shadow(color: Colors.black45, blurRadius: 5)],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'john.doe@example.com',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 14,
+                        shadows: const [
+                          Shadow(color: Colors.black45, blurRadius: 5),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            SliverList(
-              delegate: SliverChildListDelegate([
-                FadeTransition(
-                  opacity: _animation,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 0.1),
-                      end: Offset.zero,
-                    ).animate(_animation),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 20),
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 8, 0, 8),
-                            child: const Text(
-                              'Settings',
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                letterSpacing: 1.2,
-                                color: Color.fromARGB(255, 223, 223, 223),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 28,
-                              ),
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              FadeTransition(
+                opacity: _animation,
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.1),
+                    end: Offset.zero,
+                  ).animate(_animation),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 8, 0, 8),
+                          child: const Text(
+                            'Settings',
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                              letterSpacing: 1.2,
+                              color: Color.fromARGB(255, 223, 223, 223),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 28,
                             ),
                           ),
                         ),
-                        _buildSectionHeader('Appearance'),
-                        _buildAnimatedCard(
-                          child: _buildSwitchTile(
-                            icon: Icons.dark_mode,
-                            title: 'Dark Mode',
-                            value: _darkModeEnabled,
-                            onChanged:
-                                (val) => setState(() => _darkModeEnabled = val),
-                          ),
+                      ),
+                      _buildSectionHeader('Appearance'),
+                      _buildAnimatedCard(
+                        child: _buildSwitchTile(
+                          icon: Icons.dark_mode,
+                          title: 'Dark Mode',
+                          value: _darkModeEnabled,
+                          onChanged:
+                              (val) => setState(() => _darkModeEnabled = val),
                         ),
-                        _buildAnimatedCard(
-                          child: _buildListTile(
-                            icon: Icons.color_lens,
-                            title: 'App Theme',
-                            subtitle: 'Change app accent color',
-                            trailingWidget: Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                color: _selectedThemeColor,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: _selectedThemeColor.withOpacity(0.4),
-                                    blurRadius: 5,
-                                    spreadRadius: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            onTap: _showThemeColorPicker,
-                          ),
-                        ),
-                        _buildSectionHeader('Preferences'),
-                        _buildAnimatedCard(
-                          child: _buildSwitchTile(
-                            icon: Icons.notifications_active,
-                            title: 'Push Notifications',
-                            value: _notificationsEnabled,
-                            onChanged:
-                                (val) =>
-                                    setState(() => _notificationsEnabled = val),
-                          ),
-                        ),
-                        _buildAnimatedCard(
-                          child: _buildListTile(
-                            icon: Icons.language,
-                            title: 'Language',
-                            subtitle: _selectedLanguage,
-                            onTap: _showLanguageDialog,
-                          ),
-                        ),
-                        _buildSectionHeader('App'),
-                        _buildAnimatedCard(
-                          child: _buildListTile(
-                            icon: Icons.share,
-                            title: 'Share App',
-                            subtitle: 'Tell your friends about us',
-                            onTap:
-                                () => Share.share(
-                                  'Check out this awesome news app!',
+                      ),
+                      _buildAnimatedCard(
+                        child: _buildListTile(
+                          icon: Icons.color_lens,
+                          title: 'App Theme',
+                          subtitle: 'Change app accent color',
+                          trailingWidget: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: _selectedThemeColor,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: _selectedThemeColor.withOpacity(0.4),
+                                  blurRadius: 5,
+                                  spreadRadius: 1,
                                 ),
+                              ],
+                            ),
                           ),
+                          onTap: _showThemeColorPicker,
                         ),
-                        _buildAnimatedCard(
-                          child: _buildListTile(
-                            icon: Icons.star_rate,
-                            title: 'Rate App',
-                            subtitle: 'Leave feedback on the store',
-                            onTap: () {
-                              // Implement app rating logic
-                            },
-                          ),
+                      ),
+                      _buildSectionHeader('Preferences'),
+                      _buildAnimatedCard(
+                        child: _buildSwitchTile(
+                          icon: Icons.notifications_active,
+                          title: 'Push Notifications',
+                          value: _notificationsEnabled,
+                          onChanged:
+                              (val) =>
+                                  setState(() => _notificationsEnabled = val),
                         ),
-                        _buildSectionHeader('Account'),
-                        _buildAnimatedCard(
-                          child: _buildListTile(
-                            icon: Icons.logout,
-                            titleColor: _selectedThemeColor,
-                            title: 'Log Out',
-                            subtitle: 'See you again soon',
-                            onTap: () {
-                              // Implement logout logic
-                            },
-                          ),
+                      ),
+                      _buildAnimatedCard(
+                        child: _buildListTile(
+                          icon: Icons.language,
+                          title: 'Language',
+                          subtitle: _selectedLanguage,
+                          onTap: _showLanguageDialog,
                         ),
-                        _buildAnimatedCard(
-                          color: Colors.red.withOpacity(0.05),
-                          child: _buildListTile(
-                            icon: Icons.delete_forever,
-                            iconColor: Colors.red,
-                            title: 'Delete Profile',
-                            titleColor: Colors.red,
-                            subtitle: 'Permanently erase your data',
-                            onTap: _confirmDeleteProfile,
-                          ),
+                      ),
+                      _buildSectionHeader('App'),
+                      _buildAnimatedCard(
+                        child: _buildListTile(
+                          icon: Icons.share,
+                          title: 'Share App',
+                          subtitle: 'Tell your friends about us',
+                          onTap:
+                              () => Share.share(
+                                'Check out this awesome news app!',
+                              ),
                         ),
-                        const SizedBox(height: 30),
-                      ],
-                    ),
+                      ),
+                      _buildAnimatedCard(
+                        child: _buildListTile(
+                          icon: Icons.star_rate,
+                          title: 'Rate App',
+                          subtitle: 'Leave feedback on the store',
+                          onTap: () {
+                            // Implement app rating logic
+                          },
+                        ),
+                      ),
+                      _buildSectionHeader('Account'),
+                      _buildAnimatedCard(
+                        child: _buildListTile(
+                          icon: Icons.logout,
+                          titleColor: _selectedThemeColor,
+                          title: 'Log Out',
+                          subtitle: 'See you again soon',
+                          onTap: () {
+                            // Implement logout logic
+                          },
+                        ),
+                      ),
+                      _buildAnimatedCard(
+                        color: Colors.red.withOpacity(0.05),
+                        child: _buildListTile(
+                          icon: Icons.delete_forever,
+                          iconColor: Colors.red,
+                          title: 'Delete Profile',
+                          titleColor: Colors.red,
+                          subtitle: 'Permanently erase your data',
+                          onTap: _confirmDeleteProfile,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                    ],
                   ),
                 ),
-              ]),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileHeader() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            _selectedThemeColor.withAlpha(100),
-            _selectedThemeColor.withAlpha(25),
-          ],
-        ),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: AnimatedBuilder(
-              animation: _particleAnimationController,
-              builder: (context, child) {
-                return CustomPaint(
-                  painter: ParticlesPainter(
-                    _selectedThemeColor,
-                    _particleAnimationController.value,
-                  ),
-                );
-              },
-            ),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 60, 0, 0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [_selectedThemeColor, Colors.purpleAccent],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: _selectedThemeColor.withAlpha(125),
-                          blurRadius: 20,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: const CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.white,
-                      backgroundImage: NetworkImage(
-                        'https://a0.anyrgb.com/pngimg/1140/162/user-profile-login-avatar-heroes-user-blue-icons-circle-symbol-logo-thumbnail.png',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'John Doe',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      shadows: [Shadow(color: Colors.black45, blurRadius: 5)],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'john.doe@example.com',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 14,
-                      shadows: const [
-                        Shadow(color: Colors.black45, blurRadius: 5),
-                      ],
-                    ),
-                  ),
-                ],
               ),
-            ),
+            ]),
           ),
         ],
       ),
@@ -721,49 +682,5 @@ class _SettingsScreenState extends State<SettingsScreen>
           Icon(Icons.arrow_forward_ios, color: Colors.grey[600], size: 16),
       onTap: onTap,
     );
-  }
-}
-
-class ParticlesPainter extends CustomPainter {
-  final Color themeColor;
-  final double animationValue;
-
-  ParticlesPainter(this.themeColor, this.animationValue);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = Colors.white.withAlpha(50)
-          ..style = PaintingStyle.fill;
-
-    final random = 42;
-
-    for (var i = 0; i < 30; i++) {
-      final baseX = (random * i * 7) % size.width;
-      final baseY = (random * i * 11) % size.height;
-
-      final x = (baseX + (sin(animationValue * 3 + i) * 30)) % size.width;
-      final y = (baseY + (cos(animationValue * 4 + i) * 25)) % size.height;
-
-      final radius =
-          ((random * i) % 4 + 1) * (0.8 + (sin(animationValue + i) * 0.2));
-
-      final opacity =
-          ((i % 5) * 0.1 + 0.1 + (sin(animationValue * 2 + i) * 0.05)) *
-          255.toInt();
-
-      canvas.drawCircle(
-        Offset(x, y),
-        radius.toDouble(),
-        paint..color = themeColor.withAlpha(opacity.toInt()),
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant ParticlesPainter oldDelegate) {
-    return oldDelegate.animationValue != animationValue ||
-        oldDelegate.themeColor != themeColor;
   }
 }
