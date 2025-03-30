@@ -167,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           email: _emailController.text,
                           password: _passwordController.text,
                         );
-                        context.go('/intro');
+                        context.go('/home');
                       }
                     },
                     style: ElevatedButton.styleFrom(
