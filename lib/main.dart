@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Add this import for Firebase Auth
 
 import 'package:newsai/firebase_options.dart';
+import 'package:newsai/views/inner_screens/profile.dart';
 import 'package:newsai/views/inner_screens/search_result.dart';
 import 'package:newsai/views/inner_screens/settings.dart';
 import 'package:newsai/views/intro_screen/intro_screen.dart';
@@ -139,7 +140,6 @@ final _routes = GoRouter(
                   secondaryAnimation,
                   child,
                 ) {
-                  // Combine scale and fade animations
                   return Align(
                     alignment: Alignment.center,
                     child: FadeTransition(
@@ -196,6 +196,11 @@ final _routes = GoRouter(
                 },
                 transitionDuration: const Duration(milliseconds: 225),
               ),
+        ),
+        GoRoute(
+          path: '/profile',
+          name: 'profile',
+          builder: (context, state) => ProfileScreen(),
         ),
       ],
     ),

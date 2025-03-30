@@ -42,7 +42,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Image.asset('assets/logos/logo.png'),
                   ),
                   const SizedBox(height: 20),
-                  // Title
                   ShaderMask(
                     shaderCallback:
                         (bounds) => const LinearGradient(
@@ -172,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00F5D4).withOpacity(0.9),
+                      backgroundColor: const Color(0xFF00F5D4).withAlpha(225),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -190,7 +189,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Google Login Button
                   OutlinedButton.icon(
                     icon: Image.asset('assets/logos/google.png', width: 24),
                     label: const Text(
@@ -208,12 +206,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     onPressed: () {
-                      // Handle Google sign in
+
                     },
                   ),
                   const SizedBox(height: 20),
 
-                  // Signup Link
                   TextButton(
                     onPressed: () {
                       widget.goToSignupPage();
