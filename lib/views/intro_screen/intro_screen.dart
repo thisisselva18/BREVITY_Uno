@@ -20,25 +20,25 @@ class _IntroductionScreenState extends State<IntroductionScreen>
 
   final List<IntroductionPage> _pages = [
     IntroductionPage(
-      title: 'Global Insights\nAt Your Fingertips',
+      title: 'Concise News,\nMaximum Clarity',
       description:
-          'Access real-time news from trusted sources worldwide with AI-curated briefings',
+          'Get AI-curated news briefs in 50-60 words - stay informed without information overload',
       image:
           'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=60',
       color: Color(0xFF2A2E3D),
     ),
     IntroductionPage(
-      title: 'Smart Updates\nPersonalized For You',
+      title: 'AI-Powered\nNews Companion',
       description:
-          'Receive tailored news digests based on your interests and reading habits',
+          'Ask detailed questions about any story with our advanced AI assistant - context-aware answers at your fingertips',
       image:
           'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=60',
       color: Color(0xFF1F2833),
     ),
     IntroductionPage(
-      title: 'Join an Informed\nCommunity',
+      title: 'Your News,\nYour Style',
       description:
-          'Engage with thought leaders and participate in meaningful discussions',
+          'Personalize reading experience with customizable themes - dark mode, accent colors, and visual preferences',
       image:
           'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=60',
       color: Color(0xFF151A21),
@@ -59,20 +59,14 @@ class _IntroductionScreenState extends State<IntroductionScreen>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutExpo));
 
-    _slideAnimation = Tween<double>(
-      begin: 120.0,
-      end: 0.0,
-    ).animate(
+    _slideAnimation = Tween<double>(begin: 120.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic),
       ),
     );
 
-    _opacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.4, 1.0, curve: Curves.easeIn),
@@ -188,7 +182,8 @@ class _IntroductionScreenState extends State<IntroductionScreen>
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeOutQuad,
                   );
-                } else if (details.primaryVelocity! < 0 && _currentPage < _pages.length - 1) {
+                } else if (details.primaryVelocity! < 0 &&
+                    _currentPage < _pages.length - 1) {
                   // Swipe left - go to next page
                   _pageController.nextPage(
                     duration: const Duration(milliseconds: 500),
@@ -196,7 +191,6 @@ class _IntroductionScreenState extends State<IntroductionScreen>
                   );
                 }
               },
-              // Make the GestureDetector transparent to allow clicks on underlying widgets
               behavior: HitTestBehavior.translucent,
             ),
           ),
@@ -230,13 +224,14 @@ class _BackgroundImage extends StatelessWidget {
             imageUrl: image,
             fit: BoxFit.cover,
             height: double.infinity, // Ensure the image takes full height
-            width: double.infinity,  // Ensure the image takes full width
+            width: double.infinity, // Ensure the image takes full width
             memCacheWidth: 600, // Limit memory cache size
             placeholder: (context, url) => Container(color: Colors.black),
-            errorWidget: (context, url, error) => Container(
-              color: Colors.black,
-              child: const Icon(Icons.error, color: Colors.white),
-            ),
+            errorWidget:
+                (context, url, error) => Container(
+                  color: Colors.black,
+                  child: const Icon(Icons.error, color: Colors.white),
+                ),
           ),
           // Gradient Overlay
           Container(
@@ -344,9 +339,8 @@ class _PageContent extends StatelessWidget {
                   ),
                 ),
               ),
-            
-            if (!showButton)
-              const SizedBox(height: 30),
+
+            if (!showButton) const SizedBox(height: 30),
           ],
         ),
       ),
@@ -400,10 +394,7 @@ class _SimplerButton extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 40,
-          vertical: 18,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
           gradient: const LinearGradient(

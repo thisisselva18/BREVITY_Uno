@@ -8,12 +8,12 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> 
+class _ProfileScreenState extends State<ProfileScreen>
     with TickerProviderStateMixin {
   late AnimationController _particleAnimationController;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  
+
   // Example user data - replace with your actual user data
   final Map<String, dynamic> _user = {
     'name': 'John Doe',
@@ -29,7 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     super.initState();
     _nameController.text = _user['name'];
     _emailController.text = _user['email'];
-    
+
     _particleAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
@@ -43,7 +43,6 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   void _saveProfile() {
-    // Implement save logic
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Profile updated successfully')),
     );
@@ -57,7 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         slivers: [
           SliverAppBar(
             backgroundColor: const Color.fromARGB(210, 0, 0, 0),
-            expandedHeight: 200,
+            expandedHeight: 90,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               background: ParticlesHeader(
@@ -78,7 +77,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    // Profile Picture
                     Stack(
                       alignment: Alignment.bottomRight,
                       children: [
@@ -86,7 +84,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                           radius: 50,
                           backgroundColor: Colors.blue.withAlpha(80),
                           backgroundImage: const NetworkImage(
-                            'https://a0.anyrgb.com/pngimg/1140/162/user-profile-login-avatar-heroes-user-blue-icons-circle-symbol-logo-thumbnail.png'),
+                            'https://a0.anyrgb.com/pngimg/1140/162/user-profile-login-avatar-heroes-user-blue-icons-circle-symbol-logo-thumbnail.png',
+                          ),
                         ),
                         Container(
                           padding: const EdgeInsets.all(6),
@@ -94,13 +93,16 @@ class _ProfileScreenState extends State<ProfileScreen>
                             color: Colors.blue,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Icon(Icons.edit, size: 20, color: Colors.white),
+                          child: const Icon(
+                            Icons.edit,
+                            size: 20,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 30),
 
-                    // Editable Fields
                     _buildProfileField(
                       icon: Icons.person,
                       label: 'Full Name',
@@ -142,16 +144,20 @@ class _ProfileScreenState extends State<ProfileScreen>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 15),
+                          horizontal: 40,
+                          vertical: 15,
+                        ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: const Text(
                         'Save Changes',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white),
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
@@ -206,7 +212,11 @@ class _ProfileScreenState extends State<ProfileScreen>
         leading: Icon(icon, color: Colors.blue),
         title: Text(title, style: const TextStyle(color: Colors.white)),
         subtitle: Text(subtitle, style: const TextStyle(color: Colors.white70)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.blue),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: Colors.blue,
+        ),
         onTap: onTap,
       ),
     );

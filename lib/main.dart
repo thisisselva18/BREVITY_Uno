@@ -21,7 +21,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _routes = GoRouter(
-  initialLocation: '/intro',
+  initialLocation: '/splash',
   routes: [
     GoRoute(
       path: '/splash',
@@ -117,7 +117,6 @@ final _routes = GoRouter(
                   secondaryAnimation,
                   child,
                 ) {
-                  // Combine scale and fade animations
                   return Align(
                     alignment: Alignment.center,
                     child: FadeTransition(
@@ -178,8 +177,7 @@ final _routes = GoRouter(
         GoRoute(
           path: '/profile',
           name: 'profile',
-          builder:
-              (context, state) => ProfileScreen()
+          builder: (context, state) => ProfileScreen(),
         ),
       ],
     ),

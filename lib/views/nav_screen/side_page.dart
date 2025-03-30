@@ -121,7 +121,9 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                   Icons.person,
                                   size: screenWidth * 0.06,
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  context.push("/sidepage/profile");
+                                },
                               ),
                             ),
                             const Spacer(),
