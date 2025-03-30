@@ -185,13 +185,13 @@ class _IntroductionScreenState extends State<IntroductionScreen>
                 if (details.primaryVelocity! > 0 && _currentPage > 0) {
                   // Swipe right - go to previous page
                   _pageController.previousPage(
-                    duration: const Duration(milliseconds: 500),
+                    duration: const Duration(milliseconds: 300),
                     curve: Curves.easeOutQuad,
                   );
                 } else if (details.primaryVelocity! < 0 && _currentPage < _pages.length - 1) {
                   // Swipe left - go to next page
                   _pageController.nextPage(
-                    duration: const Duration(milliseconds: 500),
+                    duration: const Duration(milliseconds: 300),
                     curve: Curves.easeOutQuad,
                   );
                 }

@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:newsai/controller/services/auth_service.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:ui';
 import 'package:newsai/views/common_widgets/common_appbar.dart';
@@ -535,6 +538,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                           subtitle: 'See you again soon',
                           onTap: () {
                             // Implement logout logic
+                            AuthService().signOut().then((value) {
+                              context.go('/slpash');
+                            },);
                           },
                         ),
                       ),

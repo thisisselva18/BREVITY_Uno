@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:go_router/go_router.dart';
+
+// Import the AuthService to check sign-in status
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -37,8 +41,29 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
     );
 
     _controller.forward().then((_) {
-       Navigator.pushReplacementNamed(context, '/auth');
+      // Check if the user is signed in when animation completes
+      navigateBasedOnAuthStatus();
     });
+  }
+
+  // Method to navigate based on authentication status
+  void navigateBasedOnAuthStatus() {
+    // Check if user has seen intro screen before
+    final hasSeenIntro = true; // Replace with actual logic (e.g., using SharedPreferences)
+    
+    // Check if user is signed in
+    final isSignedIn = FirebaseAuth.instance.currentUser != null;
+    
+    if (!hasSeenIntro) {
+      // If user hasn't seen intro screen, navigate there first
+      context.go('/intro');
+    } else if (isSignedIn) {
+      // If user is signed in, navigate to home with default category (0)
+      context.go('/home/0');
+    } else {
+      // If user is not signed in, navigate to auth screen
+      context.go('/auth');
+    }
   }
 
   @override
@@ -82,7 +107,7 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                     CircleAvatar(
                       radius: 70,
                       backgroundColor: Colors.transparent,
-                      child: Image.asset('assets/logos/applogo.png'),
+                      child: Image.asset('assets/logos/logo.png'),
                     ),
                     const SizedBox(height: 20),
                     ShaderMask(
