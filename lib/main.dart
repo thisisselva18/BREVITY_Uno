@@ -20,7 +20,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _routes = GoRouter(
-  initialLocation: '/sidepage',
+  initialLocation: '/intro',
   routes: [
     GoRoute(
       path: '/splash',
@@ -104,21 +104,75 @@ final _routes = GoRouter(
               ),
         ),
         GoRoute(
-          path: '/searchResults',
-          name: 'searchResults',
-          builder:
-              (context, state) => SearchResultsScreen(
-                query:
-                    state.uri.queryParameters['query']!,
+          path: '/settings',
+          name: 'settings',
+          pageBuilder:
+              (context, state) => CustomTransitionPage(
+                key: state.pageKey,
+                child: const SettingsScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  // Combine scale and fade animations
+                  return Align(
+                    alignment: Alignment.center,
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: ScaleTransition(
+                        scale: animation.drive(
+                          Tween<double>(
+                            begin: 0.0,
+                            end: 1.0,
+                          ).chain(CurveTween(curve: Curves.easeInOutQuad)),
+                        ),
+                        child: child,
+                      ),
+                    ),
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 225),
               ),
         ),
         GoRoute(
-          path: '/settings',
-          name: 'settings',
-          builder:
-              (context, state){
-                return const SettingsScreen();
-              },
+          path: '/searchResults',
+          name: 'searchResults',
+          pageBuilder:
+              (context, state) => CustomTransitionPage(
+                key: state.pageKey,
+                child: SearchResultsScreen(
+                  query:
+                      state
+                          .uri
+                          .queryParameters['query']!, // Only query parameter
+                ),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  // Combine scale and fade animations
+                  return Align(
+                    alignment: Alignment.center,
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: ScaleTransition(
+                        scale: animation.drive(
+                          Tween<double>(
+                            begin: 0.0,
+                            end: 1.0,
+                          ).chain(CurveTween(curve: Curves.easeInOutQuad)),
+                        ),
+                        child: child,
+                      ),
+                    ),
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 225),
+              ),
         ),
       ],
     ),
