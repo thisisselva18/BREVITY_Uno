@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:newsai/controller/services/auth_service.dart';
 
@@ -61,7 +62,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   CircleAvatar(
                     radius: 70,
                     backgroundColor: Colors.transparent,
-                    child: Image.asset('assets/logos/applogo.png'),
+                    child: Image.asset('assets/logos/logo.png'),
                   ),
                   const SizedBox(height: 20),
 
@@ -208,11 +209,15 @@ class _SignupScreenState extends State<SignupScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        await AuthService().signUpWithEmail(
-                          email: _emailController.text,
-                          password: _passwordController.text,
-                          userName: _nameController.text,
-                        );
+                        await AuthService()
+                            .signUpWithEmail(
+                              email: _emailController.text,
+                              password: _passwordController.text,
+                              userName: _nameController.text,
+                            )
+                            .whenComplete(() {
+                              context.go('/intro');
+                            });
                       }
                     },
                     style: ElevatedButton.styleFrom(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:newsai/controller/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -38,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   CircleAvatar(
                     radius: 70,
                     backgroundColor: Colors.transparent,
-                    child: Image.asset('assets/logos/applogo.png'),
+                    child: Image.asset('assets/logos/logo.png'),
                   ),
                   const SizedBox(height: 20),
                   ShaderMask(
@@ -166,6 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           email: _emailController.text,
                           password: _passwordController.text,
                         );
+                        context.go('/intro');
                       }
                     },
                     style: ElevatedButton.styleFrom(

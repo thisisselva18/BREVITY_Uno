@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:newsai/models/news_category.dart';
 import 'package:newsai/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Add this import for Firebase Auth
 
 import 'package:newsai/firebase_options.dart';
 import 'package:newsai/views/inner_screens/profile.dart';
@@ -20,7 +21,29 @@ import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+// Create a class to manage authentication state
+class AuthService {
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
+  
+  // Check if user is signed in
+  static bool isUserSignedIn() {
+    return _auth.currentUser != null;
+  }
+}
+
+// Create a router notifier to handle authentication state changes
+class AuthNotifier extends ChangeNotifier {
+  AuthNotifier() {
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      notifyListeners();
+    });
+  }
+}
+
+// Create the router with auth state handling
+final _authNotifier = AuthNotifier();
 final _routes = GoRouter(
+  refreshListenable: _authNotifier,
   initialLocation: '/splash',
   routes: [
     GoRoute(
@@ -208,6 +231,23 @@ final _routes = GoRouter(
       },
     ),
   ],
+  // Add redirect logic to handle authentication state
+  redirect: (context, state) {
+    // Allow access to splash screen
+    if (state.matchedLocation == '/splash') return null;
+    
+    // Check for routes that should be accessible without authentication
+    final allowedPaths = ['/auth', '/intro'];
+    if (allowedPaths.contains(state.matchedLocation)) return null;
+    
+    // If user is not signed in, redirect to auth
+    if (!AuthService.isUserSignedIn()) {
+      return '/auth';
+    }
+    
+    // Allow access to authenticated routes
+    return null;
+  },
 );
 
 void main() async {
