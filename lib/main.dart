@@ -6,6 +6,7 @@ import 'package:newsai/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:newsai/firebase_options.dart';
+import 'package:newsai/views/inner_screens/profile.dart';
 import 'package:newsai/views/inner_screens/search_result.dart';
 import 'package:newsai/views/inner_screens/settings.dart';
 import 'package:newsai/views/intro_screen/intro_screen.dart';
@@ -119,6 +120,12 @@ final _routes = GoRouter(
               (context, state){
                 return const SettingsScreen();
               },
+        ),
+        GoRoute(
+          path: '/profile',
+          name: 'profile',
+          builder:
+              (context, state) => ProfileScreen()
         ),
       ],
     ),
