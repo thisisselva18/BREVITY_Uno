@@ -89,7 +89,7 @@ class _HomeScreenContent extends StatelessWidget {
                 }
 
                 if (details.primaryVelocity! < -5) {
-                  _launchArticleUrl(article.url, context);
+                  // _launchUrl(article.url, context);
                 }
               },
               behavior: HitTestBehavior.opaque,
@@ -181,18 +181,17 @@ class _HomeScreenContent extends StatelessWidget {
       ),
     );
   }
-
-  Future<void> _launchArticleUrl(String url, BuildContext context) async {
-    try {
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Could not open article: $e')));
-    }
-  }
+  // Future<void> _launchArticleUrl(String url, BuildContext context) async {
+  //   try {
+  //     if (await canLaunchUrl(Uri.parse(url))) {
+  //       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(
+  //       context,
+  //     ).showSnackBar(SnackBar(content: Text('Could not open article: $e')));
+  //   }
+  // }
 }
 
 class _NewsCard extends StatelessWidget {
@@ -320,7 +319,7 @@ class _NewsCard extends StatelessWidget {
                           size: 28,
                         ),
                         onPressed:
-                            () => _launchArticleUrl(article.url, context),
+                            () => _launchUrl(article.url),
                       ),
                     ],
                   ),
@@ -333,15 +332,9 @@ class _NewsCard extends StatelessWidget {
     );
   }
 
-  Future<void> _launchArticleUrl(String url, BuildContext context) async {
-    try {
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Could not open article: $e')));
+  Future<void> _launchUrl(String url) async {
+    if (!await launchUrl(Uri.parse(url))) {
+      throw Exception('Could not launch $url');
     }
   }
 }
