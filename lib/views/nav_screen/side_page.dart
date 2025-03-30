@@ -58,6 +58,7 @@ class _SidePageState extends State<SidePage> {
       child: Scaffold(
         backgroundColor: Colors.black45,
         body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Padding(
             padding: EdgeInsets.all(screenWidth * 0.04),
             child: Column(
