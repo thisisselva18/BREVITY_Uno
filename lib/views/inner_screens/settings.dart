@@ -1,7 +1,11 @@
 //import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:newsai/controller/cubit/user_profile/user_profile_cubit.dart';
+import 'package:newsai/controller/cubit/user_profile/user_profile_state.dart';
 import 'package:newsai/controller/services/auth_service.dart';
+import 'package:newsai/models/user_model.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:ui';
 import 'package:newsai/views/common_widgets/common_appbar.dart';
@@ -22,6 +26,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   late AnimationController _animationController;
   late Animation<double> _animation;
   late AnimationController _particleAnimationController;
+  final UserProfileCubit _userProfileCubit = UserProfileCubit();
 
   final List<Color> _themeColors = [
     Colors.blue,
@@ -58,12 +63,16 @@ class _SettingsScreenState extends State<SettingsScreen>
         // Empty setState to trigger rebuild
       });
     });
+    
+    // Start the real-time profile subscription
+    _userProfileCubit.startProfileSubscription();
   }
 
   @override
   void dispose() {
     _animationController.dispose();
     _particleAnimationController.dispose();
+    _userProfileCubit.close();
     super.dispose();
   }
 
@@ -356,213 +365,365 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-            backgroundColor: const Color.fromARGB(210, 0, 0, 0),
-            expandedHeight: 220,
-            //pinned: true,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-              color: Colors.white70,
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: ParticlesHeader(
-                title: "",
-                themeColor: _selectedThemeColor,
-                particleAnimation: _particleAnimationController,
+    return BlocProvider(
+      create: (context) => _userProfileCubit,
+      child: AppScaffold(
+        body: BlocBuilder<UserProfileCubit, UserProfileState>(
+          builder: (context, state) {
+            // Create a loading widget to show while user data is loading
+            if (state.status == UserProfileStatus.loading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            
+            // Show error if loading failed
+            if (state.status == UserProfileStatus.error) {
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [_selectedThemeColor, Colors.purpleAccent],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _selectedThemeColor.withAlpha(125),
-                            blurRadius: 20,
-                            spreadRadius: 2,
+                    const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error: ${state.errorMessage}',
+                      style: const TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => _userProfileCubit.startProfileSubscription(),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
+            }
+            
+            // Show user data when loaded
+            return CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverAppBar(
+                  backgroundColor: const Color.fromARGB(210, 0, 0, 0),
+                  expandedHeight: 220,
+                  pinned: true,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                    color: Colors.white70,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: ParticlesHeader(
+                      title: "",
+                      themeColor: _selectedThemeColor,
+                      particleAnimation: _particleAnimationController,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [_selectedThemeColor, Colors.purpleAccent],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: _selectedThemeColor.withAlpha(125),
+                                  blurRadius: 20,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: const CircleAvatar(
+                              radius: 40,
+                              backgroundColor: Colors.white,
+                              backgroundImage: NetworkImage(
+                                'https://a0.anyrgb.com/pngimg/1140/162/user-profile-login-avatar-heroes-user-blue-icons-circle-symbol-logo-thumbnail.png',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            state.user?.displayName ?? 'User',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              shadows: [Shadow(color: Colors.black45, blurRadius: 5)],
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            state.user?.email ?? '',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 14,
+                              shadows: const [
+                                Shadow(color: Colors.black45, blurRadius: 5),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      child: const CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.white,
-                        backgroundImage: NetworkImage(
-                          'https://a0.anyrgb.com/pngimg/1140/162/user-profile-login-avatar-heroes-user-blue-icons-circle-symbol-logo-thumbnail.png',
+                    ),
+                  ),
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    FadeTransition(
+                      opacity: _animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.1),
+                          end: Offset.zero,
+                        ).animate(_animation),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            const Align(
+                              alignment: Alignment.topLeft,
+                              child: Padding(
+                                padding: EdgeInsets.fromLTRB(20, 8, 0, 8),
+                                child: Text(
+                                  'Settings',
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    letterSpacing: 1.2,
+                                    color: Color.fromARGB(255, 223, 223, 223),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 28,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            _buildSectionHeader('Profile'),
+                            _buildAnimatedCard(
+                              child: _buildListTile(
+                                icon: Icons.person,
+                                title: 'Edit Profile',
+                                subtitle: 'Update your personal information',
+                                onTap: () => _showEditProfileDialog(context, state.user),
+                              ),
+                            ),
+                            _buildSectionHeader('Appearance'),
+                            _buildAnimatedCard(
+                              child: _buildSwitchTile(
+                                icon: Icons.dark_mode,
+                                title: 'Dark Mode',
+                                value: _darkModeEnabled,
+                                onChanged:
+                                    (val) => setState(() => _darkModeEnabled = val),
+                              ),
+                            ),
+                            _buildAnimatedCard(
+                              child: _buildListTile(
+                                icon: Icons.color_lens,
+                                title: 'App Theme',
+                                subtitle: 'Change app accent color',
+                                trailingWidget: Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: _selectedThemeColor,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: _selectedThemeColor.withOpacity(0.4),
+                                        blurRadius: 5,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                onTap: _showThemeColorPicker,
+                              ),
+                            ),
+                            _buildSectionHeader('Preferences'),
+                            _buildAnimatedCard(
+                              child: _buildSwitchTile(
+                                icon: Icons.notifications_active,
+                                title: 'Push Notifications',
+                                value: _notificationsEnabled,
+                                onChanged:
+                                    (val) =>
+                                        setState(() => _notificationsEnabled = val),
+                              ),
+                            ),
+                            _buildAnimatedCard(
+                              child: _buildListTile(
+                                icon: Icons.language,
+                                title: 'Language',
+                                subtitle: _selectedLanguage,
+                                onTap: _showLanguageDialog,
+                              ),
+                            ),
+                            _buildSectionHeader('App'),
+                            _buildAnimatedCard(
+                              child: _buildListTile(
+                                icon: Icons.share,
+                                title: 'Share App',
+                                subtitle: 'Tell your friends about us',
+                                onTap:
+                                    () => Share.share(
+                                      'Check out this awesome news app!',
+                                    ),
+                              ),
+                            ),
+                            _buildAnimatedCard(
+                              child: _buildListTile(
+                                icon: Icons.star_rate,
+                                title: 'Rate App',
+                                subtitle: 'Leave feedback on the store',
+                                onTap: () {
+                                  // Implement app rating logic
+                                },
+                              ),
+                            ),
+                            _buildSectionHeader('Account'),
+                            _buildAnimatedCard(
+                              child: _buildListTile(
+                                icon: Icons.logout,
+                                titleColor: _selectedThemeColor,
+                                title: 'Log Out',
+                                subtitle: 'See you again soon',
+                                onTap: () {
+                                  // Implement logout logic
+                                  AuthService().signOut().then((value) {
+                                    context.go('/slpash');
+                                  },);
+                                },
+                              ),
+                            ),
+                            _buildAnimatedCard(
+                              color: Colors.red.withOpacity(0.05),
+                              child: _buildListTile(
+                                icon: Icons.delete_forever,
+                                iconColor: Colors.red,
+                                title: 'Delete Profile',
+                                titleColor: Colors.red,
+                                subtitle: 'Permanently erase your data',
+                                onTap: _confirmDeleteProfile,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'John Doe',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        shadows: [Shadow(color: Colors.black45, blurRadius: 5)],
+                  ]),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showEditProfileDialog(BuildContext context, UserModel? user) {
+    if (user == null) return;
+    
+    final TextEditingController displayNameController = TextEditingController(text: user.displayName);
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: _selectedThemeColor.withAlpha(50),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Edit Profile',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                TextField(
+                  controller: displayNameController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Display Name',
+                    labelStyle: TextStyle(color: Colors.grey[400]),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.grey[700]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: _selectedThemeColor),
+                    ),
+                    prefixIcon: Icon(Icons.person, color: _selectedThemeColor),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: _selectedThemeColor),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(color: _selectedThemeColor),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'john.doe@example.com',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
-                        fontSize: 14,
-                        shadows: const [
-                          Shadow(color: Colors.black45, blurRadius: 5),
-                        ],
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Update profile using the cubit
+                          BlocProvider.of<UserProfileCubit>(context).updateProfile(
+                            displayName: displayNameController.text,
+                          );
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _selectedThemeColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text('Save'),
                       ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              FadeTransition(
-                opacity: _animation,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 0.1),
-                    end: Offset.zero,
-                  ).animate(_animation),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 8, 0, 8),
-                          child: const Text(
-                            'Settings',
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              letterSpacing: 1.2,
-                              color: Color.fromARGB(255, 223, 223, 223),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 28,
-                            ),
-                          ),
-                        ),
-                      ),
-                      _buildSectionHeader('Appearance'),
-                      _buildAnimatedCard(
-                        child: _buildSwitchTile(
-                          icon: Icons.dark_mode,
-                          title: 'Dark Mode',
-                          value: _darkModeEnabled,
-                          onChanged:
-                              (val) => setState(() => _darkModeEnabled = val),
-                        ),
-                      ),
-                      _buildAnimatedCard(
-                        child: _buildListTile(
-                          icon: Icons.color_lens,
-                          title: 'App Theme',
-                          subtitle: 'Change app accent color',
-                          trailingWidget: Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: _selectedThemeColor,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _selectedThemeColor.withOpacity(0.4),
-                                  blurRadius: 5,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                          ),
-                          onTap: _showThemeColorPicker,
-                        ),
-                      ),
-                      _buildSectionHeader('Preferences'),
-                      _buildAnimatedCard(
-                        child: _buildSwitchTile(
-                          icon: Icons.notifications_active,
-                          title: 'Push Notifications',
-                          value: _notificationsEnabled,
-                          onChanged:
-                              (val) =>
-                                  setState(() => _notificationsEnabled = val),
-                        ),
-                      ),
-                      _buildAnimatedCard(
-                        child: _buildListTile(
-                          icon: Icons.language,
-                          title: 'Language',
-                          subtitle: _selectedLanguage,
-                          onTap: _showLanguageDialog,
-                        ),
-                      ),
-                      _buildSectionHeader('App'),
-                      _buildAnimatedCard(
-                        child: _buildListTile(
-                          icon: Icons.share,
-                          title: 'Share App',
-                          subtitle: 'Tell your friends about us',
-                          onTap:
-                              () => Share.share(
-                                'Check out this awesome news app!',
-                              ),
-                        ),
-                      ),
-                      _buildAnimatedCard(
-                        child: _buildListTile(
-                          icon: Icons.star_rate,
-                          title: 'Rate App',
-                          subtitle: 'Leave feedback on the store',
-                          onTap: () {
-                            // Implement app rating logic
-                          },
-                        ),
-                      ),
-                      _buildSectionHeader('Account'),
-                      _buildAnimatedCard(
-                        child: _buildListTile(
-                          icon: Icons.logout,
-                          titleColor: _selectedThemeColor,
-                          title: 'Log Out',
-                          subtitle: 'See you again soon',
-                          onTap: () {
-                            // Implement logout logic
-                            AuthService().signOut().then((value) {
-                              context.go('/slpash');
-                            },);
-                          },
-                        ),
-                      ),
-                      _buildAnimatedCard(
-                        color: Colors.red.withOpacity(0.05),
-                        child: _buildListTile(
-                          icon: Icons.delete_forever,
-                          iconColor: Colors.red,
-                          title: 'Delete Profile',
-                          titleColor: Colors.red,
-                          subtitle: 'Permanently erase your data',
-                          onTap: _confirmDeleteProfile,
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                    ],
-                  ),
-                ),
-              ),
-            ]),
-          ),
-        ],
+        ),
       ),
     );
   }

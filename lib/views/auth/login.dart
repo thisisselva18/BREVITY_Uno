@@ -169,14 +169,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Login Button
                   ElevatedButton(
                     onPressed: () {
-                      FocusScope.of(context).unfocus();
+                      
                       if (_formKey.currentState!.validate()) {
                         // Handle login
+                        FocusScope.of(context).unfocus();
                         AuthService().loginWithEmail(
                           email: _emailController.text,
                           password: _passwordController.text,
                         );
-                        context.go('/intro');
+                        context.go('/home/0');
                       }
                     },
                     style: ElevatedButton.styleFrom(

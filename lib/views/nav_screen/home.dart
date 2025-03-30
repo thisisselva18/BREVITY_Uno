@@ -310,12 +310,6 @@ class _NewsCard extends StatelessWidget {
                         ),
                       ),
                       const Spacer(),
-                      Image.asset(
-                        'assets/logos/ai.gif',
-                        width: 90,
-                        height: 70,
-                        fit: BoxFit.contain,
-                      ),
                       IconButton(
                         icon: const Icon(
                           Icons.open_in_new_rounded,
@@ -324,6 +318,13 @@ class _NewsCard extends StatelessWidget {
                         ),
                         onPressed: () => _launchUrl(article.url),
                       ),
+                      Image.asset(
+                        'assets/logos/ai.gif',
+                        width: 90,
+                        height: 70,
+                        fit: BoxFit.contain,
+                      ),
+                      
                     ],
                   ),
                 ],

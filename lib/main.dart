@@ -20,11 +20,13 @@ import 'package:newsai/controller/services/news_services.dart';
 import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:newsai/controller/services/firestore_service.dart';
+import 'package:newsai/controller/cubit/user_profile/user_profile_cubit.dart';
 
 // Create a class to manage authentication state
 class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
   // Check if user is signed in
   static bool isUserSignedIn() {
     return _auth.currentUser != null;
@@ -44,7 +46,7 @@ class AuthNotifier extends ChangeNotifier {
 final _authNotifier = AuthNotifier();
 final _routes = GoRouter(
   refreshListenable: _authNotifier,
-  initialLocation: '/intro',
+  initialLocation: '/splash',
   routes: [
     GoRoute(
       path: '/splash',
@@ -160,6 +162,38 @@ final _routes = GoRouter(
               ),
         ),
         GoRoute(
+          path: '/profile',
+          name: 'profile',
+          pageBuilder:
+              (context, state) => CustomTransitionPage(
+                key: state.pageKey,
+                child: const ProfileScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  return Align(
+                    alignment: Alignment.center,
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: ScaleTransition(
+                        scale: animation.drive(
+                          Tween<double>(
+                            begin: 0.0,
+                            end: 1.0,
+                          ).chain(CurveTween(curve: Curves.easeInOutQuad)),
+                        ),
+                        child: child,
+                      ),
+                    ),
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 225),
+              ),
+        ),
+        GoRoute(
           path: '/searchResults',
           name: 'searchResults',
           pageBuilder:
@@ -197,11 +231,6 @@ final _routes = GoRouter(
                 transitionDuration: const Duration(milliseconds: 225),
               ),
         ),
-        GoRoute(
-          path: '/profile',
-          name: 'profile',
-          builder: (context, state) => ProfileScreen(),
-        ),
       ],
     ),
     GoRoute(
@@ -235,16 +264,16 @@ final _routes = GoRouter(
   redirect: (context, state) {
     // Allow access to splash screen
     if (state.matchedLocation == '/splash') return null;
-    
+
     // Check for routes that should be accessible without authentication
     final allowedPaths = ['/auth', '/intro'];
     if (allowedPaths.contains(state.matchedLocation)) return null;
-    
+
     // If user is not signed in, redirect to auth
     if (!AuthService.isUserSignedIn()) {
       return '/auth';
     }
-    
+
     // Allow access to authenticated routes
     return null;
   },
@@ -257,6 +286,8 @@ void main() async {
 
   final bookmarkRepository = BookmarkServices();
   final newsService = NewsService();
+  final userRepository = UserRepository();
+
   await bookmarkRepository.initialize();
 
   SystemChrome.setPreferredOrientations([
@@ -270,10 +301,12 @@ void main() async {
       providers: [
         RepositoryProvider.value(value: newsService),
         RepositoryProvider.value(value: bookmarkRepository),
+        RepositoryProvider.value(value: userRepository),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => BookmarkBloc(bookmarkRepository)),
+          BlocProvider(create: (context) => UserProfileCubit()),
         ],
         child: const MyApp(),
       ),
