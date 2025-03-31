@@ -1,18 +1,14 @@
-# 🚀 FlutterWave - Smart Finance Management
+# 🚀 Brevity - Short, Smart, Straight to the point
 
 <p align="center">
-  <img src="https://via.placeholder.com/200x200" alt="FlutterWave Logo" width="200"/>
+  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/applogo.png" width="150"/>
 </p>
 
 <p align="center">
-  <a href="https://flutter.dev">
-    <img src="https://img.shields.io/badge/Flutter-3.15.0-blue?logo=flutter" alt="Flutter Version" />
-  </a>
-  <a href="https://dart.dev">
-    <img src="https://img.shields.io/badge/Dart-3.2.0-blue?logo=dart" alt="Dart Version" />
-  </a>
+  <img src="https://img.shields.io/badge/Flutter-3.29.2-blue?logo=flutter" alt="Flutter Version" />
+  <img src="https://img.shields.io/badge/Dart-3.7.2-blue?logo=dart" alt="Dart Version" />
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License" />
-  <img src="https://img.shields.io/badge/Version-1.2.3-orange" alt="Version" />
+  <img src="https://img.shields.io/badge/Version-1.0.0-orange" alt="Version" />
 </p>
 
 <p align="center">
@@ -27,31 +23,22 @@
   <table>
     <tr>
       <td align="center">
-        <a href="https://github.com/yourusername">
-          <img src="https://via.placeholder.com/100x100" width="100px" alt="Your Name"/>
+        <a href="https://github.com/saysamarth">
+          <img src="" width="100px" alt="Your Name"/>
           <br />
-          <sub><b>Your Name</b></sub>
+          <sub><b>Samarth Sharma</b></sub>
         </a>
         <br />
-        <sub>Lead Developer</sub>
+        <sub>Full Stack Developer</sub>
       </td>
       <td align="center">
-        <a href="https://github.com/collaborator1">
-          <img src="https://via.placeholder.com/100x100" width="100px" alt="Collaborator 1"/>
+        <a href="https://github.com/Yash159357">
+          <img src="" width="100px" alt="Collaborator 1"/>
           <br />
-          <sub><b>Collaborator Name 1</b></sub>
+          <sub><b>Yash</b></sub>
         </a>
         <br />
-        <sub>UI/UX Designer</sub>
-      </td>
-      <td align="center">
-        <a href="https://github.com/collaborator2">
-          <img src="https://via.placeholder.com/100x100" width="100px" alt="Collaborator 2"/>
-          <br />
-          <sub><b>Collaborator Name 2</b></sub>
-        </a>
-        <br />
-        <sub>Backend Developer</sub>
+        <sub>Full Stack Developer</sub>
       </td>
     </tr>
   </table>
