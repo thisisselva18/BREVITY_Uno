@@ -24,7 +24,7 @@
     <tr>
       <td align="center">
         <a href="https://github.com/saysamarth">
-          <img src="https://private-user-images.githubusercontent.com/125565160/428565229-cccb1dc2-c7b6-4962-bffd-dde402e2c3be.jpg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDM0MTU0OTIsIm5iZiI6MTc0MzQxNTE5MiwicGF0aCI6Ii8xMjU1NjUxNjAvNDI4NTY1MjI5LWNjY2IxZGMyLWM3YjYtNDk2Mi1iZmZkLWRkZTQwMmUyYzNiZS5qcGc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwMzMxJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDMzMVQwOTU5NTJaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT00OGQ2ZDE1YWJiYjEyZjkyYTU1ZWVkYjA0NjUzOWUwNDNmOTUxMGVkZmZlZTRhNDI2YzdlNDg4YWU3NTc0MWJhJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.lnuo_GFrxZEfFaQwEFbwiN1J_Ka3izaaaUVnof_hjGE" width="100px" alt="Photo Here"/>
+          <img src="https://private-user-images.githubusercontent.com/125565160/428565229-cccb1dc2-c7b6-4962-bffd-dde402e2c3be.jpg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDM0MTY2MzUsIm5iZiI6MTc0MzQxNjMzNSwicGF0aCI6Ii8xMjU1NjUxNjAvNDI4NTY1MjI5LWNjY2IxZGMyLWM3YjYtNDk2Mi1iZmZkLWRkZTQwMmUyYzNiZS5qcGc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwMzMxJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDMzMVQxMDE4NTVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1jMzk4OWNlOTM1MTE1ZGNkNDZlODFhNGY1NjMzMjVmOTBiMWI4ZTI0OTcxMmNhNDA4MzZmMjhiNjA1Y2YxMDllJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.g4XWHc7ZRKS8yFqwBe-o3GtBjaoyPn18puQuCrB_ImQ" width="100px" alt="Photo Here"/>
           <br />
           <sub><b>Samarth Sharma</b></sub>
         </a>
@@ -141,24 +141,16 @@ flutter pub get
 flutter run
 ```
 
-## 🗺️ Roadmap
+## 🔮 Future Plans
 
+We're constantly evolving and have some exciting ideas in the pipeline to make Newsai even more engaging and trustworthy:
 
----
-
-## 🤝 Contributing
-
-We welcome contributions to Brevity! Check out our [Contributing Guide](CONTRIBUTING.md) to get started.
-
-<p align="center">
-  <img src="https://via.placeholder.com/600x250" alt="Contributors" width="70%"/>
-</p>
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- **Chatbot Integration**: Develop a smart chatbot that helps users discuss news and delve into details, aiming to curb misinformation through fact-checking conversations. 🤖
+- **Enhanced UI/UX**: Roll out sleek design updates and smoother animations to further elevate the user experience. 🎨
+- **Beginner Tutorial**: Create an in-app tutorial for new users, guiding them through the app's features and best practices for navigating the news. 📚
+- **Advanced News Sharing**: Implement more versatile sharing options, allowing users to easily distribute news stories across social media and messaging apps. 🔗
+- **Personalized News Insights**: Integrate machine learning to offer personalized news feeds and insights based on user behavior and interests. 📈
+- **Community Engagement Tools**: Explore features that allow users to comment, rate, and discuss news articles, fostering a community of informed readers. 💬
 
 ---
 
@@ -176,5 +168,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <p align="center">
-  Made with ❤️ by the FlutterWave Team
+  Made with ❤️ by the Brevity Team
 </p>
