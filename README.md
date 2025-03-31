@@ -129,22 +129,22 @@
 
 ### Key Dependencies
 
-- **go_router**: For easy and dynamic navigation between screens.
-- **flutter_bloc**: Manages state effectively so that your app stays responsive.
-- **firebase_core, firebase_auth, & cloud_firestore**: Integrate Firebase services to power backend functionalities.
-- **google_sign_in**: Seamlessly lets users log in with their Google accounts.
-- **http**: For robust API calls fetching the latest news data.
-- **equatable**: Simplifies comparing objects within your business logic.
-- **card_swiper & flutter_card_swiper**: Enhance the user interface with cool card-swipe animations.
-- **cached_network_image**: Ensures your images load quickly and cache effectively.
-- **shimmer**: Adds attractive shimmer effects during image and content loading.
-- **url_launcher**: Allows you to open URLs directly from the app.
-- **intl**: Formats dates and times to keep everything neat and localized.
-- **gap**: Provides spacing utilities for a cleaner layout.
-- **shared_preferences**: Stores user settings and preferences locally.
-- **flutter_dotenv**: Manages environment variables securely.
-- **share_plus**: Makes sharing content a breeze.
-- **showcaseview**: Guides new users with in-app feature showcases.
+1. **go_router**: For easy and dynamic navigation between screens.
+2. **flutter_bloc**: Manages state effectively so that your app stays responsive.
+3. **firebase_core, firebase_auth, & cloud_firestore**: Integrate Firebase services to power backend functionalities.
+4. **google_sign_in**: Seamlessly lets users log in with their Google accounts.
+5. **http**: For robust API calls fetching the latest news data.
+6. **equatable**: Simplifies comparing objects within your business logic.
+7. **card_swiper & flutter_card_swiper**: Enhance the user interface with cool card-swipe animations.
+8. **cached_network_image**: Ensures your images load quickly and cache effectively.
+9. **shimmer**: Adds attractive shimmer effects during image and content loading.
+10. **url_launcher**: Allows you to open URLs directly from the app.
+11. **intl**: Formats dates and times to keep everything neat and localized.
+12. **gap**: Provides spacing utilities for a cleaner layout.
+13. **shared_preferences**: Stores user settings and preferences locally.
+14. **flutter_dotenv**: Manages environment variables securely.
+15. **share_plus**: Makes sharing content a breeze.
+16. **showcaseview**: Guides new users with in-app feature showcases.
 
 
 ## 📲 Installation
@@ -182,13 +182,16 @@ We're constantly evolving and have some exciting ideas in the pipeline to make N
   <a href="https://www.linkedin.com/in/saysamarth/">
     <img src="https://img.shields.io/badge/Linkedin-Samarth%20Sharma-1DA1F2?style=for-the-badge" alt="LinkedIn" />
   </a>
-  <a href="https://twitter.com/flutterwave_app">
+  <a href="https://www.linkedin.com/in/yash-kumar101/">
     <img src="https://img.shields.io/badge/Linkedin-Yash-1DA1F2?style=for-the-badge" alt="LinkedIn" />
   </a>
 </p>
 
+**Email**: [samarth2668@gmail.com](mailto:samarth2668@gmail.com)  
+**Email**: [yashmalihan3@gmail.com](mailto:yashmalihan3@gmail.com)  
+
 ---
 
 <p align="center">
-  Made with ❤️ by the Brevity Team
+  Made with ❤️ by us
 </p>
