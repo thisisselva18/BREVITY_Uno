@@ -47,12 +47,34 @@
 ---
 
 ## ✨ App Demo
-
-<p align="center">
-  <a href="https://youtube.com/shorts/tuf-qZ3jiEY?feature=share" target="_blank">
-    <img src="https://img.shields.io/badge/Flutter-3.29.2-blue?logo=flutter" alt="App Demo Video" width="50%"/>
-  </a>
-</p>
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://youtube.com/shorts/1T-qu-lke-I?feature=share" target="_blank">
+        <img src="https://private-user-images.githubusercontent.com/125565160/428586415-8868e125-4711-4ab1-a62a-15c5fe1e134b.jpg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDM0MTg5OTQsIm5iZiI6MTc0MzQxODY5NCwicGF0aCI6Ii8xMjU1NjUxNjAvNDI4NTg2NDE1LTg4NjhlMTI1LTQ3MTEtNGFiMS1hNjJhLTE1YzVmZTFlMTM0Yi5qcGc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwMzMxJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDMzMVQxMDU4MTRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0xZjZmMGM4M2Q0OTNkMTE0MDQ0NmVlMjU4OGUzMjJiZjYzNzM4M2E3ZDJiMTNkMzI4MzAzZTAzNzk3MDhmYTgwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.xmDBK02kU62C6VVsOjuccsU8mdzb-jtJ4BrhVqhs9Yc" width="200"/>
+        <br/>
+        <b>Video 1</b>
+      </a>
+      <p>Login & SignUp</p>
+    </td>
+    <td align="center">
+      <a href="https://youtube.com/shorts/tuf-qZ3jiEY?feature=share" target="_blank">
+        <img src="https://private-user-images.githubusercontent.com/125565160/428586415-8868e125-4711-4ab1-a62a-15c5fe1e134b.jpg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDM0MTg5OTQsIm5iZiI6MTc0MzQxODY5NCwicGF0aCI6Ii8xMjU1NjUxNjAvNDI4NTg2NDE1LTg4NjhlMTI1LTQ3MTEtNGFiMS1hNjJhLTE1YzVmZTFlMTM0Yi5qcGc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwMzMxJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDMzMVQxMDU4MTRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0xZjZmMGM4M2Q0OTNkMTE0MDQ0NmVlMjU4OGUzMjJiZjYzNzM4M2E3ZDJiMTNkMzI4MzAzZTAzNzk3MDhmYTgwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.xmDBK02kU62C6VVsOjuccsU8mdzb-jtJ4BrhVqhs9Yc" width="200"/>
+        <br/>
+        <b>Video 2</b>
+      </a>
+      <p>Main Features</p>
+    </td>
+     <td align="center">
+      <a href="https://youtube.com/shorts/7Xda11xPDwE?feature=share" target="_blank">
+        <img src="https://private-user-images.githubusercontent.com/125565160/428586415-8868e125-4711-4ab1-a62a-15c5fe1e134b.jpg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDM0MTg5OTQsIm5iZiI6MTc0MzQxODY5NCwicGF0aCI6Ii8xMjU1NjUxNjAvNDI4NTg2NDE1LTg4NjhlMTI1LTQ3MTEtNGFiMS1hNjJhLTE1YzVmZTFlMTM0Yi5qcGc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwMzMxJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDMzMVQxMDU4MTRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0xZjZmMGM4M2Q0OTNkMTE0MDQ0NmVlMjU4OGUzMjJiZjYzNzM4M2E3ZDJiMTNkMzI4MzAzZTAzNzk3MDhmYTgwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.xmDBK02kU62C6VVsOjuccsU8mdzb-jtJ4BrhVqhs9Yc" width="200"/>
+        <br/>
+        <b>Video 3</b>
+      </a>
+      <p>Additional Features</p>
+    </td>
+  </tr>
+</table>
 
 <details>
 <summary>📱 View App Screenshots</summary>
@@ -154,14 +176,14 @@ We're constantly evolving and have some exciting ideas in the pipeline to make N
 
 ---
 
-## 💬 Community
+## 💬 Connect With Us
 
 <p align="center">
-  <a href="https://discord.gg/flutterwave">
-    <img src="https://img.shields.io/badge/Discord-Join%20Community-7289DA?style=for-the-badge&logo=discord" alt="Discord" />
+  <a href="https://www.linkedin.com/in/saysamarth/">
+    <img src="https://img.shields.io/badge/Linkedin-Samarth%20Sharma-1DA1F2?style=for-the-badge" alt="LinkedIn" />
   </a>
   <a href="https://twitter.com/flutterwave_app">
-    <img src="https://img.shields.io/badge/Twitter-Follow%20Us-1DA1F2?style=for-the-badge&logo=twitter" alt="Twitter" />
+    <img src="https://img.shields.io/badge/Linkedin-Yash-1DA1F2?style=for-the-badge" alt="LinkedIn" />
   </a>
 </p>
 
