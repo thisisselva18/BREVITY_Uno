@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <b>Manage your finances seamlessly with beautiful visualizations and smart insights</b>
+  <b>Stay informed effortlessly with real-time news, seamless navigation, and a personalized reading experience.</b>
 </p>
 
 ---
@@ -69,38 +69,58 @@
 ## 🌟 Features
 
 ### Core Features
-- **Smart Budget Tracking** - AI-powered categorization of expenses and income
-- **Interactive Visualizations** - Beautiful charts and graphs for financial analysis
-- **Financial Forecasting** - Predict future spending patterns and savings
-- **Secure Authentication** - Biometric and multi-factor authentication
-- **Cloud Sync** - Real-time data synchronization across all devices
+- **Infinite Scrolling** - Never hit “the end” – keep scrolling for more stories! 🔄
+- **Side Page Navigation** -Bookmark articles, adjust settings, and access more details with ease. 📚
+- **Theming Support** - Users can personalize their reading experience by selecting their preferred theme. 🎨
+- **Direct Full Article Access** - Easily navigate to the full news article from the app. 🌐
+- **Search News** - Quickly find news articles based on keywords or categories. 🔍
+- **Shareability** - Effortlessly share the app with friends using share_plus. 🤝
 
 ### Technical Highlights
-- **Offline Mode** - Full functionality without internet connection
-- **Adaptive UI** - Seamless experience across mobile, tablet, and desktop
-- **Dark/Light Themes** - Customizable appearance with dynamic color schemes
-- **Localization** - Available in 12 languages
-- **Accessibility** - Screen reader support and dynamic text sizing
+
+- **State Management** – Uses flutter_bloc for efficient, scalable, and predictable state handling. ⚡
+- **Dynamic Routing** – Seamless navigation with go_router for a smooth user experience. 🚦
+- **Optimized Caching** – Uses cached_network_image for efficient image loading and reduced data usage. 📶
+- **Engaging Animations** – Implements shimmer effects and smooth transitions for a delightful UI. 🎬
+- **Modular Architecture** – Clean and maintainable codebase with a well-structured project setup. 🏗️
 
 ---
 
 ## 🛠️ Tech Stack
 
 <p align="center">
-  <img src="https://via.placeholder.com/80x80" alt="Flutter" width="80" height="80"/>
-  <img src="https://via.placeholder.com/80x80" alt="Firebase" width="80" height="80"/>
-  <img src="https://via.placeholder.com/80x80" alt="Provider" width="80" height="80"/>
-  <img src="https://via.placeholder.com/80x80" alt="SQLite" width="80" height="80"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/flutter/flutter-original.svg" alt="Flutter" width="50" height="50"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-original-wordmark.svg" alt="Firebase" width="50" height="50"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg" alt="git" width="50" height="50"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vscode/vscode-original.svg" alt="VScode" width="50" height="50"/>
 </p>
 
-- **Frontend**: Flutter, Dart, Provider for state management
+- **Frontend**: Flutter, Dart, BLoc for state management
 - **Backend**: Firebase (Authentication, Firestore, Functions)
-- **Local Storage**: Hive, SQLite
-- **APIs**: Plaid API (banking integration), Currency Exchange API
-- **CI/CD**: GitHub Actions, Firebase App Distribution
-- **Analytics**: Firebase Analytics, Sentry for crash reporting
+- **Local Storage**: Shared Preferences
+- **APIs**: News API, Gemini API
 
 ---
+
+### Key Dependencies
+
+- **go_router**: For easy and dynamic navigation between screens.
+- **flutter_bloc**: Manages state effectively so that your app stays responsive.
+- **firebase_core, firebase_auth, & cloud_firestore**: Integrate Firebase services to power backend functionalities.
+- **google_sign_in**: Seamlessly lets users log in with their Google accounts.
+- **http**: For robust API calls fetching the latest news data.
+- **equatable**: Simplifies comparing objects within your business logic.
+- **card_swiper & flutter_card_swiper**: Enhance the user interface with cool card-swipe animations.
+- **cached_network_image**: Ensures your images load quickly and cache effectively.
+- **shimmer**: Adds attractive shimmer effects during image and content loading.
+- **url_launcher**: Allows you to open URLs directly from the app.
+- **intl**: Formats dates and times to keep everything neat and localized.
+- **gap**: Provides spacing utilities for a cleaner layout.
+- **shared_preferences**: Stores user settings and preferences locally.
+- **flutter_dotenv**: Manages environment variables securely.
+- **share_plus**: Makes sharing content a breeze.
+- **showcaseview**: Guides new users with in-app feature showcases.
+
 
 ## 📲 Installation
 
