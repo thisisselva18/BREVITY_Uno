@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:go_router/go_router.dart';
 
-// Import the AuthService to check sign-in status
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -80,7 +79,11 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF2A2D5E), Color(0xFF00F5D4)],
+            colors: [ Color.fromARGB(255, 4, 16, 54),
+            Color.fromARGB(255, 30, 36, 98),
+            Color.fromARGB(255, 36, 3, 95),
+          ],
+          stops: [0.0, 0.5, 1.0],
           ),
         ),
         child: Stack(
@@ -112,7 +115,7 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                     const SizedBox(height: 20),
                     ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
-                        colors: [Color(0xFF00F5D4), Colors.white],
+                        colors: [Color.fromARGB(255, 26, 175, 255), Colors.white],
                       ).createShader(bounds),
                       child: const Text(
                         'BREVITY',
@@ -128,31 +131,12 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                     const Text(
                       'Short, Smart, Straight to the point',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Color.fromARGB(202, 255, 255, 255),
                         fontSize: 14,
                         fontFamily: 'Poppins',
                       ),
                     ),
                   ],
-                ),
-              ),
-            ),
-      
-            // Progress Bar
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 40),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: LinearProgressIndicator(
-                    value: _controller.value,
-                    minHeight: 4,
-                    backgroundColor: Colors.white.withAlpha(51),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      const Color(0xFF00F5D4).withAlpha(205),
-                    ),
-                  ),
                 ),
               ),
             ),
@@ -187,7 +171,7 @@ class ParticlePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF00F5D4)
+      ..color = const Color(0xFF3B82F6)
       ..style = PaintingStyle.fill;
 
     for (var particle in particles) {
