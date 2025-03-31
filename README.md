@@ -49,8 +49,8 @@
 ## ✨ App Demo
 
 <p align="center">
-  <a href="https://youtu.be/your-video-link" target="_blank">
-    <img src="https://via.placeholder.com/640x360" alt="App Demo Video" width="70%"/>
+  <a href="https://youtube.com/shorts/tuf-qZ3jiEY?feature=share" target="_blank">
+    <img src="https://img.shields.io/badge/Flutter-3.29.2-blue?logo=flutter" alt="App Demo Video" width="50%"/>
   </a>
 </p>
 
