@@ -24,7 +24,7 @@
     <tr>
       <td align="center">
         <a href="https://github.com/saysamarth">
-          <img src="" width="100px" alt="Your Name"/>
+          <img src="https://user-images.githubusercontent.com/cccb1dc2-c7b6-4962-bffd-dde402e2c3be" width="100px" alt="Your Name"/>
           <br />
           <sub><b>Samarth Sharma</b></sub>
         </a>
