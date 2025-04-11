@@ -235,9 +235,9 @@ class _NewsCard extends StatelessWidget {
                   colors: [
                     const Color.fromARGB(230, 4, 4, 4),
                     Colors.transparent,
-                    const Color.fromARGB(230, 4, 4, 4)
+                    const Color.fromARGB(230, 4, 4, 4),
                   ],
-                  stops: const [0.1, 0.7,1.0],
+                  stops: const [0.1, 0.7, 1.0],
                 ),
               ),
             ),
@@ -318,13 +318,20 @@ class _NewsCard extends StatelessWidget {
                         ),
                         onPressed: () => _launchUrl(article.url),
                       ),
-                      Image.asset(
-                        'assets/logos/ai.gif',
-                        width: 90,
-                        height: 70,
-                        fit: BoxFit.contain,
+                      IconButton(
+                        onPressed:
+                            () => context.pushNamed(
+                              'chat',
+                              extra:
+                                  article, // Pass current article
+                            ),
+                        icon: Image.asset(
+                          'assets/logos/ai.gif',
+                          width: 90,
+                          height: 70,
+                          fit: BoxFit.contain,
+                        ),
                       ),
-                      
                     ],
                   ),
                 ],

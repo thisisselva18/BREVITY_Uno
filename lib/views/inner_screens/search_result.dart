@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newsai/controller/services/news_services.dart';
 import 'package:newsai/models/article_model.dart';
-import 'package:newsai/views/common_widgets/List_of_article.dart';
+import 'package:newsai/views/common_widgets/list_of_article.dart';
 import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_event.dart';
 import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:newsai/views/common_widgets/common_appbar.dart';
