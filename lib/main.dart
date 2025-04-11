@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
+import 'package:newsai/models/article_model.dart';
 import 'package:newsai/models/news_category.dart';
 import 'package:newsai/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:newsai/firebase_options.dart';
+import 'package:newsai/views/inner_screens/chat_screen.dart';
 import 'package:newsai/views/inner_screens/profile.dart';
 import 'package:newsai/views/inner_screens/search_result.dart';
 import 'package:newsai/views/inner_screens/settings.dart';
@@ -258,6 +260,39 @@ final _routes = GoRouter(
           transitionDuration: const Duration(milliseconds: 225),
         );
       },
+    ),
+    GoRoute(
+      path: '/chat',
+      name: 'chat',
+      pageBuilder:
+          (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: ChatScreen(article: state.extra as Article),
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              // Combine scale and fade animations
+              return Align(
+                alignment: Alignment.center,
+                child: FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: animation.drive(
+                      Tween<double>(
+                        begin: 0.0,
+                        end: 1.0,
+                      ).chain(CurveTween(curve: Curves.easeInOutQuad)),
+                    ),
+                    child: child,
+                  ),
+                ),
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 225),
+          ),
     ),
   ],
   // Add redirect logic to handle authentication state
