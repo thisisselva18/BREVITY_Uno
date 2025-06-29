@@ -27,14 +27,16 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
       _currentCategory = event.category;
       _page = 1;
       _hasReachedMax = false;
-      
+
       emit(NewsLoading());
       final articles = await _fetchCategoryNews();
-      emit(NewsLoaded(
-        articles: articles,
-        hasReachedMax: articles.length < _pageSize,
-        category: _currentCategory,
-      ));
+      emit(
+        NewsLoaded(
+          articles: articles,
+          hasReachedMax: articles.length < _pageSize,
+          category: _currentCategory,
+        ),
+      );
     } catch (e) {
       emit(NewsError('Failed to load news: $e'));
     }
@@ -45,31 +47,35 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
     Emitter<NewsState> emit,
   ) async {
     final currentState = state;
-    if (currentState is! NewsLoaded || 
-        _hasReachedMax || 
-        _currentCategory != event.category) return;
+    if (currentState is! NewsLoaded ||
+        _hasReachedMax ||
+        _currentCategory != event.category) {
+      return;
+    }
 
     try {
       emit(currentState.copyWith(isLoadingMore: true));
-      
+
       final newArticles = await _fetchCategoryNews(page: _page + 1);
 
       _hasReachedMax = newArticles.length < _pageSize;
       _page++;
 
-      emit(NewsLoaded(
-        articles: [...currentState.articles, ...newArticles],
-        hasReachedMax: _hasReachedMax,
-        isLoadingMore: false,
-        category: _currentCategory,
-      ));
+      emit(
+        NewsLoaded(
+          articles: [...currentState.articles, ...newArticles],
+          hasReachedMax: _hasReachedMax,
+          isLoadingMore: false,
+          category: _currentCategory,
+        ),
+      );
     } catch (e) {
       emit(NewsError('Failed to load more news: $e'));
     }
   }
 
   Future<List<Article>> _fetchCategoryNews({int? page}) async {
-    switch(_currentCategory) {
+    switch (_currentCategory) {
       case NewsCategory.technology:
         return newsService.fetchTechnologyNews(page: page ?? _page);
       case NewsCategory.sports:

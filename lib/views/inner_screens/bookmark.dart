@@ -5,6 +5,7 @@ import 'package:newsai/views/common_widgets/list_of_article.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_state.dart';
+import 'package:newsai/controller/cubit/theme/theme_cubit.dart';
 import 'package:newsai/models/article_model.dart';
 import 'package:newsai/views/common_widgets/common_appbar.dart';
 
@@ -63,6 +64,9 @@ class _BookmarkScreenState extends State<BookmarkScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Access current theme from ThemeCubit for dynamic theming
+    final currentTheme = context.read<ThemeCubit>().currentTheme;
+
     return AppScaffold(
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
@@ -75,7 +79,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
             flexibleSpace: FlexibleSpaceBar(
               background: ParticlesHeader(
                 title: "Bookmarks",
-                themeColor: Colors.blue,
+                // Apply theme's primary color to particle header
+                themeColor: currentTheme.primaryColor,
                 particleAnimation: _particleAnimationController,
               ),
             ),
@@ -99,12 +104,13 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                     builder: (context, state) {
                       if (state is BookmarksLoaded) {
                         return state.bookmarks.isEmpty
-                            ? _buildEmptyState()
+                            ? _buildEmptyState(currentTheme)
                             : _buildBookmarksList(state.bookmarks);
                       }
-                      return const Center(
+                      return Center(
                         child: CircularProgressIndicator(
-                          color: Color(0xFF5E92F3),
+                          // Use theme's primary color for loading indicator
+                          color: currentTheme.primaryColor,
                           strokeWidth: 3,
                         ),
                       );
@@ -119,7 +125,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     );
   }
 
-  Widget _buildEmptyState() {
+  // Updated empty state with theme parameter for dynamic styling
+  Widget _buildEmptyState(currentTheme) {
     return Center(
       child: Container(
         padding: const EdgeInsets.all(30),
@@ -133,16 +140,18 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 borderRadius: BorderRadius.circular(100),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF5E92F3).withOpacity(0.15),
+                    // Apply theme color to shadow with opacity
+                    color: currentTheme.primaryColor.withOpacity(0.15),
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),
                 ],
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.bookmark_border_rounded,
                 size: 70,
-                color: Color(0xFF5E92F3),
+                // Use theme's primary color for bookmark icon
+                color: currentTheme.primaryColor,
               ),
             ),
             const SizedBox(height: 32),
@@ -168,7 +177,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
             const SizedBox(height: 32),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF5E92F3),
+                // Apply theme's primary color to button background
+                backgroundColor: currentTheme.primaryColor,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
@@ -178,7 +188,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 4,
-                shadowColor: const Color(0xFF5E92F3).withOpacity(0.5),
+                // Apply theme color to button shadow
+                shadowColor: currentTheme.primaryColor.withOpacity(0.5),
               ),
               onPressed: () => Navigator.of(context).pop(),
               child: const Row(

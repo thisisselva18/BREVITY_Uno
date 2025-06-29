@@ -9,13 +9,13 @@ class ParticlesHeader extends StatelessWidget {
   final double height;
 
   const ParticlesHeader({
-    Key? key,
+    super.key,
     required this.title,
     required this.themeColor,
     required this.particleAnimation,
     this.child,
     this.height = 80,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -72,10 +72,10 @@ class AnimatedPageTransition extends StatelessWidget {
   final Widget child;
 
   const AnimatedPageTransition({
-    Key? key,
+    super.key,
     required this.animation,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +134,7 @@ class ParticlesPainter extends CustomPainter {
 class AppScaffold extends StatelessWidget {
   final Widget body;
 
-  const AppScaffold({Key? key, required this.body}) : super(key: key);
+  const AppScaffold({super.key, required this.body});
 
   @override
   Widget build(BuildContext context) {
