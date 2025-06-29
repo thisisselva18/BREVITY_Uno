@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
-
 import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_state.dart';
+import 'package:newsai/controller/cubit/theme/theme_cubit.dart';
 import 'package:newsai/models/article_model.dart';
 
 class ArticleListItem extends StatelessWidget {
@@ -25,16 +25,20 @@ class ArticleListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentTheme = context.read<ThemeCubit>().currentTheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         height: 120,
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF20242D), Color(0xFF2A303A)],
+            colors: [
+              currentTheme.primaryColor.withAlpha(70),
+              currentTheme.primaryColor.withAlpha(10),
+            ],
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
@@ -59,23 +63,25 @@ class ArticleListItem extends StatelessWidget {
                     CachedNetworkImage(
                       imageUrl: article.urlToImage,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: const Color(0xFF2A303A),
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xFF5E92F3),
-                            strokeWidth: 2,
+                      placeholder:
+                          (context, url) => Container(
+                            color: const Color(0xFF2A303A),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: currentTheme.primaryColor,
+                                strokeWidth: 2,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: const Color(0xFF2A303A),
-                        child: const Icon(
-                          Icons.image_not_supported_outlined,
-                          color: Colors.white54,
-                          size: 40,
-                        ),
-                      ),
+                      errorWidget:
+                          (context, url, error) => Container(
+                            color: const Color(0xFF2A303A),
+                            child: const Icon(
+                              Icons.image_not_supported_outlined,
+                              color: Colors.white54,
+                              size: 40,
+                            ),
+                          ),
                     ),
                     Container(
                       decoration: BoxDecoration(
@@ -92,7 +98,6 @@ class ArticleListItem extends StatelessWidget {
                   ],
                 ),
               ),
-              // Content section
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(12),
@@ -100,7 +105,6 @@ class ArticleListItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Source and date row
                       Row(
                         children: [
                           Container(
@@ -109,13 +113,13 @@ class ArticleListItem extends StatelessWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF5E92F3).withAlpha(40),
+                              color: currentTheme.primaryColor.withAlpha(40),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               article.sourceName.toUpperCase(),
-                              style: const TextStyle(
-                                color: Color(0xFF5E92F3),
+                              style: TextStyle(
+                                color: currentTheme.primaryColor,
                                 fontSize: 9,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0,
@@ -173,23 +177,30 @@ class ArticleListItem extends StatelessWidget {
                           if (showBookmark)
                             BlocBuilder<BookmarkBloc, BookmarkState>(
                               builder: (context, state) {
-                                final isBookmarked = state is BookmarksLoaded &&
-                                    state.bookmarks.any((a) => a.url == article.url);
-                                
+                                final isBookmarked =
+                                    state is BookmarksLoaded &&
+                                    state.bookmarks.any(
+                                      (a) => a.url == article.url,
+                                    );
+
                                 return SizedBox(
                                   width: 28,
                                   height: 28,
                                   child: IconButton(
                                     icon: Icon(
-                                      isBookmarked ? Icons.bookmark : Icons.bookmark_add_outlined,
+                                      isBookmarked
+                                          ? Icons.bookmark
+                                          : Icons.bookmark_add_outlined,
                                       size: 20,
                                     ),
                                     padding: EdgeInsets.zero,
                                     style: IconButton.styleFrom(
-                                      backgroundColor: const Color(0xFF353A47),
-                                      foregroundColor: isBookmarked 
-                                          ? const Color(0xFF5E92F3)
-                                          : const Color(0xFFB0BEC5),
+                                      backgroundColor: currentTheme.primaryColor
+                                          .withAlpha(isBookmarked ? 40 : 10),
+                                      foregroundColor:
+                                          isBookmarked
+                                              ? currentTheme.primaryColor
+                                              : Colors.white70,
                                     ),
                                     onPressed: onSide,
                                     tooltip: 'Bookmark',

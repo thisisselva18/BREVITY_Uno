@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
 import 'package:newsai/controller/bloc/chat_bloc/chat_bloc.dart';
 import 'package:newsai/models/article_model.dart';
-import 'package:newsai/models/conversation_model.dart';
 import 'package:newsai/views/common_widgets/message_bubble.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -14,24 +12,30 @@ class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ChatBloc()..add(InitializeChat(articleData: article.title)),
+      create:
+          (context) =>
+              ChatBloc()..add(InitializeChat(articleData: article.title)),
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 24, 24, 24),
         appBar: AppBar(
           automaticallyImplyLeading: true,
           backgroundColor: Colors.transparent,
-          title: const Text('NewsAI Assistant',
+          iconTheme: const IconThemeData(
+            color: Colors.white,
+          ), // Set back button color to white
+          title: const Text(
+            'NewsAI Assistant',
             style: TextStyle(
               color: Colors.white,
               fontFamily: 'Poppins',
-              fontWeight: FontWeight.w600
+              fontWeight: FontWeight.w600,
             ),
           ),
           actions: [
             IconButton(
               icon: const Icon(Icons.delete_outline, color: Colors.white70),
               onPressed: () => context.read<ChatBloc>().add(ClearChat()),
-            )
+            ),
           ],
         ),
         body: Column(
@@ -56,10 +60,7 @@ class ChatScreen extends StatelessWidget {
       ),
       child: Text(
         article.title,
-        style: TextStyle(
-          color: Colors.white.withOpacity(0.9),
-          fontSize: 16,
-        ),
+        style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 16),
         textAlign: TextAlign.center,
       ),
     );
@@ -74,7 +75,8 @@ class ChatScreen extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16),
             itemCount: state.chatWindow.conversations.length,
             itemBuilder: (context, index) {
-              final message = state.chatWindow.conversations.reversed.toList()[index];
+              final message =
+                  state.chatWindow.conversations.reversed.toList()[index];
               return MessageBubble(
                 message: message.request,
                 response: message.response,
@@ -89,14 +91,14 @@ class ChatScreen extends StatelessWidget {
   }
 
   Widget _buildInputField(BuildContext context) {
-    final TextEditingController _controller = TextEditingController();
+    final TextEditingController controller = TextEditingController();
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
           Expanded(
             child: TextField(
-              controller: _controller,
+              controller: controller,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'Ask about this news...',
@@ -109,7 +111,7 @@ class ChatScreen extends StatelessWidget {
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 20,
-                  vertical: 16
+                  vertical: 16,
                 ),
               ),
             ),
@@ -120,19 +122,19 @@ class ChatScreen extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.send, color: Colors.white),
               onPressed: () {
-                final message = _controller.text;
+                final message = controller.text;
                 if (message.isNotEmpty) {
                   context.read<ChatBloc>().add(
                     AddMessage(
                       message: message,
                       response: _generateDummyResponse(message), // Temporary
-                    )
+                    ),
                   );
-                  _controller.clear();
+                  controller.clear();
                 }
               },
             ),
-          )
+          ),
         ],
       ),
     );

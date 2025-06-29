@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:newsai/controller/cubit/theme/theme_cubit.dart';
 import 'package:newsai/controller/cubit/user_profile/user_profile_cubit.dart';
 import 'package:newsai/controller/cubit/user_profile/user_profile_state.dart';
 import 'package:newsai/views/common_widgets/common_appbar.dart';
@@ -20,14 +21,12 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   void initState() {
     super.initState();
-    
-    // Initialize animation controller
+
     _particleAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
     )..repeat();
-    
-    // Load user profile on init
+
     context.read<UserProfileCubit>().loadUserProfile();
   }
 
@@ -40,47 +39,51 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   void _saveProfile() {
-    // Update profile using the cubit
     final userProfileCubit = context.read<UserProfileCubit>();
-    userProfileCubit.updateProfile(
-      displayName: _nameController.text,
-    ).then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully')),
-      );
-    }).catchError((error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error updating profile: $error')),
-      );
-    });
+    userProfileCubit
+        .updateProfile(displayName: _nameController.text)
+        .then((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile updated successfully')),
+          );
+        })
+        .catchError((error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error updating profile: $error')),
+          );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Access current theme from ThemeCubit for dynamic theming
+    final currentTheme = context.read<ThemeCubit>().currentTheme;
+
     return BlocConsumer<UserProfileCubit, UserProfileState>(
       listener: (context, state) {
-        // Update text controllers when user data is loaded
         if (state.status == UserProfileStatus.loaded && state.user != null) {
           _nameController.text = state.user!.displayName;
           _emailController.text = state.user!.email;
         }
       },
       builder: (context, state) {
-        // Show loading indicator while data is loading
         if (state.status == UserProfileStatus.loading) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(
+                // Apply theme's primary color to loading indicator
+                color: currentTheme.primaryColor,
+              ),
+            ),
           );
         }
-        
-        // Show error if loading failed
+
         if (state.status == UserProfileStatus.error) {
           return Scaffold(
             body: Center(child: Text('Error: ${state.errorMessage}')),
           );
         }
-        
-        // Build UI with loaded data
+
         final user = state.user;
         return AppScaffold(
           body: CustomScrollView(
@@ -93,7 +96,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                 flexibleSpace: FlexibleSpaceBar(
                   background: ParticlesHeader(
                     title: "Profile Settings",
-                    themeColor: Colors.blue,
+                    // Apply theme's primary color to particle header
+                    themeColor: currentTheme.primaryColor,
                     particleAnimation: _particleAnimationController,
                   ),
                 ),
@@ -114,7 +118,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                           children: [
                             CircleAvatar(
                               radius: 50,
-                              backgroundColor: Colors.blue.withAlpha(80),
+                              // Apply theme color to avatar background with opacity
+                              backgroundColor: currentTheme.primaryColor
+                                  .withAlpha(80),
                               child: Text(
                                 user?.displayName.isNotEmpty == true
                                     ? user!.displayName[0].toUpperCase()
@@ -129,7 +135,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                             Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: Colors.blue,
+                                // Apply theme's primary color to edit button
+                                color: currentTheme.primaryColor,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Icon(
@@ -146,6 +153,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                           icon: Icons.person,
                           label: 'Full Name',
                           controller: _nameController,
+                          currentTheme:
+                              currentTheme, // Pass theme to field builder
                         ),
                         const SizedBox(height: 20),
                         _buildProfileField(
@@ -153,40 +162,49 @@ class _ProfileScreenState extends State<ProfileScreen>
                           label: 'Email Address',
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
-                          enabled: false, // Email should not be editable
+                          enabled: false,
+                          currentTheme:
+                              currentTheme, // Pass theme to field builder
                         ),
                         const SizedBox(height: 30),
 
-                        // Account Information
                         _buildProfileOption(
                           icon: Icons.verified_user,
                           title: 'Email Verified',
                           subtitle: user?.emailVerified == true ? 'Yes' : 'No',
-                          onTap: () {}, 
+                          onTap: () {},
+                          currentTheme:
+                              currentTheme, // Pass theme to option builder
                         ),
                         _buildProfileOption(
                           icon: Icons.calendar_today,
                           title: 'Account Created',
-                          subtitle: user?.createdAt != null
-                              ? '${user!.createdAt!.day}/${user.createdAt!.month}/${user.createdAt!.year}'
-                              : 'Unknown',
+                          subtitle:
+                              user?.createdAt != null
+                                  ? '${user!.createdAt!.day}/${user.createdAt!.month}/${user.createdAt!.year}'
+                                  : 'Unknown',
                           onTap: () {},
+                          currentTheme:
+                              currentTheme, // Pass theme to option builder
                         ),
                         _buildProfileOption(
                           icon: Icons.update,
                           title: 'Last Updated',
-                          subtitle: user?.updatedAt != null
-                              ? '${user!.updatedAt!.day}/${user.updatedAt!.month}/${user.updatedAt!.year}'
-                              : 'Never',
+                          subtitle:
+                              user?.updatedAt != null
+                                  ? '${user!.updatedAt!.day}/${user.updatedAt!.month}/${user.updatedAt!.year}'
+                                  : 'Never',
                           onTap: () {},
+                          currentTheme:
+                              currentTheme, // Pass theme to option builder
                         ),
                         const SizedBox(height: 40),
 
-                        // Save Button
                         ElevatedButton(
                           onPressed: _saveProfile,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            // Apply theme's primary color to save button
+                            backgroundColor: currentTheme.primaryColor,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 40,
                               vertical: 15,
@@ -216,10 +234,12 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  // Updated profile field builder with theme parameter
   Widget _buildProfileField({
     required IconData icon,
     required String label,
     required TextEditingController controller,
+    required currentTheme, // Add theme parameter for dynamic styling
     TextInputType keyboardType = TextInputType.text,
     bool enabled = true,
   }) {
@@ -234,7 +254,8 @@ class _ProfileScreenState extends State<ProfileScreen>
         enabled: enabled,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.blue),
+          // Apply theme's primary color to prefix icon
+          prefixIcon: Icon(icon, color: currentTheme.primaryColor),
           labelText: label,
           labelStyle: const TextStyle(color: Colors.white70),
           border: InputBorder.none,
@@ -244,11 +265,13 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  // Updated profile option builder with theme parameter
   Widget _buildProfileOption({
     required IconData icon,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
+    required currentTheme, // Add theme parameter for dynamic styling
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
@@ -257,13 +280,15 @@ class _ProfileScreenState extends State<ProfileScreen>
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
-        leading: Icon(icon, color: Colors.blue),
+        // Apply theme's primary color to leading icon
+        leading: Icon(icon, color: currentTheme.primaryColor),
         title: Text(title, style: const TextStyle(color: Colors.white)),
         subtitle: Text(subtitle, style: const TextStyle(color: Colors.white70)),
-        trailing: const Icon(
+        trailing: Icon(
           Icons.arrow_forward_ios,
           size: 16,
-          color: Colors.blue,
+          // Apply theme's primary color to trailing arrow
+          color: currentTheme.primaryColor,
         ),
         onTap: onTap,
       ),
