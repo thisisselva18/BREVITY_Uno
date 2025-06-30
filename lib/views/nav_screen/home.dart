@@ -1,21 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:go_router/go_router.dart';
-import 'package:newsai/controller/services/news_services.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:gap/gap.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_event.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_state.dart';
 import 'package:newsai/controller/bloc/news_scroll_bloc/news_scroll_bloc.dart';
 import 'package:newsai/controller/bloc/news_scroll_bloc/news_scroll_event.dart';
 import 'package:newsai/controller/bloc/news_scroll_bloc/news_scroll_state.dart';
-import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
-import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_state.dart';
-import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_event.dart';
+import 'package:newsai/controller/cubit/theme/theme_cubit.dart';
+import 'package:newsai/controller/services/news_services.dart';
 import 'package:newsai/models/article_model.dart';
 import 'package:newsai/models/news_category.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatelessWidget {
   final NewsCategory category;
@@ -197,6 +198,7 @@ class _NewsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentTheme = context.read<ThemeCubit>().currentTheme;
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -255,7 +257,7 @@ class _NewsCard extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color.fromRGBO(68, 138, 255, 0.9),
+                          color: currentTheme.primaryColor,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -322,8 +324,7 @@ class _NewsCard extends StatelessWidget {
                         onPressed:
                             () => context.pushNamed(
                               'chat',
-                              extra:
-                                  article, // Pass current article
+                              extra: article, // Pass current article
                             ),
                         icon: Image.asset(
                           'assets/logos/ai.gif',
@@ -357,6 +358,7 @@ class _TappableHeadline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentTheme = context.read<ThemeCubit>().currentTheme;
     return BlocBuilder<BookmarkBloc, BookmarkState>(
       builder: (context, state) {
         final isBookmarked =
@@ -373,7 +375,7 @@ class _TappableHeadline extends StatelessWidget {
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: isBookmarked ? Colors.blue : Colors.white,
+              color: isBookmarked ? currentTheme.primaryColor : Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.w700,
             ),

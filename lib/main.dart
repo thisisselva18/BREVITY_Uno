@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
+import 'package:newsai/controller/cubit/theme/theme_cubit.dart';
 import 'package:newsai/models/article_model.dart';
 import 'package:newsai/models/news_category.dart';
 import 'package:newsai/views/auth/auth.dart';
@@ -342,6 +343,7 @@ void main() async {
         providers: [
           BlocProvider(create: (context) => BookmarkBloc(bookmarkRepository)),
           BlocProvider(create: (context) => UserProfileCubit()),
+          BlocProvider(create: (context) => ThemeCubit()),
         ],
         child: const MyApp(),
       ),

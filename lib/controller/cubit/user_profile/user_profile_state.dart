@@ -7,13 +7,13 @@ class UserProfileState extends Equatable {
   final UserProfileStatus status;
   final UserModel? user;
   final String? errorMessage;
-  
+
   const UserProfileState({
     this.status = UserProfileStatus.initial,
-    this.user = null,
+    this.user,
     this.errorMessage,
   });
-  
+
   UserProfileState copyWith({
     UserProfileStatus? status,
     UserModel? user,
@@ -25,7 +25,7 @@ class UserProfileState extends Equatable {
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
-  
+
   @override
   List<Object?> get props => [status, user, errorMessage];
 }

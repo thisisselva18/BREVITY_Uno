@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
+import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_event.dart';
+import 'package:newsai/controller/cubit/theme/theme_cubit.dart';
 import 'package:newsai/controller/services/news_services.dart';
 import 'package:newsai/models/article_model.dart';
-import 'package:newsai/views/common_widgets/list_of_article.dart';
-import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_event.dart';
-import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:newsai/views/common_widgets/common_appbar.dart';
+import 'package:newsai/views/common_widgets/list_of_article.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SearchResultsScreen extends StatefulWidget {
@@ -61,6 +62,9 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Access current theme from ThemeCubit for dynamic theming
+    final currentTheme = context.read<ThemeCubit>().currentTheme;
+
     return AppScaffold(
       body: FutureBuilder<List<Article>>(
         future: _searchResults,
@@ -76,7 +80,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                 flexibleSpace: FlexibleSpaceBar(
                   background: ParticlesHeader(
                     title: "Results for ${widget.query}",
-                    themeColor: Colors.blue,
+                    // Apply theme's primary color to particle header
+                    themeColor: currentTheme.primaryColor,
                     particleAnimation: _particleAnimationController,
                   ),
                 ),
@@ -87,8 +92,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ),
-              SliverToBoxAdapter(child: SizedBox(height: 35)),
-              _buildContentSlivers(snapshot),
+              const SliverToBoxAdapter(child: SizedBox(height: 35)),
+              _buildContentSlivers(snapshot, currentTheme),
             ],
           );
         },
@@ -97,6 +102,9 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
   }
 
   void _launchArticle(String url) async {
+    // Access current theme for themed error messages
+    final currentTheme = context.read<ThemeCubit>().currentTheme;
+
     try {
       if (await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url));
@@ -112,7 +120,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
             ),
             action: SnackBarAction(
               label: 'DISMISS',
-              textColor: const Color(0xFF64B5F6),
+              // Apply theme's primary color to snackbar action
+              textColor: currentTheme.primaryColor,
               onPressed: () {},
             ),
           ),
@@ -121,11 +130,18 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
     }
   }
 
-  Widget _buildContentSlivers(AsyncSnapshot<List<Article>> snapshot) {
+  // Updated content slivers with theme parameter for dynamic styling
+  Widget _buildContentSlivers(
+    AsyncSnapshot<List<Article>> snapshot,
+    currentTheme,
+  ) {
     if (snapshot.connectionState == ConnectionState.waiting) {
       return SliverFillRemaining(
         child: Center(
-          child: CircularProgressIndicator(color: Color(0xFF64B5F6)),
+          child: CircularProgressIndicator(
+            // Apply theme's primary color to loading indicator
+            color: currentTheme.primaryColor,
+          ),
         ),
       );
     }
@@ -136,12 +152,50 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, size: 60, color: Color(0xFFEF5350)),
-              SizedBox(height: 16),
+              Icon(
+                Icons.error_outline,
+                size: 60,
+                // Apply theme's secondary color to error icon for visual variety
+                color: currentTheme.secondaryColor,
+              ),
+              const SizedBox(height: 16),
               Text(
                 'Error: ${snapshot.error}',
-                style: TextStyle(color: Color(0xFFEF5350), fontSize: 16),
+                style: TextStyle(
+                  // Apply theme's secondary color to error text
+                  color: currentTheme.secondaryColor,
+                  fontSize: 16,
+                ),
                 textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  // Apply theme's primary color to retry button
+                  backgroundColor: currentTheme.primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
+                  // Refresh search results
+                  setState(() {
+                    _searchResults = _newsService.searchNews(widget.query);
+                  });
+                },
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.refresh, size: 18),
+                    SizedBox(width: 8),
+                    Text('Retry Search'),
+                  ],
+                ),
               ),
             ],
           ),
@@ -157,17 +211,74 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.search_off, size: 70, color: Color(0xFFB0BEC5)),
-              SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E222A),
+                  borderRadius: BorderRadius.circular(100),
+                  boxShadow: [
+                    BoxShadow(
+                      // Apply theme color to empty state shadow
+                      color: currentTheme.primaryColor.withOpacity(0.15),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.search_off,
+                  size: 70,
+                  // Apply theme's primary color to empty search icon
+                  color: currentTheme.primaryColor,
+                ),
+              ),
+              const SizedBox(height: 24),
               Text(
                 'No results found for "${widget.query}"',
-                style: TextStyle(color: Colors.white, fontSize: 18),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 8),
-              Text(
+              const SizedBox(height: 8),
+              const Text(
                 'Try a different search term',
                 style: TextStyle(color: Color(0xFFB0BEC5), fontSize: 16),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  // Apply theme's primary color to search again button
+                  backgroundColor: currentTheme.primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 4,
+                  // Apply theme color to button shadow
+                  shadowColor: currentTheme.primaryColor.withOpacity(0.5),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.search),
+                    SizedBox(width: 8),
+                    Text(
+                      'Search Again',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -182,7 +293,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
           opacity: _animation,
           child: SlideTransition(
             position: Tween<Offset>(
-              begin: Offset(0, 0.1),
+              begin: const Offset(0, 0.1),
               end: Offset.zero,
             ).animate(_animation),
             child: Padding(
