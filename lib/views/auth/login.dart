@@ -176,6 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         AuthService().loginWithEmail(
                           email: _emailController.text,
                           password: _passwordController.text,
+                          context: context,
                         );
                         context.go('/home/0');
                       }
