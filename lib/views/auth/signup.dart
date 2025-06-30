@@ -222,6 +222,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               email: _emailController.text,
                               password: _passwordController.text,
                               userName: _nameController.text,
+                              context: context,
                             )
                             .whenComplete(() {
                               context.go('/intro');
