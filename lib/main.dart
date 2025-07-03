@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
-import 'package:newsai/controller/cubit/theme/theme_cubit.dart';
-import 'package:newsai/models/article_model.dart';
-import 'package:newsai/models/news_category.dart';
-import 'package:newsai/views/auth/auth.dart';
+import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
+import 'package:brevity/models/article_model.dart';
+import 'package:brevity/models/news_category.dart';
+import 'package:brevity/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:newsai/firebase_options.dart';
-import 'package:newsai/views/inner_screens/chat_screen.dart';
-import 'package:newsai/views/inner_screens/profile.dart';
-import 'package:newsai/views/inner_screens/search_result.dart';
-import 'package:newsai/views/inner_screens/settings.dart';
-import 'package:newsai/views/intro_screen/intro_screen.dart';
-import 'package:newsai/views/inner_screens/bookmark.dart';
-import 'package:newsai/views/nav_screen/home.dart';
-import 'package:newsai/views/nav_screen/side_page.dart';
-import 'package:newsai/views/splash_screen.dart';
-import 'package:newsai/controller/services/bookmark_services.dart';
-import 'package:newsai/controller/services/news_services.dart';
-import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
+import 'package:brevity/firebase_options.dart';
+import 'package:brevity/views/inner_screens/chat_screen.dart';
+import 'package:brevity/views/inner_screens/profile.dart';
+import 'package:brevity/views/inner_screens/search_result.dart';
+import 'package:brevity/views/inner_screens/settings.dart';
+import 'package:brevity/views/intro_screen/intro_screen.dart';
+import 'package:brevity/views/inner_screens/bookmark.dart';
+import 'package:brevity/views/nav_screen/home.dart';
+import 'package:brevity/views/nav_screen/side_page.dart';
+import 'package:brevity/views/splash_screen.dart';
+import 'package:brevity/controller/services/bookmark_services.dart';
+import 'package:brevity/controller/services/news_services.dart';
+import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:newsai/controller/services/firestore_service.dart';
-import 'package:newsai/controller/cubit/user_profile/user_profile_cubit.dart';
+import 'package:brevity/controller/services/firestore_service.dart';
+import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
 
 // Create a class to manage authentication state
 class AuthService {
@@ -343,7 +343,7 @@ void main() async {
         providers: [
           BlocProvider(create: (context) => BookmarkBloc(bookmarkRepository)),
           BlocProvider(create: (context) => UserProfileCubit()),
-          BlocProvider(create: (context) => ThemeCubit()),
+          BlocProvider(create: (context) => ThemeCubit()..initializeTheme()),
         ],
         child: const MyApp(),
       ),

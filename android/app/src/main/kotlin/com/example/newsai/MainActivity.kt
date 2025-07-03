@@ -1,4 +1,4 @@
-package com.example.newsai
+package com.unity.brevity
 
 import io.flutter.embedding.android.FlutterActivity
 

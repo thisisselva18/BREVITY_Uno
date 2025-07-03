@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:newsai/models/article_model.dart';
+import 'package:brevity/models/article_model.dart';
 
 abstract class BookmarkState extends Equatable {
   const BookmarkState();

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:newsai/controller/bloc/chat_bloc/chat_bloc.dart';
-import 'package:newsai/models/article_model.dart';
-import 'package:newsai/views/common_widgets/message_bubble.dart';
+import 'package:brevity/controller/bloc/chat_bloc/chat_bloc.dart';
+import 'package:brevity/models/article_model.dart';
+import 'package:brevity/views/common_widgets/message_bubble.dart';
 
 class ChatScreen extends StatelessWidget {
   final Article article;
