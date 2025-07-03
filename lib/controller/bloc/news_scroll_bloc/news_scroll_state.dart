@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:newsai/models/article_model.dart';
-import 'package:newsai/models/news_category.dart';
+import 'package:brevity/models/article_model.dart';
+import 'package:brevity/models/news_category.dart';
 
 abstract class NewsState extends Equatable {
   const NewsState();

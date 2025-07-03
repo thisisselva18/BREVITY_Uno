@@ -1,7 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:newsai/models/article_model.dart';
+import 'package:brevity/models/article_model.dart';
 
 class NewsService {
 

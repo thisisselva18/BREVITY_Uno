@@ -3,11 +3,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:newsai/controller/cubit/user_profile/user_profile_cubit.dart';
-import 'package:newsai/controller/cubit/user_profile/user_profile_state.dart';
-import 'package:newsai/controller/services/auth_service.dart';
-import 'package:newsai/models/user_model.dart';
-import 'package:newsai/views/common_widgets/common_appbar.dart';
+import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
+import 'package:brevity/controller/cubit/user_profile/user_profile_state.dart';
+import 'package:brevity/controller/services/auth_service.dart';
+import 'package:brevity/models/user_model.dart';
+import 'package:brevity/views/common_widgets/common_appbar.dart';
 import 'package:share_plus/share_plus.dart';
 
 // Import theme system

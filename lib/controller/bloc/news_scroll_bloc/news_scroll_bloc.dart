@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:newsai/controller/bloc/news_scroll_bloc/news_scroll_event.dart';
-import 'package:newsai/controller/bloc/news_scroll_bloc/news_scroll_state.dart';
-import 'package:newsai/controller/services/news_services.dart';
-import 'package:newsai/models/article_model.dart';
-import 'package:newsai/models/news_category.dart';
+import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_event.dart';
+import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_state.dart';
+import 'package:brevity/controller/services/news_services.dart';
+import 'package:brevity/models/article_model.dart';
+import 'package:brevity/models/news_category.dart';
 
 class NewsBloc extends Bloc<NewsEvent, NewsState> {
   final NewsService newsService;

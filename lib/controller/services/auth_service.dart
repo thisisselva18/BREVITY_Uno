@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:go_router/go_router.dart';
+
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -58,6 +60,7 @@ class AuthService {
       if (context != null) {
         _showSuccessSnackBar(context, 'Account created successfully! Please check your email for verification.');
       }
+      context?.go('/intro');
 
       return user;
     } on FirebaseAuthException catch (e) {
@@ -99,7 +102,7 @@ class AuthService {
       if (context != null) {
         _showSuccessSnackBar(context, 'Welcome back!');
       }
-
+      context?.go('/home/0');
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (context != null) {

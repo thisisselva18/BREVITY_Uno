@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:newsai/models/conversation_model.dart';
-import 'package:newsai/models/chat_window_model.dart';
+import 'package:brevity/models/conversation_model.dart';
+import 'package:brevity/models/chat_window_model.dart';
 
 part 'chat_event.dart';
 part 'chat_state.dart';

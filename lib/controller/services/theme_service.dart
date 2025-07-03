@@ -25,6 +25,7 @@ class ThemeService {
     try {
       await _ensureInitialized();
       final themeJson = jsonEncode(theme.toJson());
+      print("Saving theme: $themeJson");
       return await _prefs!.setString(_themeKey, themeJson);
     } catch (e) {
       print('Error saving theme: $e');
@@ -37,10 +38,15 @@ class ThemeService {
     try {
       await _ensureInitialized();
       final themeJson = _prefs!.getString(_themeKey);
+      print("Loading theme: $themeJson"); // Fixed: was saying "Saving theme"
 
       if (themeJson != null) {
         final themeMap = jsonDecode(themeJson) as Map<String, dynamic>;
-        return AppTheme.fromJson(themeMap);
+        final loadedTheme = AppTheme.fromJson(themeMap);
+        print("Loaded theme: ${loadedTheme.name}");
+        return loadedTheme;
+      } else {
+        print("No saved theme found, using default");
       }
     } catch (e) {
       print('Error loading theme: $e');
@@ -54,6 +60,7 @@ class ThemeService {
   Future<bool> clearTheme() async {
     try {
       await _ensureInitialized();
+      print("Clearing theme");
       return await _prefs!.remove(_themeKey);
     } catch (e) {
       print('Error clearing theme: $e');
@@ -70,6 +77,22 @@ class ThemeService {
       print('Error checking theme: $e');
       return false;
     }
+  }
+
+  // Get saved theme synchronously (for immediate access after initialization)
+  AppTheme? getSavedThemeSync() {
+    try {
+      if (_prefs == null) return null;
+      
+      final themeJson = _prefs!.getString(_themeKey);
+      if (themeJson != null) {
+        final themeMap = jsonDecode(themeJson) as Map<String, dynamic>;
+        return AppTheme.fromJson(themeMap);
+      }
+    } catch (e) {
+      print('Error getting saved theme sync: $e');
+    }
+    return null;
   }
 
   // Ensure SharedPreferences is initialized

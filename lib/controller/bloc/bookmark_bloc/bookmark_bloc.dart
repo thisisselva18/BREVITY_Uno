@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:newsai/controller/services/bookmark_services.dart';
+import 'package:brevity/controller/services/bookmark_services.dart';
 import 'bookmark_event.dart';
 import 'bookmark_state.dart';
 
