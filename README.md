@@ -94,7 +94,7 @@
 ## 🌟 Features
 
 ### Core Features
-- **Infinite Scrolling** - Never hit “the end” – keep scrolling for more stories! 🔄
+- **Infinite Scrolling** - Never hit "the end" – keep scrolling for more stories! 🔄
 - **Side Page Navigation** -Bookmark articles, adjust settings, and access more details with ease. 📚
 - **Theming Support** - Users can personalize their reading experience by selecting their preferred theme. 🎨
 - **Direct Full Article Access** - Easily navigate to the full news article from the app. 🌐
@@ -146,26 +146,149 @@
 15. **share_plus**: Makes sharing content a breeze.
 16. **showcaseview**: Guides new users with in-app feature showcases.
 
+---
 
-## 📲 Installation
+## 📲 Installation & Setup
 
+### Prerequisites
+
+Before you begin, ensure you have the following installed:
+- **Flutter SDK** (3.29.2 or higher)
+- **Dart SDK** (3.7.2 or higher)
+- **Android Studio** or **VS Code** with Flutter extensions
+- **Git**
+
+### 🚀 Quick Start
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Yash159357/NewsAI.git
+   cd NewsAI
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   flutter pub get
+   ```
+
+3. **Set up Environment Variables**
+   
+   Create a `.env` file in the root directory of the project:
+   ```bash
+   touch .env
+   ```
+   
+   Add the following content to your `.env` file:
+   ```env
+   # .env file contents
+   GEMINI_API_KEY=your_gemini_api_key_here
+   NEWS_API_KEY=your_news_api_key_here
+   ```
+
+4. **Get Your API Keys**
+   
+   **For Gemini API:**
+   - Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Create a new API key
+   - Copy the key and replace `your_gemini_api_key_here` in the `.env` file
+
+   **For News API:**
+   - Visit [NewsAPI.org](https://newsapi.org/register)
+   - Sign up for a free account
+   - Copy your API key and replace `your_news_api_key_here` in the `.env` file
+
+5. **Firebase Setup**
+   - Go to [Firebase Console](https://console.firebase.google.com/)
+   - Create a new project or use an existing one
+   - Add your Android/iOS app to the project
+   - Download the `google-services.json` (Android) or `GoogleService-Info.plist` (iOS)
+   - Place them in the respective directories:
+     - Android: `android/app/google-services.json`
+     - iOS: `ios/Runner/GoogleService-Info.plist`
+
+6. **Run the Application**
+   ```bash
+   # For debug mode
+   flutter run
+
+   # For release mode
+   flutter run --release
+   ```
+
+### 🔧 Additional Setup (Optional)
+
+**For Android:**
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/flutterwave.git
+# Check if Android is properly set up
+flutter doctor
 
-# Navigate to project directory
-cd flutterwave
-
-# Install dependencies
-flutter pub get
-
-# Run the application
-flutter run
+# Run on specific device
+flutter devices
+flutter run -d <device_id>
 ```
+
+**For iOS (macOS only):**
+```bash
+# Install iOS dependencies
+cd ios
+pod install
+cd ..
+
+# Run on iOS simulator
+flutter run -d ios
+```
+
+### 📝 Environment Variables Template
+
+Here's the complete `.env` template you should use:
+
+```env
+# API Keys
+GEMINI_API_KEY=AIzaSyDuMOD5-Umn5xaTG3VScQmyjPSGrB_7qN4
+NEWS_API_KEY=6772b7582e9d48b6b72277239f5df490
+
+# Optional: Add other environment variables as needed
+# FIREBASE_WEB_API_KEY=your_firebase_web_api_key
+# BASE_URL=https://your-api-base-url.com
+```
+
+### 🚨 Important Notes
+
+- **Never commit your `.env` file to version control** - it's already included in `.gitignore`
+- Replace the example API keys with your actual keys
+- Keep your API keys secure and don't share them publicly
+- The app requires internet connection for fetching news and AI features
+
+### 🐛 Troubleshooting
+
+**Common Issues:**
+
+1. **Flutter Doctor Issues:**
+   ```bash
+   flutter doctor
+   ```
+   Follow the suggestions to fix any issues.
+
+2. **API Key Issues:**
+   - Ensure your API keys are valid and active
+   - Check if you've reached your API limits
+   - Verify the `.env` file is in the root directory
+
+3. **Firebase Issues:**
+   - Ensure `google-services.json` and `GoogleService-Info.plist` are in the correct locations
+   - Check if Firebase project is properly configured
+
+4. **Dependency Issues:**
+   ```bash
+   flutter clean
+   flutter pub get
+   ```
+
+---
 
 ## 🔮 Future Plans
 
-We're constantly evolving and have some exciting ideas in the pipeline to make Newsai even more engaging and trustworthy:
+We're constantly evolving and have some exciting ideas in the pipeline to make Brevity even more engaging and trustworthy:
 
 - **Chatbot Integration**: Develop a smart chatbot that helps users discuss news and delve into details, aiming to curb misinformation through fact-checking conversations. 🤖
 - **Enhanced UI/UX**: Roll out sleek design updates and smoother animations to further elevate the user experience. 🎨
@@ -173,6 +296,24 @@ We're constantly evolving and have some exciting ideas in the pipeline to make N
 - **Advanced News Sharing**: Implement more versatile sharing options, allowing users to easily distribute news stories across social media and messaging apps. 🔗
 - **Personalized News Insights**: Integrate machine learning to offer personalized news feeds and insights based on user behavior and interests. 📈
 - **Community Engagement Tools**: Explore features that allow users to comment, rate, and discuss news articles, fostering a community of informed readers. 💬
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
