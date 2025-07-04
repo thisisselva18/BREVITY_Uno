@@ -164,8 +164,8 @@ Before you begin, ensure you have the following installed:
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/Yash159357/NewsAI.git
-   cd NewsAI
+   git clone https://github.com/Yash159357/BREVITY
+   cd brevity
    ```
 
 2. **Install Dependencies**
