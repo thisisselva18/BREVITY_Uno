@@ -7,7 +7,10 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3.29.2-blue?logo=flutter" alt="Flutter Version" />
   <img src="https://img.shields.io/badge/Dart-3.7.2-blue?logo=dart" alt="Dart Version" />
+<a href="LICENSE">
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License" />
+</a>
+
   <img src="https://img.shields.io/badge/Version-1.0.0-orange" alt="Version" />
 </p>
 
