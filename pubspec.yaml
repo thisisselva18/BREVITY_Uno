@@ -29,6 +29,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   share_plus: ^10.1.4
   showcaseview: ^4.0.1
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
