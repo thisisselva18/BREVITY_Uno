@@ -1,4 +1,4 @@
-import 'package:newsai/models/conversation_model.dart';
+import 'package:brevity/models/conversation_model.dart';
 
 class ChatWindow {
   final String articleData;

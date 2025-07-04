@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:newsai/models/article_model.dart';
+import 'package:brevity/models/article_model.dart';
 import 'dart:convert';
 
 class BookmarkServices {

@@ -2,10 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
-import 'package:newsai/controller/bloc/bookmark_bloc/bookmark_state.dart';
-import 'package:newsai/controller/cubit/theme/theme_cubit.dart';
-import 'package:newsai/models/article_model.dart';
+import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
+import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_state.dart';
+import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
+import 'package:brevity/models/article_model.dart';
 
 class ArticleListItem extends StatelessWidget {
   final Article article;
@@ -180,7 +180,7 @@ class ArticleListItem extends StatelessWidget {
                                 final isBookmarked =
                                     state is BookmarksLoaded &&
                                     state.bookmarks.any(
-                                      (a) => a.url == article.url,
+                                      (a) => a!.url == article.url,
                                     );
 
                                 return SizedBox(

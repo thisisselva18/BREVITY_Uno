@@ -1,4 +1,4 @@
-import 'package:newsai/models/news_category.dart';
+import 'package:brevity/models/news_category.dart';
 
 abstract class NewsEvent {}
 

@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 // Add these imports for your theme
-import 'package:newsai/controller/cubit/theme/theme_cubit.dart';
-import 'package:newsai/controller/cubit/theme/theme_state.dart';
-import 'package:newsai/controller/services/news_services.dart';
-import 'package:newsai/models/article_model.dart';
-import 'package:newsai/models/news_category.dart';
-import 'package:newsai/views/common_widgets/common_appbar.dart';
+import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
+import 'package:brevity/controller/cubit/theme/theme_state.dart';
+import 'package:brevity/controller/services/news_services.dart';
+import 'package:brevity/models/article_model.dart';
+import 'package:brevity/models/news_category.dart';
+import 'package:brevity/views/common_widgets/common_appbar.dart';
 
 class SidePage extends StatefulWidget {
   const SidePage({super.key});

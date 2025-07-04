@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:newsai/controller/cubit/theme/theme_cubit.dart';
-import 'package:newsai/controller/cubit/user_profile/user_profile_cubit.dart';
-import 'package:newsai/controller/cubit/user_profile/user_profile_state.dart';
-import 'package:newsai/views/common_widgets/common_appbar.dart';
+import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
+import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
+import 'package:brevity/controller/cubit/user_profile/user_profile_state.dart';
+import 'package:brevity/views/common_widgets/common_appbar.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
