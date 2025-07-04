@@ -244,12 +244,8 @@ Here's the complete `.env` template you should use:
 
 ```env
 # API Keys
-GEMINI_API_KEY=AIzaSyDuMOD5-Umn5xaTG3VScQmyjPSGrB_7qN4
-NEWS_API_KEY=6772b7582e9d48b6b72277239f5df490
-
-# Optional: Add other environment variables as needed
-# FIREBASE_WEB_API_KEY=your_firebase_web_api_key
-# BASE_URL=https://your-api-base-url.com
+GEMINI_API_KEY=dummykey
+NEWS_API_KEY=dummykey
 ```
 
 ### 🚨 Important Notes
