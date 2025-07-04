@@ -221,12 +221,13 @@ Before you begin, ensure you have the following installed:
 
 We're constantly evolving and have some exciting ideas in the pipeline to make Brevity even more engaging and trustworthy:
 
-- **Chatbot Integration**: Develop a smart chatbot that helps users discuss news and delve into details, aiming to curb misinformation through fact-checking conversations. 🤖
-- **Enhanced UI/UX**: Roll out sleek design updates and smoother animations to further elevate the user experience. 🎨
-- **Beginner Tutorial**: Create an in-app tutorial for new users, guiding them through the app's features and best practices for navigating the news. 📚
-- **Advanced News Sharing**: Implement more versatile sharing options, allowing users to easily distribute news stories across social media and messaging apps. 🔗
-- **Personalized News Insights**: Integrate machine learning to offer personalized news feeds and insights based on user behavior and interests. 📈
-- **Community Engagement Tools**: Explore features that allow users to comment, rate, and discuss news articles, fostering a community of informed readers. 💬
+- **Chatbot Integration**: Develop a smart chatbot that helps users discuss news and delve into details, aiming to curb misinformation through fact-checking conversations. 🤖  
+- **Enhanced UI/UX**: Roll out sleek design updates and smoother animations to further elevate the user experience. 🎨  
+- **Beginner Tutorial**: Create an in-app tutorial for new users, guiding them through the app's features and best practices for navigating the news. 📚  
+- **Advanced News Sharing**: Implement more versatile sharing options, allowing users to easily distribute news stories across social media and messaging apps. 🔗  
+- **Personalized News Insights**: Integrate machine learning to offer personalized news feeds and insights based on user behavior and interests. 📈  
+- **Community Engagement Tools**: Explore features that allow users to comment, rate, and discuss news articles, fostering a community of informed readers. 💬  
+- **Backend Migration**: We are shifting from Firebase to a scalable **Node.js + MongoDB backend** for greater flexibility, performance, and control over our server architecture. ⚙️🚀  
 
 ---
 
@@ -235,10 +236,11 @@ We're constantly evolving and have some exciting ideas in the pipeline to make B
 We welcome contributions! Please follow these steps:
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Clone your forked repository (`git clone https://github.com/Yash159357/BREVITY`)
+3. Create a feature branch (`git checkout -b feature/amazing-feature`)
+4. Commit your changes (`git commit -m 'Add amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
 
 ---
 
