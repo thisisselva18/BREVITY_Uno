@@ -50,21 +50,6 @@ const userSchema = new mongoose.Schema({
             expires: 2592000 // 30 days
         }
     }],
-    // News preferences (for future use)
-    preferences: {
-        categories: [{
-            type: String,
-            enum: ['technology', 'sports', 'politics', 'entertainment', 'business', 'health']
-        }],
-        language: {
-            type: String,
-            default: 'en'
-        }
-    },
-    isActive: {
-        type: Boolean,
-        default: true
-    },
     lastLogin: Date,
     createdAt: {
         type: Date,

@@ -1,19 +1,9 @@
 const User = require('../models/user');
-const { generateTokens } = require('../services/jwtService');
-const { validationResult } = require('express-validator');
+const { generateTokens } = require('../services/jwt');
 
 // Register user
 const register = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                success: false,
-                message: 'Validation failed',
-                errors: errors.array()
-            });
-        }
-
         const { displayName, email, password } = req.body;
 
         // Check if user already exists
@@ -49,9 +39,6 @@ const register = async (req, res) => {
 
         // Save refresh token to user
         user.refreshTokens.push({ token: refreshToken });
-        await user.save();
-
-        // Update last login
         user.lastLogin = new Date();
         await user.save();
 
@@ -81,15 +68,6 @@ const register = async (req, res) => {
 // Login user
 const login = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                success: false,
-                message: 'Validation failed',
-                errors: errors.array()
-            });
-        }
-
         const { email, password } = req.body;
 
         // Find user and include password for comparison

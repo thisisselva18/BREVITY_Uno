@@ -1,21 +1,11 @@
 const User = require('../models/user');
-const { deleteImage } = require('../services/cloudinaryService');
-const { validationResult } = require('express-validator');
+const { deleteImage } = require('../services/cloudinary');
 
 // Update user profile
 const updateProfile = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                success: false,
-                message: 'Validation failed',
-                errors: errors.array()
-            });
-        }
-
         const userId = req.user._id;
-        const { displayName, preferences } = req.body;
+        const { displayName } = req.body;
         const user = await User.findById(userId);
 
         if (!user) {
@@ -25,9 +15,10 @@ const updateProfile = async (req, res) => {
             });
         }
 
-        // Update basic fields
-        if (displayName !== undefined) user.displayName = displayName;
-        if (preferences !== undefined) user.preferences = { ...user.preferences, ...preferences };
+        // Update display name if provided
+        if (displayName !== undefined) {
+            user.displayName = displayName;
+        }
 
         // Handle profile image update
         if (req.file) {
