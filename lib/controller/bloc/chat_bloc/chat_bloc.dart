@@ -43,20 +43,25 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       // Get response from Gemini
       final response = await _geminiService.getFreeResponse(prompt);
 
+      // Create new conversation
+      final newConversation = Conversation(
+        request: event.message,
+        response: response,
+        timestamp: DateTime.now(),
+      );
+
       // Add conversation to chat window
       final updatedConversations = [
         ...currentState.chatWindow.conversations,
-        Conversation(
-          request: event.message,
-          response: response,
-          timestamp: DateTime.now(),
-        )
+        newConversation
       ];
 
+      // Emit with typewriter animation flag
       emit(ChatLoaded(
         chatWindow: currentState.chatWindow.copyWith(
           conversations: updatedConversations,
         ),
+        shouldAnimateLatest: true, // Flag to animate the latest message
       ));
     } catch (e) {
       emit(ChatError(message: 'Failed to get response: ${e.toString()}'));
@@ -64,7 +69,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       // Return to previous state after error
       Future.delayed(const Duration(seconds: 3), () {
         if (!isClosed) {
-          emit(ChatLoaded(chatWindow: currentState.chatWindow));
+          emit(ChatLoaded(
+            chatWindow: currentState.chatWindow,
+            shouldAnimateLatest: false,
+          ));
         }
       });
     }

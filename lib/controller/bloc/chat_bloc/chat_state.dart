@@ -8,7 +8,12 @@ class ChatLoading extends ChatState {}
 
 class ChatLoaded extends ChatState {
   final ChatWindow chatWindow;
-  ChatLoaded({required this.chatWindow});
+  final bool shouldAnimateLatest;
+  
+  ChatLoaded({
+    required this.chatWindow,
+    this.shouldAnimateLatest = false,
+  });
 }
 
 class ChatError extends ChatState {
