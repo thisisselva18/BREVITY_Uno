@@ -180,7 +180,7 @@ class ArticleListItem extends StatelessWidget {
                                 final isBookmarked =
                                     state is BookmarksLoaded &&
                                     state.bookmarks.any(
-                                      (a) => a!.url == article.url,
+                                      (a) => a.url == article.url,
                                     );
 
                                 return SizedBox(

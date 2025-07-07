@@ -115,11 +115,9 @@ class AppThemes {
         primary: appTheme.primaryColor,
         secondary: appTheme.secondaryColor,
         surface: const Color(0xFF1E1E1E),
-        background: const Color(0xFF121212),
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: Colors.white,
-        onBackground: Colors.white,
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: const Color(0xFF1E1E1E),
@@ -138,14 +136,14 @@ class AppThemes {
         foregroundColor: Colors.white,
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return appTheme.primaryColor;
           }
           return Colors.grey[400];
         }),
-        trackColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return appTheme.primaryColor.withOpacity(0.3);
           }
           return Colors.grey[800];
