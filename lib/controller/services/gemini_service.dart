@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:collection';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+// https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent
 class GeminiFlashService {
-  static const String _modelId = 'gemini-2.0-flash';
+  static const String _modelId = 'gemini-2.0-flash-exp';
   static const String _baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/$_modelId:generateContent';
   static final String _apiKey = dotenv.env['GEMINI_API_KEY']!;
 
@@ -14,7 +14,7 @@ class GeminiFlashService {
     timeWindow: const Duration(minutes: 1),
   );
 
-  static Future<String> getFreeResponse(String input) async {
+  Future<String> getFreeResponse(String input) async {
     await _limiter.throttle();
     
     try {
@@ -29,50 +29,64 @@ class GeminiFlashService {
       throw Exception('Network error: ${e.message}');
     } on TimeoutException {
       throw Exception('Request timed out');
+    } catch (e) {
+      throw Exception('Unexpected error: ${e.toString()}');
     }
   }
 
-  static String _buildOptimizedPayload(String input) {
+  String _buildOptimizedPayload(String input) {
     return jsonEncode({
       'contents': [{
         'parts': [{'text': _compressPrompt(input)}]
       }],
       'generationConfig': {
-        'maxOutputTokens': 8000,
-        'temperature': 0.4,
+        'maxOutputTokens': 1024,
+        'temperature': 0.7,
+        'topK': 40,
+        'topP': 0.95,
       },
-      // Valid safety settings configuration
       'safetySettings': [
         {
+          'category': 'HARM_CATEGORY_HARASSMENT',
+          'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+        },
+        {
+          'category': 'HARM_CATEGORY_HATE_SPEECH',
+          'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+        },
+        {
+          'category': 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+          'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+        },
+        {
           'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
-          'threshold': 'BLOCK_NONE'
+          'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
         }
       ]
     });
   }
 
-  static String _compressPrompt(String input) {
-    // Improved compression retains essential punctuation
+  String _compressPrompt(String input) {
     return input
         .replaceAll(RegExp(r'\s+'), ' ')
-        .replaceAll(RegExp(r'(?<!\w)[^\w\s\.\!\?](?!\w)'), '');
+        .trim();
   }
 
-  static String _processResponse(http.Response response) {
+  String _processResponse(http.Response response) {
     switch (response.statusCode) {
       case 200:
         final data = jsonDecode(response.body);
-        // Safer response parsing
-        if (data['candidates'] == null || 
-            data['candidates'].isEmpty ||
-            data['candidates'][0]['content'] == null) {
-          throw Exception('Invalid API response format');
+        if (data['candidates']?.isNotEmpty == true &&
+            data['candidates'][0]['content']?.isNotEmpty == true) {
+          return data['candidates'][0]['content']['parts'][0]['text'];
         }
-        return data['candidates'][0]['content']['parts'][0]['text'];
+        throw Exception('Empty response from API');
       case 429:
-        throw Exception('Rate limit exceeded - Slow down requests');
+        throw Exception('Rate limit exceeded');
       case 403:
-        throw Exception('Free quota exhausted - Wait for reset');
+        throw Exception('API key quota exceeded');
+      case 400:
+        throw Exception('Invalid request');
       default:
         throw Exception('API Error: ${response.statusCode}');
     }
@@ -87,14 +101,17 @@ class RateLimiter {
   RateLimiter({required this.maxRequests, required this.timeWindow});
 
   Future<void> throttle() async {
-    while (_requestTimes.length >= maxRequests) {
-      final oldest = _requestTimes.first;
-      final age = DateTime.now().difference(oldest);
-      if (age < timeWindow) {
-        await Future.delayed(timeWindow - age);
-      }
+    final now = DateTime.now();
+    while (_requestTimes.isNotEmpty && 
+           now.difference(_requestTimes.first) > timeWindow) {
       _requestTimes.removeFirst();
     }
-    _requestTimes.add(DateTime.now());
+    
+    if (_requestTimes.length >= maxRequests) {
+      final waitTime = timeWindow - now.difference(_requestTimes.first);
+      await Future.delayed(waitTime);
+    }
+    
+    _requestTimes.add(now);
   }
 }
