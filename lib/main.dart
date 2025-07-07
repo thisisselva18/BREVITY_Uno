@@ -1,3 +1,4 @@
+import 'package:brevity/views/inner_screens/about_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
@@ -69,8 +70,15 @@ final _routes = GoRouter(
     GoRoute(
       path: '/contactUs',
       name: 'contactUs',
-      builder: (context, state){
+      builder: (context, state) {
         return const ContactUsScreen();
+      },
+    ),
+    GoRoute(
+      path: '/aboutUs',
+      name: 'aboutUs',
+      builder: (context, state) {
+        return const AboutUsScreen();
       },
     ),
     GoRoute(
