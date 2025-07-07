@@ -189,7 +189,9 @@ class _HomeScreenContent extends StatelessWidget {
     );
   }
 
-  void _showAppInfo(BuildContext context) {}
+  void _showAppInfo(BuildContext context) {
+    context.pushNamed("contactUs");
+  }
 }
 
 class _NewsCard extends StatelessWidget {
