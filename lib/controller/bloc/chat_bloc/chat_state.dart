@@ -15,3 +15,8 @@ class ChatError extends ChatState {
   final String message;
   ChatError({required this.message});
 }
+
+class MessageSending extends ChatState {
+  final ChatWindow chatWindow;
+  MessageSending({required this.chatWindow});
+}

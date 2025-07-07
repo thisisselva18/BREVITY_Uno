@@ -1,22 +1,23 @@
 import 'package:brevity/models/conversation_model.dart';
+import 'package:brevity/models/article_model.dart';
 
 class ChatWindow {
-  final String articleData;
+  final Article article;
   final List<Conversation> conversations;
   final DateTime createdAt;
 
   ChatWindow({
-    required this.articleData,
+    required this.article,
     required this.conversations,
     required this.createdAt,
   });
 
   ChatWindow copyWith({
-    String? articleData,
+    Article? article,
     List<Conversation>? conversations,
   }) {
     return ChatWindow(
-      articleData: articleData ?? this.articleData,
+      article: article ?? this.article,
       conversations: conversations ?? this.conversations,
       createdAt: createdAt,
     );

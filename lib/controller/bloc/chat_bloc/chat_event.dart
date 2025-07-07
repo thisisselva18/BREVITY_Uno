@@ -3,14 +3,14 @@ part of 'chat_bloc.dart';
 abstract class ChatEvent {}
 
 class InitializeChat extends ChatEvent {
-  final String articleData;
-  InitializeChat({required this.articleData});
+  final Article article;
+  InitializeChat({required this.article});
 }
 
-class AddMessage extends ChatEvent {
+class SendMessage extends ChatEvent {
   final String message;
-  final String response;
-  AddMessage({required this.message, required this.response});
+  final ChatWindow chatWindow;
+  SendMessage({required this.message, required this.chatWindow});
 }
 
 class ClearChat extends ChatEvent {}
