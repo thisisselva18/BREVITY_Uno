@@ -25,6 +25,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brevity/controller/services/firestore_service.dart';
 import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
+import 'package:brevity/views/inner_screens/contact_screen.dart';
 
 // Create a class to manage authentication state
 class AuthService {
@@ -63,6 +64,13 @@ final _routes = GoRouter(
       name: 'auth',
       builder: (context, state) {
         return const AuthScreen();
+      },
+    ),
+    GoRoute(
+      path: '/contactUs',
+      name: 'contactUs',
+      builder: (context, state){
+        return const ContactUsScreen();
       },
     ),
     GoRoute(
