@@ -665,6 +665,32 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   ),
                                 ),
                                 _buildSectionHeader(
+                                  'Contact',
+                                  themeState.currentTheme.primaryColor,
+                                ),
+                                _buildAnimatedCard(
+                                  child: _buildListTile(
+                                    icon: Icons.contact_mail,
+                                    title: 'Contact Us',
+                                    subtitle: 'Get in touch with support',
+                                    themeColor:
+                                        themeState.currentTheme.primaryColor,
+                                    onTap: () => context.push('/contactUs'),
+                                  ),
+                                ),
+                                _buildAnimatedCard(
+                                  child: _buildListTile(
+                                    icon: Icons.info,
+                                    title: 'About Us',
+                                    subtitle: 'Learn more about us',
+                                    themeColor:
+                                        themeState.currentTheme.primaryColor,
+                                    onTap: () {
+                                      context.push('/aboutUs');
+                                    },
+                                  ),
+                                ),
+                                _buildSectionHeader(
                                   'Account',
                                   themeState.currentTheme.primaryColor,
                                 ),
