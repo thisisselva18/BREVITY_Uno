@@ -1,7 +1,5 @@
-// Updated message_bubble.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gap/gap.dart';
 
 class MessageBubble extends StatelessWidget {
   final String message;
@@ -24,16 +22,18 @@ class MessageBubble extends StatelessWidget {
         bottom: 8,
       ),
       child: Column(
-        crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           GestureDetector(
             onLongPress: () => _copyToClipboard(context, message),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isUser
-                    ? const Color.fromRGBO(68, 138, 255, 1)
-                    : const Color.fromARGB(255, 45, 45, 45),
+                color:
+                    isUser
+                        ? const Color.fromRGBO(68, 138, 255, 1)
+                        : const Color.fromARGB(255, 45, 45, 45),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(

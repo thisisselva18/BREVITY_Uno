@@ -159,7 +159,7 @@ class _HomeScreenContent extends StatelessWidget {
                     color: Colors.white,
                     size: 22,
                   ),
-                  onPressed: () => _showAppInfo(context),
+                  onPressed: () => context.pushNamed("contactUs"),
                 ),
               ],
             ),
@@ -187,10 +187,6 @@ class _HomeScreenContent extends StatelessWidget {
         );
       },
     );
-  }
-
-  void _showAppInfo(BuildContext context) {
-    context.pushNamed("contactUs");
   }
 }
 
@@ -297,6 +293,17 @@ class _NewsCard extends StatelessWidget {
                     maxLines: 7,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (article.author.trim().isNotEmpty) ...[
+                    const Gap(12),
+                    Text(
+                      'By ${article.author}',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 13,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
                   const Gap(24),
                   Row(
                     children: [

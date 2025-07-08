@@ -11,7 +11,8 @@ class SplashScreen extends StatefulWidget {
   SplashScreenState createState() => SplashScreenState();
 }
 
-class SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _logoAnimation;
   late Animation<double> _particleAnimation;
@@ -40,27 +41,16 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
     );
 
     _controller.forward().then((_) {
-      // Check if the user is signed in when animation completes
       navigateBasedOnAuthStatus();
     });
   }
 
-  // Method to navigate based on authentication status
   void navigateBasedOnAuthStatus() {
-    // Check if user has seen intro screen before
-    final hasSeenIntro = true; // Replace with actual logic (e.g., using SharedPreferences)
-    
-    // Check if user is signed in
     final isSignedIn = FirebaseAuth.instance.currentUser != null;
-    
-    if (!hasSeenIntro) {
-      // If user hasn't seen intro screen, navigate there first
-      context.go('/intro');
-    } else if (isSignedIn) {
-      // If user is signed in, navigate to home with default category (0)
+
+    if (isSignedIn) {
       context.go('/home/0');
     } else {
-      // If user is not signed in, navigate to auth screen
       context.go('/auth');
     }
   }
@@ -79,16 +69,16 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [ Color.fromARGB(255, 4, 16, 54),
-            Color.fromARGB(255, 30, 36, 98),
-            Color.fromARGB(255, 36, 3, 95),
-          ],
-          stops: [0.0, 0.5, 1.0],
+            colors: [
+              Color.fromARGB(255, 4, 16, 54),
+              Color.fromARGB(255, 30, 36, 98),
+              Color.fromARGB(255, 36, 3, 95),
+            ],
+            stops: [0.0, 0.5, 1.0],
           ),
         ),
         child: Stack(
           children: [
-            // Floating particles
             AnimatedBuilder(
               animation: _particleAnimation,
               builder: (context, child) {
@@ -100,7 +90,7 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                 );
               },
             ),
-            
+
             Center(
               child: ScaleTransition(
                 scale: _logoAnimation,
@@ -114,9 +104,13 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                     ),
                     const SizedBox(height: 20),
                     ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        colors: [Color.fromARGB(255, 26, 175, 255), Colors.white],
-                      ).createShader(bounds),
+                      shaderCallback:
+                          (bounds) => const LinearGradient(
+                            colors: [
+                              Color.fromARGB(255, 26, 175, 255),
+                              Colors.white,
+                            ],
+                          ).createShader(bounds),
                       child: const Text(
                         'BREVITY',
                         style: TextStyle(
@@ -170,19 +164,17 @@ class ParticlePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF3B82F6)
-      ..style = PaintingStyle.fill;
+    final paint =
+        Paint()
+          ..color = const Color(0xFF3B82F6)
+          ..style = PaintingStyle.fill;
 
     for (var particle in particles) {
       final dx = (0.5 - particle.x) * progress * size.width;
       final dy = (0.5 - particle.y) * progress * size.height;
 
       canvas.drawCircle(
-        Offset(
-          particle.x * size.width + dx,
-          particle.y * size.height + dy,
-        ),
+        Offset(particle.x * size.width + dx, particle.y * size.height + dy),
         particle.radius * (1 - progress),
         paint,
       );
