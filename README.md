@@ -166,7 +166,7 @@ brevity/
 ├── pubspec.yaml           # Flutter dependencies
 ├── README.md              # Project documentation
 └── .gitignore             # Git ignore rules
-
+```
 
 ---
 
