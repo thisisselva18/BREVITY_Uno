@@ -149,6 +149,28 @@
 16. **showcaseview**: Guides new users with in-app feature showcases.
 
 ---
+## 📁 Folder Structure
+
+```bash
+brevity/
+├── android/               # Android-specific configuration
+├── assets/                # Images, logos, etc.
+├── ios/                   # iOS project files
+├── lib/                   # Flutter main code (controllers, models, views)
+├── linux/                 # Linux support
+├── macos/                 # macOS support
+├── server/                # Node.js + MongoDB backend
+├── test/                  # Test files
+├── web/                   # Web support and assets
+├── windows/               # Windows support
+├── pubspec.yaml           # Flutter dependencies
+├── README.md              # Project documentation
+└── .gitignore             # Git ignore rules
+
+
+---
+
+
 
 ## 📲 Installation & Setup
 
@@ -163,7 +185,7 @@ Before you begin, ensure you have the following installed:
 ### 🚀 Quick Start
 
 1. **Clone the Repository**
-   ```bash
+   ```bash 
    git clone https://github.com/Yash159357/BREVITY
    cd brevity
    ```
@@ -265,6 +287,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Email**: [yashmalihan3@gmail.com](mailto:yashmalihan3@gmail.com)  
 
 ---
+👥 Review our [Code of Conduct](CODE_OF_CONDUCT.md).
+
 
 <p align="center">
   Made with ❤️ by us
