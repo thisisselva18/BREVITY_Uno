@@ -30,7 +30,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     _fadeController = AnimationController(vsync: this, duration: Duration(milliseconds: 1000));
     _slideController = AnimationController(vsync: this, duration: Duration(milliseconds: 800));
     _pulseController = AnimationController(vsync: this, duration: Duration(milliseconds: 2000))..repeat();
-    
+
     _fadeAnimation = CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut);
     _slideAnimation = Tween<Offset>(begin: Offset(0, 0.5), end: Offset.zero)
         .animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic));
@@ -54,7 +54,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final theme = context.read<ThemeCubit>().currentTheme;
-    
+
     return BlocProvider(
       create: (context) => ChatBloc(geminiService: GeminiFlashService())..add(InitializeChat(article: widget.article)),
       child: Scaffold(
@@ -123,7 +123,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-                _buildGlassButton(Icons.delete_outline, Colors.red, () => context.read<ChatBloc>().add(ClearChat())),
+                // --- FIX: Use BlocBuilder to access the correct ChatBloc instance ---
+                BlocBuilder<ChatBloc, ChatState>(
+                  builder: (context, state) {
+                    return _buildGlassButton(
+                      Icons.delete_outline,
+                      Colors.red,
+                      () {
+                        context.read<ChatBloc>().add(ClearChat());
+                      },
+                    );
+                  },
+                ),
               ],
             ),
           ),
