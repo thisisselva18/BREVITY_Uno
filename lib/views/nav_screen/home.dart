@@ -26,23 +26,28 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
-      value: RepositoryProvider.of<NewsService>(
-        context,
-      ), // Explicitly provide NewsService
+      value: RepositoryProvider.of<NewsService>(context),
       child: BlocProvider(
-        create:
-            (context) => NewsBloc(
-              newsService: RepositoryProvider.of<NewsService>(context),
-            )..add(FetchInitialNews(category: category)),
+        create: (context) => NewsBloc(
+          newsService: RepositoryProvider.of<NewsService>(context),
+        )..add(FetchInitialNews(category: category)),
         child: Scaffold(body: _HomeScreenContent(category: category)),
       ),
     );
   }
 }
 
-class _HomeScreenContent extends StatelessWidget {
+class _HomeScreenContent extends StatefulWidget {
   final NewsCategory category;
   const _HomeScreenContent({this.category = NewsCategory.general});
+
+  @override
+  State<_HomeScreenContent> createState() => _HomeScreenContentState();
+}
+
+class _HomeScreenContentState extends State<_HomeScreenContent> {
+  final controller = CardSwiperController();
+  int lastIndex = -1;
 
   String _getCategoryName(NewsCategory category) {
     final String name = category.toString().split('.').last;
@@ -56,7 +61,7 @@ class _HomeScreenContent extends StatelessWidget {
       body: BlocBuilder<NewsBloc, NewsState>(
         buildWhen: (previous, current) {
           if (current is NewsLoaded) {
-            return current.category == category;
+            return current.category == widget.category;
           }
           return true;
         },
@@ -75,10 +80,10 @@ class _HomeScreenContent extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Image.asset('assets/logos/dog.png'),
-                      SizedBox(height: 20),
-                      Text(
+                      const SizedBox(height: 20),
+                      const Text(
                         "Failed To Load News :(",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 25,
                           color: Color.fromARGB(255, 194, 34, 23),
                           fontWeight: FontWeight.bold,
@@ -101,34 +106,63 @@ class _HomeScreenContent extends StatelessWidget {
     return Stack(
       children: [
         CardSwiper(
+          controller: controller,
           cardsCount: articles.length,
           cardBuilder: (context, index, horizontalOffset, verticalOffset) {
             final article = articles[index];
-            return GestureDetector(
-              onHorizontalDragEnd: (details) {
-                if (details.primaryVelocity! > 5) {
-                  context.goNamed('sidepage');
-                }
+            double offsetY = verticalOffset.toDouble();
 
-                if (details.primaryVelocity! < -5) {}
-              },
-              behavior: HitTestBehavior.opaque,
+            // Reverse the offset for swipe down to make previous card appear from top
+            if (offsetY > 0) {
+              offsetY = -offsetY;
+            }
 
-              child: _NewsCard(article: article),
+            return Transform.translate(
+              offset: Offset(0, offsetY),
+              child: GestureDetector(
+                onVerticalDragEnd: (details) {
+                  final velocity = details.primaryVelocity ?? 0;
+                  if (velocity.abs() > 300) {
+                    if (velocity < 0) {
+                      // Swipe up - go to next card (from bottom)
+                      controller.swipe(CardSwiperDirection.bottom);
+                    } else {
+                      // Swipe down - undo to previous card (from top)
+                      controller.undo();
+                    }
+                  }
+                },
+                onHorizontalDragEnd: (details) {
+                  // Right swipe to go to sidepage
+                  if (details.primaryVelocity! > 5) {
+                    context.goNamed('sidepage');
+                  }
+                  // Left swipe could be implemented here if needed
+                  if (details.primaryVelocity! < -5) {}
+                },
+                behavior: HitTestBehavior.opaque,
+                child: _NewsCard(
+                  article: article,
+                  controller: controller,
+                ),
+              ),
             );
           },
-
           onSwipe: (previousIndex, currentIndex, direction) {
-            if (currentIndex != null && currentIndex >= articles.length - 3) {
-              context.read<NewsBloc>().add(
-                FetchNextPage(currentIndex, category),
-              );
+            if (direction == CardSwiperDirection.bottom && currentIndex != null) {
+              lastIndex = currentIndex;
+              if (currentIndex >= articles.length - 3) {
+                context.read<NewsBloc>().add(FetchNextPage(currentIndex, widget.category));
+              }
             }
             return true;
           },
-          allowedSwipeDirection: const AllowedSwipeDirection.only(up: true),
-          duration: const Duration(milliseconds: 400),
-          scale: 1.0,
+          onUndo: (previousIndex, currentIndex, direction) => true,
+          allowedSwipeDirection: const AllowedSwipeDirection.only(up: true, down: true),
+          duration: const Duration(milliseconds: 150),
+          numberOfCardsDisplayed: 3,
+          backCardOffset: const Offset(0, 40),
+          scale: 0.9,
           padding: EdgeInsets.zero,
         ),
         SafeArea(
@@ -137,8 +171,8 @@ class _HomeScreenContent extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  _getCategoryName(category),
-                  style: TextStyle(
+                  _getCategoryName(widget.category),
+                  style: const TextStyle(
                     fontSize: 23,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -192,11 +226,17 @@ class _HomeScreenContent extends StatelessWidget {
 
 class _NewsCard extends StatelessWidget {
   final Article article;
-  const _NewsCard({required this.article});
+  final CardSwiperController controller;
+
+  const _NewsCard({
+    required this.article,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
     final currentTheme = context.read<ThemeCubit>().currentTheme;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -218,14 +258,13 @@ class _NewsCard extends StatelessWidget {
               imageUrl: article.urlToImage,
               fit: BoxFit.cover,
               placeholder: (context, url) => Container(color: Colors.grey[200]),
-              errorWidget:
-                  (context, url, error) => Container(
-                    color: const Color.fromRGBO(128, 128, 128, 0.8),
-                    child: const Icon(
-                      Icons.broken_image,
-                      color: Colors.white54,
-                    ),
-                  ),
+              errorWidget: (context, url, error) => Container(
+                color: const Color.fromRGBO(128, 128, 128, 0.8),
+                child: const Icon(
+                  Icons.broken_image,
+                  color: Colors.white54,
+                ),
+              ),
             ),
             Container(
               decoration: BoxDecoration(
@@ -270,9 +309,7 @@ class _NewsCard extends StatelessWidget {
                       ),
                       const Gap(12),
                       Text(
-                        DateFormat(
-                          'MMM dd, y • h:mm a',
-                        ).format(article.publishedAt),
+                        DateFormat('MMM dd, y • h:mm a').format(article.publishedAt),
                         style: TextStyle(
                           color: Colors.white.withAlpha(229),
                           fontSize: 14,
@@ -330,11 +367,10 @@ class _NewsCard extends StatelessWidget {
                         onPressed: () => _launchUrl(article.url),
                       ),
                       IconButton(
-                        onPressed:
-                            () => context.pushNamed(
-                              'chat',
-                              extra: article, // Pass current article
-                            ),
+                        onPressed: () => context.pushNamed(
+                          'chat',
+                          extra: article,
+                        ),
                         icon: Image.asset(
                           'assets/logos/ai.gif',
                           width: 90,
@@ -352,12 +388,6 @@ class _NewsCard extends StatelessWidget {
       ),
     );
   }
-
-  Future<void> _launchUrl(String url) async {
-    if (!await launchUrl(Uri.parse(url))) {
-      throw Exception('Could not launch $url');
-    }
-  }
 }
 
 class _TappableHeadline extends StatelessWidget {
@@ -370,15 +400,13 @@ class _TappableHeadline extends StatelessWidget {
     final currentTheme = context.read<ThemeCubit>().currentTheme;
     return BlocBuilder<BookmarkBloc, BookmarkState>(
       builder: (context, state) {
-        final isBookmarked =
-            state is BookmarksLoaded
-                ? state.bookmarks.any((a) => a.url == article.url)
-                : false;
+        final isBookmarked = state is BookmarksLoaded
+            ? state.bookmarks.any((a) => a.url == article.url)
+            : false;
         return GestureDetector(
-          onTap:
-              () => context.read<BookmarkBloc>().add(
-                ToggleBookmarkEvent(article),
-              ),
+          onTap: () => context.read<BookmarkBloc>().add(
+            ToggleBookmarkEvent(article),
+          ),
           child: Text(
             title,
             maxLines: 3,
@@ -392,5 +420,11 @@ class _TappableHeadline extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+Future<void> _launchUrl(String url) async {
+  if (!await launchUrl(Uri.parse(url))) {
+    throw Exception('Could not launch $url');
   }
 }

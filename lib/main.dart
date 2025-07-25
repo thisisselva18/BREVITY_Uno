@@ -9,6 +9,7 @@ import 'package:brevity/views/auth/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+
 import 'package:brevity/firebase_options.dart';
 import 'package:brevity/views/inner_screens/chat_screen.dart';
 import 'package:brevity/views/inner_screens/profile.dart';
