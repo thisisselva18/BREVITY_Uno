@@ -21,10 +21,17 @@ class UserProfileState extends Equatable {
   }) {
     return UserProfileState(
       status: status ?? this.status,
-      user: user ?? this.user ?? UserModel.empty(),
-      errorMessage: errorMessage ?? this.errorMessage,
+      user: user ?? this.user,
+      errorMessage: errorMessage,
     );
   }
+
+  // Helper getters
+  bool get isLoading => status == UserProfileStatus.loading;
+  bool get isLoaded => status == UserProfileStatus.loaded;
+  bool get hasError => status == UserProfileStatus.error;
+  bool get isInitial => status == UserProfileStatus.initial;
+  bool get hasUser => user != null;
 
   @override
   List<Object?> get props => [status, user, errorMessage];

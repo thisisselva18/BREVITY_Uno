@@ -54,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       setState(() {});
     });
 
-    _userProfileCubit.startProfileSubscription();
+    // _userProfileCubit.startProfileSubscription();
   }
 
   @override
@@ -412,9 +412,10 @@ class _SettingsScreenState extends State<SettingsScreen>
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          onPressed:
-                              () =>
-                                  _userProfileCubit.startProfileSubscription(),
+                          onPressed: (){},
+                          // onPressed:
+                          //     () =>
+                                  // _userProfileCubit.startProfileSubscription(),
                           child: const Text('Retry'),
                         ),
                       ],

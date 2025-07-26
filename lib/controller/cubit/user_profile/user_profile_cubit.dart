@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:brevity/controller/services/firestore_service.dart';
 import 'package:brevity/controller/services/auth_service.dart';
 import '../../../models/user_model.dart';
@@ -9,16 +8,31 @@ import 'user_profile_state.dart';
 class UserProfileCubit extends Cubit<UserProfileState> {
   final UserRepository _userRepository = UserRepository();
   final AuthService _authService = AuthService();
-  StreamSubscription? _profileSubscription;
+  StreamSubscription? _authSubscription;
   
-  UserProfileCubit() : super(UserProfileState());
+  UserProfileCubit() : super(UserProfileState()) {
+    // Listen to auth state changes
+    _listenToAuthChanges();
+  }
+  
+  void _listenToAuthChanges() {
+    _authSubscription = _authService.authStateChanges.listen((user) {
+      if (user != null) {
+        // User is logged in, load their profile
+        loadUserProfile();
+      } else {
+        // User is logged out, clear profile
+        emit(UserProfileState());
+      }
+    });
+  }
   
   // Load user profile once
   Future<void> loadUserProfile() async {
     emit(state.copyWith(status: UserProfileStatus.loading));
     
     try {
-      final User? currentUser = _authService.currentUser;
+      final UserModel? currentUser = _authService.currentUser;
       
       if (currentUser == null) {
         emit(state.copyWith(
@@ -26,6 +40,12 @@ class UserProfileCubit extends Cubit<UserProfileState> {
           errorMessage: 'No authenticated user found',
         ));
         return;
+      }
+      
+      // Set access token in repository
+      final String? accessToken = _authService.accessToken;
+      if (accessToken != null) {
+        _userRepository.setAccessToken(accessToken);
       }
       
       final UserModel profile = await _userRepository.getUserProfile(currentUser.uid);
@@ -42,49 +62,40 @@ class UserProfileCubit extends Cubit<UserProfileState> {
     }
   }
   
-  // Subscribe to real-time profile updates
-  void startProfileSubscription() {
-    final User? currentUser = _authService.currentUser;
-    
-    if (currentUser == null) {
-      emit(state.copyWith(
-        status: UserProfileStatus.error,
-        errorMessage: 'No authenticated user found',
-      ));
-      return;
-    }
-    
-    emit(state.copyWith(status: UserProfileStatus.loading));
-    
-    _profileSubscription?.cancel();
-    _profileSubscription = _userRepository
-        .userProfileStream(currentUser.uid)
-        .listen(
-          (profile) => emit(state.copyWith(
-            status: UserProfileStatus.loaded,
-            user: profile,
-          )),
-          onError: (error) => emit(state.copyWith(
-            status: UserProfileStatus.error,
-            errorMessage: error.toString(),
-          )),
-        );
-  }
-  
   // Update user profile
   Future<void> updateProfile({required String displayName}) async {
     try {
+      emit(state.copyWith(status: UserProfileStatus.loading));
+      
+      final UserModel? currentUser = _authService.currentUser;
+      if (currentUser == null) {
+        emit(state.copyWith(
+          status: UserProfileStatus.error,
+          errorMessage: 'No authenticated user found',
+        ));
+        return;
+      }
+      
       final UserModel updatedUser = UserModel(
-        uid: state.user?.uid ?? '',
+        uid: currentUser.uid,
         displayName: displayName,
-        email: state.user?.email ?? '',
-        emailVerified: state.user?.emailVerified ?? false,
-        createdAt: state.user?.createdAt ?? DateTime.now(),
+        email: currentUser.email,
+        emailVerified: currentUser.emailVerified,
+        createdAt: currentUser.createdAt,
         updatedAt: DateTime.now(),
       );
       
+      // Set access token in repository
+      final String? accessToken = _authService.accessToken;
+      if (accessToken != null) {
+        _userRepository.setAccessToken(accessToken);
+      }
+      
       await _userRepository.updateUserProfile(updatedUser);
-      // No need to emit a new state as the stream subscription will handle that
+      
+      // After successful update, load the updated profile
+      await loadUserProfile();
+      
     } catch (e) {
       emit(state.copyWith(
         status: UserProfileStatus.error,
@@ -93,9 +104,14 @@ class UserProfileCubit extends Cubit<UserProfileState> {
     }
   }
   
+  // Refresh profile data
+  Future<void> refreshProfile() async {
+    await loadUserProfile();
+  }
+  
   @override
   Future<void> close() {
-    _profileSubscription?.cancel();
+    _authSubscription?.cancel();
     return super.close();
   }
 }

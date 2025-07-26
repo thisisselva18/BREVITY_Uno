@@ -369,7 +369,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
             _buildDeveloperCard(
               name: 'Yash',
               role: 'Co-Developer',
-              portfolioUrl: 'https://yash-portfolio.netlify.app/',
+              portfolioUrl: 'https://portfolio-yash-914981.netlify.app/',
               linkedinUrl: 'https://www.linkedin.com/in/yash-kumar101/',
               theme: theme,
             ),
