@@ -42,15 +42,16 @@
 ### This project is now OFFICIALLY accepted for <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Heart%20on%20Fire.png" alt="Heart on Fire" width="40" height="40" />
 
 <div align="center">
-<table>
-  <tr>
-    <td align="center">
-      <strong>GSSoC 2025</strong><br/>
-      <img src="https://raw.githubusercontent.com/GSSoC24/Postman-Challenge/main/docs/assets/GSSoC-Ext.png" alt="GSSoC Logo" width="120" height="120"/><br/>
-      <em>The coding period welcomes contributors of all skill levels to join our open-source community and make meaningful contributions!</em>
-    </td>
-  </tr>
-</table>
+  <table>
+    <tr>
+      <th>Program Name</th>   <th>Program Logo</th>   <th>Program Description</th>
+    </tr>
+    <tr>
+      <td><a href="https://gssoc.girlscript.tech/">GirlScript Summer of Code</a></td>
+     <td width="300"><img src=".github/assets/GSSOC.png" width="250" height="auto" loading="lazy" alt="GSSoC 24"/></td>
+      <td><span style="font-size: 0.9em;">GirlScript Summer of Code is a three-month-long Open Source Program conducted every summer by GirlScript Foundation. It is an initiative to bring more beginners to Open-Source Software Development.</span></td>
+    </tr>
+  </table>
 </div>
 
 🎉 **Exciting News!** Brevity has been selected for **GirlScript Summer of Code (GSSoC) 2025**!
