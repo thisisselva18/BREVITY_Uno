@@ -493,7 +493,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                               Text(
                                 state.user?.email ?? '',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white.withAlpha(
+                                    (0.8 * 255).toInt(),
+                                  ),
                                   fontSize: 14,
                                   shadows: const [
                                     Shadow(
@@ -599,7 +601,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                             color: themeState
                                                 .currentTheme
                                                 .primaryColor
-                                                .withOpacity(0.4),
+                                                .withAlpha((0.4 * 255).toInt()),
                                             blurRadius: 5,
                                             spreadRadius: 1,
                                           ),
@@ -707,13 +709,14 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     onTap: () {
                                       // Implement logout logic
                                       AuthService().signOut().then((value) {
+                                        if (!context.mounted) return;
                                         context.go('/slpash');
                                       });
                                     },
                                   ),
                                 ),
                                 _buildAnimatedCard(
-                                  color: Colors.red.withOpacity(0.05),
+                                  color: Colors.red.withAlpha((0.05 * 255).toInt()),
                                   child: _buildListTile(
                                     icon: Icons.delete_forever,
                                     iconColor: Colors.red,
@@ -929,7 +932,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       ),
       value: value,
       activeColor: themeColor,
-      activeTrackColor: themeColor.withOpacity(0.3),
+      activeTrackColor: themeColor.withAlpha((0.3 * 255).toInt()),
       inactiveTrackColor: Colors.grey[800],
       inactiveThumbColor: Colors.grey[400],
       onChanged: onChanged,
@@ -950,7 +953,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: (iconColor ?? themeColor).withOpacity(0.1),
+          color: (iconColor ?? themeColor).withAlpha((0.1 * 255).toInt()),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, color: iconColor ?? themeColor, size: 24),

@@ -141,7 +141,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 boxShadow: [
                   BoxShadow(
                     // Apply theme color to shadow with opacity
-                    color: currentTheme.primaryColor.withOpacity(0.15),
+                    color: currentTheme.primaryColor.withAlpha((0.15 * 255).toInt()),
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),
@@ -189,7 +189,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 ),
                 elevation: 4,
                 // Apply theme color to button shadow
-                shadowColor: currentTheme.primaryColor.withOpacity(0.5),
+                shadowColor: currentTheme.primaryColor.withAlpha((0.5 * 255).toInt()),
               ),
               onPressed: () => Navigator.of(context).pop(),
               child: const Row(

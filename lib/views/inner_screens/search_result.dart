@@ -219,7 +219,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                   boxShadow: [
                     BoxShadow(
                       // Apply theme color to empty state shadow
-                      color: currentTheme.primaryColor.withOpacity(0.15),
+                      color: currentTheme.primaryColor.withAlpha((0.15 * 255).toInt()),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -262,7 +262,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                   ),
                   elevation: 4,
                   // Apply theme color to button shadow
-                  shadowColor: currentTheme.primaryColor.withOpacity(0.5),
+                  shadowColor: currentTheme.primaryColor.withAlpha((0.5 * 255).toInt()),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Row(

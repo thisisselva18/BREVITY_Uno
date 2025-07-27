@@ -51,12 +51,15 @@ class _AboutUsScreenState extends State<AboutUsScreen>
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(opacity ?? 0.08),
+        color: Colors.white.withAlpha(((opacity ?? 0.08) * 255).toInt()),
         borderRadius: borderRadius ?? BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.12), width: 1),
+        border: Border.all(
+          color: Colors.white.withAlpha(((0.12) * 255).toInt()),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withAlpha(((0.08) * 255).toInt()),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -91,9 +94,9 @@ class _AboutUsScreenState extends State<AboutUsScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              theme.primaryColor.withOpacity(0.08),
+              theme.primaryColor.withAlpha((0.08 * 255).toInt()),
               Colors.black,
-              Colors.black.withOpacity(0.95),
+              Colors.black.withAlpha((0.95 * 255).toInt()),
             ],
           ),
         ),
@@ -166,7 +169,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                 Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: theme.primaryColor.withOpacity(0.2),
+                    color: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -199,7 +202,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
             Text(
               'Stay informed with curated news from reliable sources. Our intelligent chatbot helps you understand and discuss articles in real-time.',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withAlpha((0.7 * 255).toInt()),
                 fontSize: 14,
                 height: 1.4,
               ),
@@ -242,7 +245,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                 Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: theme.primaryColor.withOpacity(0.2),
+                    color: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -275,16 +278,19 @@ class _AboutUsScreenState extends State<AboutUsScreen>
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
+        color: Colors.white.withAlpha((0.04 * 255).toInt()),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
+        border: Border.all(
+          color: Colors.white.withAlpha((0.08 * 255).toInt()),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: theme.primaryColor.withOpacity(0.2),
+              color: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(feature['icon'], color: theme.primaryColor, size: 16),
@@ -306,7 +312,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                 Text(
                   feature['description'],
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withAlpha((0.7 * 255).toInt()),
                     fontSize: 12,
                   ),
                 ),
@@ -332,7 +338,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                 Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: theme.primaryColor.withOpacity(0.2),
+                    color: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(Icons.code, color: theme.primaryColor, size: 20),
@@ -352,7 +358,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
             Text(
               'Meet the talented developers behind Unity News.',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withAlpha((0.7 * 255).toInt()),
                 fontSize: 14,
                 height: 1.4,
               ),
@@ -389,9 +395,12 @@ class _AboutUsScreenState extends State<AboutUsScreen>
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
+        color: Colors.white.withAlpha((0.04 * 255).toInt()),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
+        border: Border.all(
+          color: Colors.white.withAlpha((0.08 * 255).toInt()),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,7 +409,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: theme.primaryColor.withOpacity(0.2),
+                backgroundColor: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
                 child: Text(
                   name.split(' ').map((n) => n[0]).take(2).join(),
                   style: TextStyle(
@@ -426,7 +435,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                     Text(
                       role,
                       style: TextStyle(
-                        color: theme.primaryColor.withOpacity(0.8),
+                        color: theme.primaryColor.withAlpha((0.8 * 255).toInt()),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -446,10 +455,10 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: theme.primaryColor.withOpacity(0.1),
+                      color: theme.primaryColor.withAlpha((0.1 * 255).toInt()),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: theme.primaryColor.withOpacity(0.3),
+                        color: theme.primaryColor.withAlpha((0.3 * 255).toInt()),
                         width: 1,
                       ),
                     ),
@@ -479,10 +488,10 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.04),
+                      color: Colors.white.withAlpha(((0.04) * 255).toInt()),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.12),
+                        color: Colors.white.withAlpha(((0.12) * 255).toInt()),
                         width: 1,
                       ),
                     ),
@@ -491,14 +500,16 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                       children: [
                         Icon(
                           Icons.business,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withAlpha(((0.8) * 255).toInt()),
                           size: 16,
                         ),
                         Gap(6),
                         Text(
                           'LinkedIn',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withAlpha(
+                              ((0.8) * 255).toInt(),
+                            ),
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),
@@ -526,7 +537,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
           children: [
             Icon(
               Icons.info_outline,
-              color: theme.primaryColor.withOpacity(0.7),
+              color: theme.primaryColor.withAlpha((0.7 * 255).toInt()),
               size: 16,
             ),
             Gap(8),
@@ -537,7 +548,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                   Text(
                     'Version 1.0.0 • Built with Flutter',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withAlpha(((0.8) * 255).toInt()),
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
@@ -546,7 +557,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                   Text(
                     'Unity is created for news consumption and educational purposes.',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withAlpha(((0.6) * 255).toInt()),
                       fontSize: 11,
                     ),
                   ),
