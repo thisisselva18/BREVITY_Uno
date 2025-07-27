@@ -293,7 +293,7 @@ We're excited to connect with you! Whether you have questions, ideas, or just wa
 
 [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat&logo=github)](https://github.com/saysamarth)
 [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/saysamarth/)
-[![Email](https://img.shields.io/badge/-Email-EA4335?style=flat&logo=gmail&logoColor=white)](mailto:samarth2668@gmail.com)
+[![Email](https://img.shields.io/badge/-Email-EA4335?style=flat&logo=gmail&logoColor=white)](mailto:saysamarth26@gmail.com)
 
 </td>
 <td align="center" width="50%">
