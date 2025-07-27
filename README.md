@@ -19,6 +19,39 @@
 
 ---
 
+<img src="https://raw.githubusercontent.com/alo7lika/daccotta/refs/heads/dev/Images/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="900">
+
+### This project is now OFFICIALLY accepted for <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Heart%20on%20Fire.png" alt="Heart on Fire" width="40" height="40" />
+
+<div align="center">
+<table>
+  <tr>
+    <td align="center">
+      <strong>GSSoC 2025</strong><br/>
+      <img src="https://raw.githubusercontent.com/GSSoC24/Postman-Challenge/main/docs/assets/GSSoC-Ext.png" alt="GSSoC Logo" width="120" height="120"/><br/>
+      <em>The coding period welcomes contributors of all skill levels to join our open-source community and make meaningful contributions!</em>
+    </td>
+  </tr>
+</table>
+</div>
+
+🎉 **Exciting News!** Brevity has been selected for **GirlScript Summer of Code (GSSoC) 2025**! 
+
+📢 **Want to contribute?** Join our community Discord server to connect with maintainers and fellow contributors:
+<p align="center">
+  <a href="https://discord.gg/ueAnrmWr">
+    <img src="https://img.shields.io/badge/Discord-Join%20Community-7289da?style=for-the-badge&logo=discord&logoColor=white" alt="Join Discord" />
+  </a>
+</p>
+
+We welcome all contributors - from beginners to experienced developers. Let's build something amazing together! 🚀
+
+<br>
+    
+<img src="https://raw.githubusercontent.com/alo7lika/daccotta/refs/heads/dev/Images/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="900">
+
+---
+
 ## 👥 Collaborators
 
 <p align="center">
