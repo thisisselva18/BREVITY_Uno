@@ -250,15 +250,15 @@ brevity/
 
 We're constantly evolving and have some exciting ideas in the pipeline to make Brevity even more engaging and trustworthy:
 
-- [cite_start]**Multi-Language Support** 🌍 - Expanding our reach by offering the app in multiple languages. [cite: 1]
-- [cite_start]**Robust Backend** 🔒 - Implementing email verification and forget password functionality. [cite: 1]
-- [cite_start]**Improved Chatbot Response** 🧠 - Enhancing the chatbot's ability to provide accurate and helpful information. [cite: 1]
-- [cite_start]**App Rating and Sharing** ⭐🤝 - Allowing users to rate the app and easily share it with others. [cite: 1]
-- [cite_start]**User Preference Feed** ⚙️ - Enabling users to customize their news feed based on personal preferences. [cite: 1]
-- [cite_start]**Text-to-Speech** 🗣️ - Adding an option for news articles to be read aloud. [cite: 1]
-- [cite_start]**Reactions and Likes** 👍 - Introducing features for users to react to and like news content. [cite: 1]
-- [cite_start]**Light Mode** ☀️ - Providing an alternative light theme option for personalized viewing. [cite: 1]
-- [cite_start]**Notifications** 🔔 - Implementing a notification system to keep users updated. [cite: 1]
+-   **Multi-Language Support** 🌍 - Expanding our reach by offering the app in multiple languages.
+-   **Robust Backend** 🔒 - Implementing email verification and forget password functionality.
+-   **Improved Chatbot Response** 🧠 - Enhancing the chatbot's ability to provide accurate and helpful information.
+-   **App Rating and Sharing** ⭐🤝 - Allowing users to rate the app and easily share it with others.
+-   **User Preference Feed** ⚙️ - Enabling users to customize their news feed based on personal preferences.
+-   **Text-to-Speech** 🗣️ - Adding an option for news articles to be read aloud.
+-   **Reactions and Likes** 👍 - Introducing features for users to react to and like news content.
+-   **Light Mode** ☀️ - Providing an alternative light theme option for personalized viewing.
+-   **Notifications** 🔔 - Implementing a notification system to keep users updated.
 
 ---
 
