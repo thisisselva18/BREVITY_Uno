@@ -1,10 +1,15 @@
 import java.util.Properties
 import java.io.FileInputStream
 
+// This block should ideally be outside the 'android' block, at the top level of the build.gradle.kts file.
+// It sets up the keystore properties that will be used by the signingConfigs.
 val keystoreProperties = Properties()
 val keyPropertiesFile = rootProject.file("key.properties")
 if (keyPropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keyPropertiesFile))
+} else {
+    // It's good practice to throw an error if the file is missing, especially for release builds.
+    throw GradleException("key.properties not found! Please create it in the 'android' directory of your Flutter project and add your signing information.")
 }
 
 
@@ -18,53 +23,43 @@ plugins {
 android {
     namespace = "com.unity.brevity"
     compileSdk = flutter.compileSdkVersion
-    android {
-        // ...
-        compileSdk = flutter.compileSdkVersion
-        ndkVersion = "27.0.12077973"
 
-        // Java compatibility
-        compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
-        }
+    // Combine all top-level android configurations here
+    ndkVersion = "27.0.12077973"
 
-        // Kotlin compatibility
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_11.toString()
-        }
-
-        // ... rest of your config ...
-        ndkVersion = "27.0.12077973"
+    // Java compatibility
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+
+    // Kotlin compatibility - only one block needed
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+
     signingConfigs {
-        maybeCreate("release").apply {
-            val storeFilePath = keystoreProperties["storeFile"] as? String
-            if (!storeFilePath.isNullOrEmpty()) {
-                storeFile = file(storeFilePath)
-                storePassword = keystoreProperties["storePassword"] as String
-                keyAlias = keystoreProperties["keyAlias"] as String
-                keyPassword = keystoreProperties["keyPassword"] as String
-            }
+        create("release") { // Use 'create("name")' for Kotlin DSL to define a new config
+            // *** THE FIX IS HERE: Add .toString() and handle potential nulls ***
+            storeFile = file(keystoreProperties["storeFile"] as String) // Cast directly as String
+            storePassword = keystoreProperties["storePassword"] as String // Cast directly as String
+            keyAlias = keystoreProperties["keyAlias"] as String // Cast directly as String
+            keyPassword = keystoreProperties["keyPassword"] as String // Cast directly as String
         }
     }
-
-
 
     buildTypes {
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = false
-            isShrinkResources = false
+        getByName("release") { // Use getByName("release") to configure the default release build type
+            signingConfig = signingConfigs.getByName("release") // Assign the defined signing config
+
+            // Existing release configurations should go here
+            isMinifyEnabled = false // Consider setting to true for release builds for smaller APKs
+            isShrinkResources = false // Consider setting to true for release builds
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
     defaultConfig {
