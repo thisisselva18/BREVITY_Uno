@@ -51,12 +51,12 @@ class _ContactUsScreenState extends State<ContactUsScreen>
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(opacity ?? 0.08),
+        color: Colors.white.withAlpha((opacity ?? 0.08 * 255).toInt()),
         borderRadius: borderRadius ?? BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.12), width: 1),
+        border: Border.all(color: Colors.white.withAlpha((0.12 * 255).toInt()), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withAlpha((0.08 * 255).toInt()),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -78,7 +78,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
       SnackBar(
         content: Text('$type copied to clipboard'),
         duration: Duration(seconds: 2),
-        backgroundColor: Colors.green.withOpacity(0.8),
+        backgroundColor: Colors.green.withAlpha((0.8 * 255).toInt()),
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.all(16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -98,9 +98,9 @@ class _ContactUsScreenState extends State<ContactUsScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              theme.primaryColor.withOpacity(0.08),
+              theme.primaryColor.withAlpha((0.08 * 255).toInt()),
               Colors.black,
-              Colors.black.withOpacity(0.95),
+              Colors.black.withAlpha((0.95 * 255).toInt()),
             ],
           ),
         ),
@@ -169,7 +169,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
                 Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: theme.primaryColor.withOpacity(0.2),
+                    color: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -193,7 +193,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
             Text(
               'For support, feedback, or questions about the app, reach out to our development team.',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withAlpha((0.7 * 255).toInt()),
                 fontSize: 14,
                 height: 1.4,
               ),
@@ -230,9 +230,9 @@ class _ContactUsScreenState extends State<ContactUsScreen>
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
+        color: Colors.white.withAlpha((0.04 * 255).toInt()),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
+        border: Border.all(color: Colors.white.withAlpha((0.08 * 255).toInt()), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,7 +241,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: theme.primaryColor.withOpacity(0.2),
+                backgroundColor: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
                 child: Text(
                   name.split(' ').map((n) => n[0]).take(2).join(),
                   style: TextStyle(
@@ -267,7 +267,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
                     Text(
                       role,
                       style: TextStyle(
-                        color: theme.primaryColor.withOpacity(0.8),
+                        color: theme.primaryColor.withAlpha((0.8 * 255).toInt()),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -312,12 +312,12 @@ class _ContactUsScreenState extends State<ContactUsScreen>
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         child: Row(
           children: [
-            Icon(icon, color: theme.primaryColor.withOpacity(0.7), size: 16),
+            Icon(icon, color: theme.primaryColor.withAlpha((0.7 * 255).toInt()), size: 16),
             Gap(8),
             Text(
               label,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withAlpha((0.7 * 255).toInt()),
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),
@@ -335,7 +335,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
             ),
             Icon(
               Icons.copy,
-              color: theme.primaryColor.withOpacity(0.5),
+              color: theme.primaryColor.withAlpha((0.5 * 255).toInt()),
               size: 14,
             ),
           ],
@@ -355,7 +355,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
           children: [
             Icon(
               Icons.schedule_outlined,
-              color: theme.primaryColor.withOpacity(0.7),
+              color: theme.primaryColor.withAlpha((0.7 * 255).toInt()),
               size: 16,
             ),
             Gap(8),
@@ -363,7 +363,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
               child: Text(
                 'We typically respond within 1-2 business days',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withAlpha((0.7 * 255).toInt()),
                   fontSize: 12,
                 ),
               ),

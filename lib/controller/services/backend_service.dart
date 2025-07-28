@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:brevity/utils/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:image_picker/image_picker.dart';
@@ -496,7 +497,7 @@ class AuthService {
       await _apiService.logout();
     } catch (e) {
       // Continue with local logout even if API call fails
-      print('Logout API call failed: $e');
+      Log.e('Logout API call failed: $e');
     }
   }
 
@@ -511,7 +512,7 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      print('Get current user failed: $e');
+      Log.e('Get current user failed: $e');
       return null;
     }
   }

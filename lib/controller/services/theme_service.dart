@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:brevity/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/theme_model.dart';
 
@@ -25,10 +26,10 @@ class ThemeService {
     try {
       await _ensureInitialized();
       final themeJson = jsonEncode(theme.toJson());
-      print("Saving theme: $themeJson");
+      Log.i("Saving theme: $themeJson");
       return await _prefs!.setString(_themeKey, themeJson);
     } catch (e) {
-      print('Error saving theme: $e');
+      Log.e('Error saving theme: $e');
       return false;
     }
   }
@@ -38,18 +39,18 @@ class ThemeService {
     try {
       await _ensureInitialized();
       final themeJson = _prefs!.getString(_themeKey);
-      print("Loading theme: $themeJson"); // Fixed: was saying "Saving theme"
+      Log.d("Loading theme: $themeJson");
 
       if (themeJson != null) {
         final themeMap = jsonDecode(themeJson) as Map<String, dynamic>;
         final loadedTheme = AppTheme.fromJson(themeMap);
-        print("Loaded theme: ${loadedTheme.name}");
+        Log.i("Loaded theme: ${loadedTheme.name}");
         return loadedTheme;
       } else {
-        print("No saved theme found, using default");
+        Log.w("No saved theme found, using default");
       }
     } catch (e) {
-      print('Error loading theme: $e');
+      Log.e('Error loading theme: $e');
     }
 
     // Return default theme if loading fails
@@ -60,10 +61,10 @@ class ThemeService {
   Future<bool> clearTheme() async {
     try {
       await _ensureInitialized();
-      print("Clearing theme");
+      Log.d("Clearing theme");
       return await _prefs!.remove(_themeKey);
     } catch (e) {
-      print('Error clearing theme: $e');
+      Log.e('Error clearing theme: $e');
       return false;
     }
   }
@@ -74,7 +75,7 @@ class ThemeService {
       await _ensureInitialized();
       return _prefs!.containsKey(_themeKey);
     } catch (e) {
-      print('Error checking theme: $e');
+      Log.e('Error checking theme: $e');
       return false;
     }
   }
@@ -90,7 +91,7 @@ class ThemeService {
         return AppTheme.fromJson(themeMap);
       }
     } catch (e) {
-      print('Error getting saved theme sync: $e');
+      Log.e('Error getting saved theme sync: $e');
     }
     return null;
   }

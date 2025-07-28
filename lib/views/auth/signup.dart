@@ -155,6 +155,7 @@ class _SignupScreenState extends State<SignupScreen>
       );
     } catch (e) {
       // Handle error with animated snackbar
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
@@ -226,7 +227,7 @@ class _SignupScreenState extends State<SignupScreen>
                                         26,
                                         175,
                                         255,
-                                      ).withOpacity(0.4),
+                                      ).withAlpha((0.4 * 255).toInt()),
                                       blurRadius: 25,
                                       spreadRadius: 5,
                                     ),
@@ -539,7 +540,7 @@ class AnimatedPasswordStrengthIndicator extends StatelessWidget {
                     color: barColor,
                     boxShadow: [
                       BoxShadow(
-                        color: barColor.withOpacity(0.5),
+                        color: barColor.withAlpha((0.5 * 255).toInt()),
                         blurRadius: 4,
                         spreadRadius: 1,
                       ),
@@ -636,7 +637,7 @@ class _AnimatedTextFormFieldState extends State<AnimatedTextFormField>
                             26,
                             175,
                             255,
-                          ).withOpacity(0.3),
+                          ).withAlpha((0.3 * 255).toInt()),
                           blurRadius: 10,
                           spreadRadius: 2,
                         ),
@@ -764,7 +765,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
                     26,
                     175,
                     255,
-                  ).withOpacity(0.3),
+                  ).withAlpha((0.3 * 255).toInt()),
                   blurRadius: 15,
                   spreadRadius: 2,
                 ),

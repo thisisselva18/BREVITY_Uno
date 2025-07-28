@@ -43,11 +43,13 @@ class _ProfileScreenState extends State<ProfileScreen>
     userProfileCubit
         .updateProfile(displayName: _nameController.text)
         .then((_) {
+          if(!mounted) return; // Check if widget is still mounted
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Profile updated successfully')),
           );
         })
         .catchError((error) {
+          if(!mounted) return; // Check if widget is still mounted
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error updating profile: $error')),
           );
