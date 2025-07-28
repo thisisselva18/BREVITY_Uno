@@ -10,7 +10,7 @@ part 'chat_state.dart';
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final GeminiFlashService _geminiService;
 
-  ChatBloc({required GeminiFlashService geminiService}) 
+  ChatBloc({required GeminiFlashService geminiService})
       : _geminiService = geminiService,
         super(ChatInitial()) {
     on<InitializeChat>(_onInitializeChat);
@@ -32,14 +32,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (state is! ChatLoaded) return;
 
     final currentState = state as ChatLoaded;
-    
+        
     // Show message sending state
     emit(MessageSending(chatWindow: currentState.chatWindow));
 
     try {
       // Build full context with conversation history
       final prompt = _buildContextualPrompt(event.chatWindow, event.message);
-      
+            
       // Get response from Gemini
       final response = await _geminiService.getFreeResponse(prompt);
 
@@ -65,7 +65,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       ));
     } catch (e) {
       emit(ChatError(message: 'Failed to get response: ${e.toString()}'));
-      
+            
       // Return to previous state after error
       Future.delayed(const Duration(seconds: 3), () {
         if (!isClosed) {
@@ -85,26 +85,31 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   String _buildContextualPrompt(ChatWindow chatWindow, String userQuery) {
     final article = chatWindow.article;
     final history = chatWindow.conversations;
-    
-    String prompt = """You are a helpful news assistant. Answer questions about the following article accurately and concisely.
+        
+    String prompt = """You are an intelligent news companion that engages readers in meaningful discussions about articles. 
 
-Article: ${article.title}
-Description: ${article.description}
-Author: ${article.author}
-Source: ${article.sourceName}
+ARTICLE CONTEXT:
+Title: ${article.title}
+Author: ${article.author} | Source: ${article.sourceName}
+Summary: ${article.description}
 Content: ${article.content}
 
-""";
+GUIDELINES:
+• Answer questions accurately based solely on the article content
+• Match the conversational tone and style from our chat history
+• Politely redirect off-topic questions back to the article
+• Keep responses engaging by ending with thoughtful follow-up questions
+• Maintain a natural, human-like conversational flow""";
 
     if (history.isNotEmpty) {
-      prompt += "Previous conversation:\n";
+      prompt += "\n\nCONVERSATION HISTORY:\n";
       for (var conv in history) {
-        prompt += "User: ${conv.request}\nAssistant: ${conv.response}\n\n";
+        prompt += "You: ${conv.response}\nReader: ${conv.request}\n";
       }
     }
 
-    prompt += "Current question: $userQuery\n\nProvide a helpful response based on the article and conversation context.";
-    
+    prompt += "\n\nReader's Question: $userQuery\n\nYour Response:";
+        
     return prompt;
   }
 }

@@ -1,0 +1,9 @@
+exclude:
+  - server/node_modules/
+  - android/
+  - ios/
+  - lib/
+  - linux/
+  - macos/
+  - test/
+  - windows/
