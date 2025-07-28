@@ -16,6 +16,7 @@ Thank you for your interest in contributing to **Brevity**! We welcome all kinds
   - [3. Configure Environment Variables](#3-configure-environment-variables)
   - [4. Run the Server](#4-run-the-server)
   - [Notes for Backend Contributors](#notes-for-backend-contributors)
+- [📍 Backend Route Overview](#backend-route-overview)
 - [🔁 Keeping Your Fork Up-to-Date](#keeping-your-fork-up-to-date)
 - [🛠️ Making Contributions](#making-contributions)
 - [🧩 Working on Issues](#working-on-issues)
@@ -146,6 +147,12 @@ Your backend will be running at:
 * ☁️ Images and media uploads use **Cloudinary**.
 * 🧪 Test APIs with tools like **Postman** or **Thunder Client**.
 * 🗂️ Keep code modular: organize logic in `/routes`, `/controllers`, `/middlewares`, etc.
+
+## 📍 Backend Route Overview <a id="backend-route-overview"></a>
+
+You can view or download a detailed document outlining all backend routes and their usage.
+
+[📄 Download Backend Route Overview](.github/assets/backend_route_overview.docx)
 
 ## 🔁 Keeping Your Fork Up-to-Date <a id="keeping-your-fork-up-to-date"></a>
 
