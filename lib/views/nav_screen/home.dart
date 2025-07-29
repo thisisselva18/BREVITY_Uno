@@ -9,10 +9,7 @@ import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_event.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_state.dart';
 import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_bloc.dart';
-import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_event.dart';
-import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_state.dart';
 import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
-import 'package:brevity/controller/services/news_services.dart';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/models/news_category.dart';
 import 'package:shimmer/shimmer.dart';
@@ -25,15 +22,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: RepositoryProvider.of<NewsService>(context),
-      child: BlocProvider(
-        create: (context) => NewsBloc(
-          newsService: RepositoryProvider.of<NewsService>(context),
-        )..add(FetchInitialNews(category: category)),
-        child: Scaffold(body: _HomeScreenContent(category: category)),
-      ),
-    );
+    return Scaffold(body: _HomeScreenContent(category: category));
   }
 }
 
@@ -46,8 +35,18 @@ class _HomeScreenContent extends StatefulWidget {
 }
 
 class _HomeScreenContentState extends State<_HomeScreenContent> {
-  final controller = CardSwiperController();
-  int lastIndex = -1;
+  final CardSwiperController controller = CardSwiperController();
+
+  @override
+  void initState() {
+    super.initState();
+    final newsBloc = context.read<NewsBloc>();
+    final currentState = newsBloc.state;
+
+    if (currentState is! NewsLoaded || currentState.category != widget.category) {
+      newsBloc.add(FetchInitialNews(category: widget.category));
+    }
+  }
 
   String _getCategoryName(NewsCategory category) {
     final String name = category.toString().split('.').last;
@@ -59,40 +58,19 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 24, 24, 24),
       body: BlocBuilder<NewsBloc, NewsState>(
-        buildWhen: (previous, current) {
-          if (current is NewsLoaded) {
-            return current.category == widget.category;
-          }
-          return true;
-        },
         builder: (context, state) {
           if (state is NewsLoading) {
             return _buildLoadingShimmer();
           } else if (state is NewsLoaded) {
-            return _buildNewsSwiper(context, state.articles);
+            if (state.category != widget.category) {
+              return _buildLoadingShimmer();
+            }
+            return _buildNewsSwiper(context, state);
           } else if (state is NewsError) {
-            return Container(
-              color: const Color.fromARGB(255, 15, 15, 15),
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(40.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset('assets/logos/dog.png'),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Failed To Load News :(",
-                        style: TextStyle(
-                          fontSize: 25,
-                          color: Color.fromARGB(255, 194, 34, 23),
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
+            return Center(
+              child: Text(
+                state.message,
+                style: const TextStyle(color: Colors.red, fontSize: 18),
               ),
             );
           }
@@ -102,17 +80,21 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     );
   }
 
-  Widget _buildNewsSwiper(BuildContext context, List<Article> articles) {
+  Widget _buildNewsSwiper(BuildContext context, NewsLoaded state) {
+    final articles = state.articles;
+    if (articles.isEmpty) {
+      return const Center(child: Text("No articles found.", style: TextStyle(color: Colors.white)));
+    }
     return Stack(
       children: [
         CardSwiper(
           controller: controller,
           cardsCount: articles.length,
+          initialIndex: state.currentIndex,
           cardBuilder: (context, index, horizontalOffset, verticalOffset) {
             final article = articles[index];
             double offsetY = verticalOffset.toDouble();
 
-            // Reverse the offset for swipe down to make previous card appear from top
             if (offsetY > 0) {
               offsetY = -offsetY;
             }
@@ -121,44 +103,41 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
               offset: Offset(0, offsetY),
               child: GestureDetector(
                 onVerticalDragEnd: (details) {
-                  final velocity = details.primaryVelocity ?? 0;
-                  if (velocity.abs() > 300) {
-                    if (velocity < 0) {
-                      // Swipe up - go to next card (from bottom)
+                  final velocity = details.primaryVelocity;
+                  if (velocity != null) {
+                    if (velocity < -300) {
                       controller.swipe(CardSwiperDirection.bottom);
-                    } else {
-                      // Swipe down - undo to previous card (from top)
+                    } else if (velocity > 300) {
                       controller.undo();
                     }
                   }
                 },
                 onHorizontalDragEnd: (details) {
-                  // Right swipe to go to sidepage
-                  if (details.primaryVelocity! > 5) {
+                  final velocity = details.primaryVelocity;
+                  if (velocity != null && velocity > 200) {
                     context.goNamed('sidepage');
                   }
-                  // Left swipe could be implemented here if needed
-                  if (details.primaryVelocity! < -5) {}
                 },
-                behavior: HitTestBehavior.opaque,
-                child: _NewsCard(
-                  article: article,
-                  controller: controller,
-                ),
+                child: _NewsCard(article: article, controller: controller),
               ),
             );
           },
           onSwipe: (previousIndex, currentIndex, direction) {
-            if (direction == CardSwiperDirection.bottom && currentIndex != null) {
-              lastIndex = currentIndex;
-              if (currentIndex >= articles.length - 3) {
-                context.read<NewsBloc>().add(FetchNextPage(currentIndex, widget.category));
-              }
+            if (currentIndex == null) return true;
+
+            context.read<NewsBloc>().add(UpdateNewsIndex(currentIndex));
+            if (!state.hasReachedMax && currentIndex >= articles.length - 3) {
+              context
+                  .read<NewsBloc>()
+                  .add(FetchNextPage(currentIndex, widget.category));
             }
             return true;
           },
-          onUndo: (previousIndex, currentIndex, direction) => true,
-          allowedSwipeDirection: const AllowedSwipeDirection.only(up: true, down: true),
+          onUndo: (previousIndex, currentIndex, direction) {
+            context.read<NewsBloc>().add(UpdateNewsIndex(currentIndex));
+            return true;
+          },
+          allowedSwipeDirection: AllowedSwipeDirection.none(),
           duration: const Duration(milliseconds: 150),
           numberOfCardsDisplayed: 3,
           backCardOffset: const Offset(0, 40),
@@ -204,22 +183,18 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   }
 
   Widget _buildLoadingShimmer() {
-    return ListView.builder(
-      itemCount: 5,
-      itemBuilder: (context, index) {
-        return Shimmer.fromColors(
-          baseColor: const Color.fromARGB(255, 19, 19, 19),
-          highlightColor: const Color.fromARGB(255, 11, 11, 11),
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.8,
-            margin: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 27, 27, 27),
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-        );
-      },
+    return Shimmer.fromColors(
+      baseColor: const Color.fromARGB(255, 19, 19, 19),
+      highlightColor: const Color.fromARGB(255, 11, 11, 11),
+      child: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        margin: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 27, 27, 27),
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
     );
   }
 }

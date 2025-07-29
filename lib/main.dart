@@ -28,6 +28,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brevity/controller/services/firestore_service.dart';
 import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
 import 'package:brevity/views/inner_screens/contact_screen.dart';
+import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_bloc.dart';
 
 // Create a class to manage authentication state
 class AuthService {
@@ -94,162 +95,162 @@ final _routes = GoRouter(
       name: 'sidepage',
       pageBuilder:
           (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const SidePage(),
-            transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
+        key: state.pageKey,
+        child: const SidePage(),
+        transitionsBuilder: (
+            context,
+            animation,
+            secondaryAnimation,
+            child,
             ) {
-              const begin = Offset(-1.0, 0.0);
-              const end = Offset.zero;
-              const curve = Curves.easeInOut;
-              return SlideTransition(
-                position: Tween(
-                  begin: begin,
-                  end: end,
-                ).chain(CurveTween(curve: curve)).animate(animation),
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 225),
-          ),
+          const begin = Offset(-1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+          return SlideTransition(
+            position: Tween(
+              begin: begin,
+              end: end,
+            ).chain(CurveTween(curve: curve)).animate(animation),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 225),
+      ),
       routes: [
         GoRoute(
           path: 'bookmark',
           name: 'bookmark',
           pageBuilder:
               (context, state) => CustomTransitionPage(
-                key: state.pageKey,
-                child: const BookmarkScreen(),
-                transitionsBuilder: (
-                  context,
-                  animation,
-                  secondaryAnimation,
-                  child,
+            key: state.pageKey,
+            child: const BookmarkScreen(),
+            transitionsBuilder: (
+                context,
+                animation,
+                secondaryAnimation,
+                child,
                 ) {
-                  // Combine scale and fade animations
-                  return Align(
-                    alignment: Alignment.center,
-                    child: FadeTransition(
-                      opacity: animation,
-                      child: ScaleTransition(
-                        scale: animation.drive(
-                          Tween<double>(
-                            begin: 0.0,
-                            end: 1.0,
-                          ).chain(CurveTween(curve: Curves.easeInOutQuad)),
-                        ),
-                        child: child,
-                      ),
+              // Combine scale and fade animations
+              return Align(
+                alignment: Alignment.center,
+                child: FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: animation.drive(
+                      Tween<double>(
+                        begin: 0.0,
+                        end: 1.0,
+                      ).chain(CurveTween(curve: Curves.easeInOutQuad)),
                     ),
-                  );
-                },
-                transitionDuration: const Duration(milliseconds: 225),
-              ),
+                    child: child,
+                  ),
+                ),
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 225),
+          ),
         ),
         GoRoute(
           path: '/settings',
           name: 'settings',
           pageBuilder:
               (context, state) => CustomTransitionPage(
-                key: state.pageKey,
-                child: const SettingsScreen(),
-                transitionsBuilder: (
-                  context,
-                  animation,
-                  secondaryAnimation,
-                  child,
+            key: state.pageKey,
+            child: const SettingsScreen(),
+            transitionsBuilder: (
+                context,
+                animation,
+                secondaryAnimation,
+                child,
                 ) {
-                  return Align(
-                    alignment: Alignment.center,
-                    child: FadeTransition(
-                      opacity: animation,
-                      child: ScaleTransition(
-                        scale: animation.drive(
-                          Tween<double>(
-                            begin: 0.0,
-                            end: 1.0,
-                          ).chain(CurveTween(curve: Curves.easeInOutQuad)),
-                        ),
-                        child: child,
-                      ),
+              return Align(
+                alignment: Alignment.center,
+                child: FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: animation.drive(
+                      Tween<double>(
+                        begin: 0.0,
+                        end: 1.0,
+                      ).chain(CurveTween(curve: Curves.easeInOutQuad)),
                     ),
-                  );
-                },
-                transitionDuration: const Duration(milliseconds: 225),
-              ),
+                    child: child,
+                  ),
+                ),
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 225),
+          ),
         ),
         GoRoute(
           path: '/profile',
           name: 'profile',
           pageBuilder:
               (context, state) => CustomTransitionPage(
-                key: state.pageKey,
-                child: const ProfileScreen(),
-                transitionsBuilder: (
-                  context,
-                  animation,
-                  secondaryAnimation,
-                  child,
+            key: state.pageKey,
+            child: const ProfileScreen(),
+            transitionsBuilder: (
+                context,
+                animation,
+                secondaryAnimation,
+                child,
                 ) {
-                  return Align(
-                    alignment: Alignment.center,
-                    child: FadeTransition(
-                      opacity: animation,
-                      child: ScaleTransition(
-                        scale: animation.drive(
-                          Tween<double>(
-                            begin: 0.0,
-                            end: 1.0,
-                          ).chain(CurveTween(curve: Curves.easeInOutQuad)),
-                        ),
-                        child: child,
-                      ),
+              return Align(
+                alignment: Alignment.center,
+                child: FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: animation.drive(
+                      Tween<double>(
+                        begin: 0.0,
+                        end: 1.0,
+                      ).chain(CurveTween(curve: Curves.easeInOutQuad)),
                     ),
-                  );
-                },
-                transitionDuration: const Duration(milliseconds: 225),
-              ),
+                    child: child,
+                  ),
+                ),
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 225),
+          ),
         ),
         GoRoute(
           path: '/searchResults',
           name: 'searchResults',
           pageBuilder:
               (context, state) => CustomTransitionPage(
-                key: state.pageKey,
-                child: SearchResultsScreen(
-                  query:
-                      state
-                          .uri
-                          .queryParameters['query']!, // Only query parameter
-                ),
-                transitionsBuilder: (
-                  context,
-                  animation,
-                  secondaryAnimation,
-                  child,
+            key: state.pageKey,
+            child: SearchResultsScreen(
+              query:
+              state
+                  .uri
+                  .queryParameters['query']!, // Only query parameter
+            ),
+            transitionsBuilder: (
+                context,
+                animation,
+                secondaryAnimation,
+                child,
                 ) {
-                  // Combine scale and fade animations
-                  return Align(
-                    alignment: Alignment.center,
-                    child: FadeTransition(
-                      opacity: animation,
-                      child: ScaleTransition(
-                        scale: animation.drive(
-                          Tween<double>(
-                            begin: 0.0,
-                            end: 1.0,
-                          ).chain(CurveTween(curve: Curves.easeInOutQuad)),
-                        ),
-                        child: child,
-                      ),
+              // Combine scale and fade animations
+              return Align(
+                alignment: Alignment.center,
+                child: FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: animation.drive(
+                      Tween<double>(
+                        begin: 0.0,
+                        end: 1.0,
+                      ).chain(CurveTween(curve: Curves.easeInOutQuad)),
                     ),
-                  );
-                },
-                transitionDuration: const Duration(milliseconds: 225),
-              ),
+                    child: child,
+                  ),
+                ),
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 225),
+          ),
         ),
       ],
     ),
@@ -284,33 +285,33 @@ final _routes = GoRouter(
       name: 'chat',
       pageBuilder:
           (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: ChatScreen(article: state.extra as Article),
-            transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
+        key: state.pageKey,
+        child: ChatScreen(article: state.extra as Article),
+        transitionsBuilder: (
+            context,
+            animation,
+            secondaryAnimation,
+            child,
             ) {
-              // Combine scale and fade animations
-              return Align(
-                alignment: Alignment.center,
-                child: FadeTransition(
-                  opacity: animation,
-                  child: ScaleTransition(
-                    scale: animation.drive(
-                      Tween<double>(
-                        begin: 0.0,
-                        end: 1.0,
-                      ).chain(CurveTween(curve: Curves.easeInOutQuad)),
-                    ),
-                    child: child,
-                  ),
+          // Combine scale and fade animations
+          return Align(
+            alignment: Alignment.center,
+            child: FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(
+                scale: animation.drive(
+                  Tween<double>(
+                    begin: 0.0,
+                    end: 1.0,
+                  ).chain(CurveTween(curve: Curves.easeInOutQuad)),
                 ),
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 225),
-          ),
+                child: child,
+              ),
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 225),
+      ),
     ),
   ],
   // Add redirect logic to handle authentication state
@@ -358,6 +359,8 @@ void main() async {
       ],
       child: MultiBlocProvider(
         providers: [
+          // THIS IS THE CRITICAL FIX: PROVIDING THE NEWSBLOC GLOBALLY
+          BlocProvider(create: (context) => NewsBloc(newsService: newsService)),
           BlocProvider(create: (context) => BookmarkBloc(bookmarkRepository)),
           BlocProvider(create: (context) => UserProfileCubit()),
           BlocProvider(create: (context) => ThemeCubit()..initializeTheme()),
