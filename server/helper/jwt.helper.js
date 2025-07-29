@@ -5,7 +5,7 @@ dotenv.config();
 
 const encode = (payload) => {
     try {
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
         return token;
     } catch (error) {
         console.error('Error encoding JWT:', error);
