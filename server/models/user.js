@@ -95,6 +95,19 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
+// Instance method to generate password reset token
+userSchema.methods.generatePasswordResetToken = async function () {
+    const rawToken = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    const salt = await bcrypt.genSalt(parseInt(process.env.BCRYPT_ROUNDS) || 12);
+    this.passwordResetToken = await bcrypt.hash(rawToken, salt);
+    this.passwordResetExpires = Date.now() + 3600000; // 1 hour
+    return rawToken; // Return the raw token for sending in email
+};
+
+userSchema.methods.comparePasswordResetToken = async function (token) {
+    return await bcrypt.compare(token, this.passwordResetToken);
+}
+
 // Instance method to handle failed login attempts
 userSchema.methods.incLoginAttempts = function () {
     // Clear attempts if lock has expired
