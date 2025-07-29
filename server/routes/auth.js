@@ -7,13 +7,15 @@ const {
     logout,
     getCurrentUser,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    resendVerification
 } = require('../controllers/auth');
 
 const router = express.Router();
 
 // Routes
 router.post('/register', upload.single('profileImage'), register);
+router.post('/resend-verification', resendVerification);
 router.post('/login', login);
 
 router.post('/forgot-password', forgotPassword);

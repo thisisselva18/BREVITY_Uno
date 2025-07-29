@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { encode } = require('../helper/jwt.helper');
 
 const userSchema = new mongoose.Schema({
     displayName: {
@@ -34,7 +36,6 @@ const userSchema = new mongoose.Schema({
         default: false
     },
     emailVerificationToken: String,
-    emailVerificationExpires: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
     loginAttempts: {
@@ -104,8 +105,23 @@ userSchema.methods.generatePasswordResetToken = async function () {
     return rawToken; // Return the raw token for sending in email
 };
 
+// Instance method to verify password reset token
 userSchema.methods.comparePasswordResetToken = async function (token) {
     return await bcrypt.compare(token, this.passwordResetToken);
+}
+
+// Instance method to generate email verification token
+userSchema.methods.generateEmailVerificationToken = async function () {
+    if(!this.emailVerificationToken) {
+        const token = require('crypto').randomBytes(32).toString('hex');
+        this.emailVerificationToken = token;
+        await this.save();
+    }
+    const returnToken = encode({
+        email: this.email,
+        emailVerificationToken: this.emailVerificationToken
+    });
+    return returnToken;
 }
 
 // Instance method to handle failed login attempts
