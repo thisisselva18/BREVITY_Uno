@@ -23,10 +23,14 @@ Thank you for your interest in contributing to **Brevity**! We welcome all kinds
 - [💬 Community & Support](#community--support)
 - [🙌 Thank You!](#thank-you)
 
+---
+
 ## ⭐ Show Your Support <a id="show-your-support"></a>
 
 If you like the project, **give it a star**!  
 👉 [Star Brevity on GitHub](https://github.com/Yash159357/BREVITY)
+
+---
 
 ## 🚀 Frontend Setup Guide <a id="frontend-setup-guide"></a>
 
@@ -71,6 +75,8 @@ NEWS_API_KEY=your_news_api_key_here
 ```
 
 > 🔒 **Never commit this file** — it contains sensitive credentials.
+
+---
 
 ## 🧱 Backend Setup Guide (Node.js) <a id="backend-setup-guide-nodejs"></a>
 
@@ -148,11 +154,15 @@ Your backend will be running at:
 * 🧪 Test APIs with tools like **Postman** or **Thunder Client**.
 * 🗂️ Keep code modular: organize logic in `/routes`, `/controllers`, `/middlewares`, etc.
 
+---
+
 ## 📍 Backend Route Overview <a id="backend-route-overview"></a>
 
 You can view or download a detailed document outlining all backend routes and their usage.
 
 [📄 Download Backend Route Overview](.github/assets/backend_route_overview.docx)
+
+---
 
 ## 🔁 Keeping Your Fork Up-to-Date <a id="keeping-your-fork-up-to-date"></a>
 
@@ -196,6 +206,8 @@ git rebase upstream/main
    * Go to your fork on GitHub
    * Open a **Pull Request** targeting the `main` branch
 
+---
+
 ## 🧩 Working on Issues <a id="working-on-issues"></a>
 
 * 💬 **Comment first**: Claim an issue by leaving a comment.
@@ -203,6 +215,8 @@ git rebase upstream/main
 * 🥇 **First come, first serve**: Contributors are assigned based on who claims first.
 
 👉 [Browse Open Issues](https://github.com/Yash159357/BREVITY/issues)
+
+---
 
 ## 💬 Community & Support <a id="community--support"></a>
 

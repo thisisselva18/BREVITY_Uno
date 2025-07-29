@@ -64,12 +64,12 @@
 1. [✨ App Demo](#-app-demo)
 2. [🌟 Features](#-features)
 3. [🛠️ Tech Stack](#️-tech-stack)
-4. [📲 Installation & Setup](#-installation--setup)
-5. [📁 Folder Structure](#-folder-structure)
-6. [🔮 Future Plans](#-future-plans)
-7. [🤝 Contributing](#-contributing)
-8. [📄 License](#-license)
-9. [💬 Connect With Us](#-get-in-touch)
+4. [📁 Folder Structure](#-folder-structure)
+5. [🔮 Future Plans](#-future-plans)
+6. [🤝 Contributing](#-contributing)
+7. [📄 License](#-license)
+8. [🌐 Connect With Us](#-get-in-touch)
+9. [💬 Join the Conversation](#-join-the-conversation)
 
 ---
 
@@ -154,80 +154,6 @@
 -   **Local Storage**: Shared Preferences
 -   **APIs**: News API, Gemini API
 ---
-## 🚀 Installation & Setup
-
-This guide will help you get BREVITY up and running on your local machine.
-
-### Prerequisites
-
-Before you start, make sure you have the following installed:
-
-* **Flutter SDK**: Version 3.29.2 or higher.
-* **Dart SDK**: Version 3.7.2 or higher.
-* **Code Editor**:
-    * [Android Studio](https://developer.android.com/studio) or [VS Code](https://code.visualstudio.com/)
-    * Ensure you have the respective Flutter extensions installed.
-* **Git**: For cloning the repository.
-
-### ⚡ Quick Start
-
-Follow these steps to set up and run the application:
-
-1.  **Clone the Repository**
-    ```bash
-    git clone [https://github.com/Yash159357/BREVITY](https://github.com/Yash159357/BREVITY)
-    cd brevity
-    ```
-
-2.  **Install Dependencies**
-    ```bash
-    flutter pub get
-    ```
-
-3.  **Configure API Keys**
-
-    Create a `.env` file in the root directory of your project:
-    ```bash
-    touch .env
-    ```
-    Add the following content to your `.env` file, replacing the placeholders with your actual keys:
-    ```env
-    # .env file contents
-    GEMINI_API_KEY=your_gemini_api_key_here
-    NEWS_API_KEY=your_news_api_key_here
-    ```
-
-    **How to get your API Keys:**
-    * **Gemini API:**
-        1.  Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-        2.  Create a new API key.
-        3.  Copy the key and update `GEMINI_API_KEY` in your `.env` file.
-    * **News API:**
-        1.  Visit [NewsAPI.org](https://newsapi.org/register)
-        2.  Sign up for a free account.
-        3.  Copy your API key and update `NEWS_API_KEY` in your `.env` file.
-
-4.  **Set Up Firebase**
-
-    To enable Firebase services (e.g., authentication, database):
-    1.  Go to the [Firebase Console](https://console.firebase.google.com/).
-    2.  Create a new project or select an existing one.
-    3.  Add your Android and/or iOS app(s) to the project.
-    4.  Download the configuration files:
-        * For Android: `google-services.json`
-        * For iOS: `GoogleService-Info.plist`
-    5.  Place them in the correct directories:
-        * Android: `android/app/google-services.json`
-        * iOS: `ios/Runner/GoogleService-Info.plist`
-
-5.  **Run the Application**
-    ```bash
-    # For development/debug mode
-    flutter run
-
-    # For a release build (optimized for performance)
-    flutter run --release
-    ```
 
 # 📁 Folder Structure
 
@@ -260,6 +186,12 @@ We're constantly evolving and have some exciting ideas in the pipeline to make B
 -   **Reactions and Likes** 👍 - Introducing features for users to react to and like news content.
 -   **Light Mode** ☀️ - Providing an alternative light theme option for personalized viewing.
 -   **Notifications** 🔔 - Implementing a notification system to keep users updated.
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please read our [Contributing Guidelines](.github/CONTRIBUTING.md) before submitting a pull request.
 
 ---
 
