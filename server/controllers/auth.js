@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const { generateTokens } = require('../services/jwt');
 const { sendEmail } = require('../services/email.service');
+const { jwt, decode } = require('jsonwebtoken');
 
 // Register user
 const register = async (req, res) => {
@@ -31,6 +32,15 @@ const register = async (req, res) => {
             email,
             password,
             profileImage
+        });
+
+        const emailVerificationToken = await user.generateEmailVerificationToken();
+
+        await sendEmail({
+            to: user.email,
+            subject: 'Email Verification',
+            userName: user.displayName,
+            url: emailVerificationToken,
         });
 
         await user.save();
@@ -302,11 +312,104 @@ const resetPassword = async (req, res) => {
     }
 }
 
+const verifyEmail = async (req, res) => {
+    try {
+        const { token } = req.query;
+        if (!token) {
+            return res.status(400).json({
+                success: false,
+                message: 'Token is required for email verification'
+            });
+        }
+        const { email, emailVerificationToken } = decode(token);
+        if (!email || !emailVerificationToken) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid token format'
+            });
+        }
+
+        const user = await User.findOne({ email, emailVerificationToken });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found or token is invalid'
+            });
+        }
+
+        user.emailVerified = true;
+        user.emailVerificationToken = undefined;
+        await user.save();
+
+        res.status(200).send(
+            require('../helper/html.helper').html(user.displayName)
+        )
+    }
+    catch (error) {
+        console.error('Email verification error:', error.message);
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid or expired email verification token'
+        });
+    }
+}
+
+const resendVerification = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email is required'
+            });
+        }
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found with this email'
+            });
+        }
+
+        if (user.emailVerified) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email is already verified'
+            });
+        }
+
+        const emailVerificationToken = await user.generateEmailVerificationToken();
+
+        await sendEmail({
+            to: user.email,
+            subject: 'Resend Email Verification',
+            userName: user.displayName,
+            url: emailVerificationToken,
+        });
+        res.status(200).json({
+            success: true,
+            message: 'Verification email sent successfully'
+        });
+    }
+    catch (error) {
+        console.error('Resend verification error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to resend verification email',
+            error: error.message
+        });
+    }
+}
+
+
 module.exports = {
     register,
     login,
     logout,
     forgotPassword,
     resetPassword,
-    getCurrentUser
+    getCurrentUser,
+    verifyEmail,
+    resendVerification
 };

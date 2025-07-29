@@ -23,7 +23,7 @@ async function sendEmail({ to, subject, userName, token, url }) {
             to,
             subject,
         };
-        if(!token && !url) {
+        if (!token && !url) {
             let fullHtml = fs.readFileSync('services/templates/reset-successful.html', 'utf8');
             fullHtml = fullHtml.replace('{{userName}}', userName);
             mailOptions.html = fullHtml;
@@ -34,8 +34,15 @@ async function sendEmail({ to, subject, userName, token, url }) {
             fullHtml = fullHtml.replace('{{token}}', token);
             mailOptions.html = fullHtml;
         }
+        if (url) {
+            const _url = `${process.env.DEPLOYMENT_URL}/auth/verify-email?token=${url}`;
+            const safeUrl = _url.replace(/&/g, '&amp;');
+            let fullHtml = fs.readFileSync('services/templates/email-verification.html', 'utf8');
+            fullHtml = fullHtml.replace('{{userName}}', userName);
+            fullHtml = fullHtml.replace('{{verificationLink}}', safeUrl);
+            mailOptions.html = fullHtml;
+        }
         await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully');
     } catch (error) {
         console.error('Error sending email:', error);
     }
