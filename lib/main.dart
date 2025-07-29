@@ -359,7 +359,6 @@ void main() async {
       ],
       child: MultiBlocProvider(
         providers: [
-          // THIS IS THE CRITICAL FIX: PROVIDING THE NEWSBLOC GLOBALLY
           BlocProvider(create: (context) => NewsBloc(newsService: newsService)),
           BlocProvider(create: (context) => BookmarkBloc(bookmarkRepository)),
           BlocProvider(create: (context) => UserProfileCubit()),
