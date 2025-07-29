@@ -6,7 +6,7 @@ import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
 import 'package:brevity/controller/services/news_services.dart';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/views/common_widgets/common_appbar.dart';
-import 'package:brevity/views/common_widgets/list_of_article.dart';
+import 'package:brevity/views/common_widgets/List_of_article.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SearchResultsScreen extends StatefulWidget {
