@@ -49,3 +49,9 @@ app.*.map.json
 android/key.properties
 android/app/my-release-key.jks
 android/app/key.jks
+
+# Server related
+/server/.env
+/server/.env.local
+/server/.env.development.local
+/server/node_modules
