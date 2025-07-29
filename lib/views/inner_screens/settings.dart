@@ -9,6 +9,7 @@ import 'package:brevity/controller/services/auth_service.dart';
 import 'package:brevity/models/user_model.dart';
 import 'package:brevity/views/common_widgets/common_appbar.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:share_plus/share_plus.dart';
 
 // Import theme system
 import '../../controller/cubit/theme/theme_cubit.dart';
@@ -649,7 +650,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                         themeState.currentTheme.primaryColor,
                                     onTap:
                                         () => Share.share(
-                                          'Check out this awesome news app!',
+                                          'Hey! I\'m using this amazing app. You can try it too! 📲\n\nDownload here: https://play.google.com/store/apps/details?id=com.placeholder',
                                         ),
                                   ),
                                 ),
