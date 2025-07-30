@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:brevity/models/user_model.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 
 class AuthService {
   // Singleton instance
@@ -24,10 +25,28 @@ class AuthService {
 
   // Initialize auth state (call this when app starts)
   Future<void> initializeAuth() async {
-    // Check if user is already logged in by checking stored token
-    // You might want to use shared_preferences or secure_storage here
-    // For now, we'll assume user needs to login again
-    _authStateController.add(null);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final storedToken = prefs.getString('accessToken');
+
+      if (storedToken != null && storedToken.isNotEmpty) {
+        _accessToken = storedToken;
+        // Attempt to refresh user data with the stored token
+        await refreshUser();
+        if (_currentUser != null) {
+          _authStateController.add(_currentUser);
+        } else {
+          // If refresh fails (e.g., token expired), clear token and notify logged out
+          await signOut();
+        }
+      } else {
+        _authStateController.add(null);
+      }
+    } catch (e) {
+      // Handle any errors during initialization, e.g., SharedPreferences error
+      _authStateController.add(null);
+      print('Error initializing auth: $e'); // For debugging
+    }
   }
 
   Future<UserModel?> signUpWithEmail({
@@ -55,18 +74,22 @@ class AuthService {
         final data = json.decode(response.body);
         _accessToken = data['data']['accessToken'];
         final userData = data['data']['user'];
-        
+
+        // Save access token locally
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', _accessToken!);
+
         // Create UserModel from backend response
         _currentUser = UserModel(
           uid: userData['_id'], // Node.js uses _id
           displayName: userData['displayName'] ?? '',
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
-          createdAt: userData['createdAt'] != null 
-              ? DateTime.parse(userData['createdAt']) 
+          createdAt: userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'])
               : null,
-          updatedAt: userData['updatedAt'] != null 
-              ? DateTime.parse(userData['updatedAt']) 
+          updatedAt: userData['updatedAt'] != null
+              ? DateTime.parse(userData['updatedAt'])
               : null,
         );
 
@@ -74,7 +97,7 @@ class AuthService {
           _showSuccessSnackBar(context, 'Account created successfully!');
           context.go('/intro');
         }
-        
+
         // Notify listeners of auth state change
         _authStateController.add(_currentUser);
         return _currentUser;
@@ -113,18 +136,22 @@ class AuthService {
         final data = json.decode(response.body);
         _accessToken = data['data']['accessToken'];
         final userData = data['data']['user'];
-        
+
+        // Save access token locally
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', _accessToken!);
+
         // Create UserModel from backend response
         _currentUser = UserModel(
           uid: userData['_id'], // Node.js uses _id
           displayName: userData['displayName'] ?? '',
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
-          createdAt: userData['createdAt'] != null 
-              ? DateTime.parse(userData['createdAt']) 
+          createdAt: userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'])
               : null,
-          updatedAt: userData['updatedAt'] != null 
-              ? DateTime.parse(userData['updatedAt']) 
+          updatedAt: userData['updatedAt'] != null
+              ? DateTime.parse(userData['updatedAt'])
               : null,
         );
 
@@ -132,7 +159,7 @@ class AuthService {
           _showSuccessSnackBar(context, 'Welcome back!');
           context.go('/home/0');
         }
-        
+
         // Notify listeners of auth state change
         _authStateController.add(_currentUser);
         return _currentUser;
@@ -160,11 +187,15 @@ class AuthService {
           },
         );
       }
-      
+
       // Clear local state
       _accessToken = null;
       _currentUser = null;
-      
+
+      // Clear token from local storage
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('accessToken');
+
       // Notify listeners of auth state change
       _authStateController.add(null);
 
@@ -177,7 +208,11 @@ class AuthService {
       _accessToken = null;
       _currentUser = null;
       _authStateController.add(null);
-      
+
+      // Ensure token is cleared from local storage even on server error
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('accessToken');
+
       if (context != null) {
         if(!context.mounted) return;
         _showErrorSnackBar(context, 'Error signing out, but you have been logged out locally');
@@ -192,10 +227,10 @@ class AuthService {
   // Refresh user data
   Future<void> refreshUser() async {
     if (_accessToken == null) return;
-    
+
     try {
       final response = await http.get(
-        Uri.parse('https://brevitybackend.onrender.com/api/users/me'),
+        Uri.parse('https://brevitybackend.onrender.com/api/auth/me'),
         headers: {
           'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',
@@ -205,25 +240,29 @@ class AuthService {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final userData = data['data']['user'];
-        
+
         _currentUser = UserModel(
           uid: userData['_id'],
           displayName: userData['displayName'] ?? '',
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
-          createdAt: userData['createdAt'] != null 
-              ? DateTime.parse(userData['createdAt']) 
+          createdAt: userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'])
               : null,
-          updatedAt: userData['updatedAt'] != null 
-              ? DateTime.parse(userData['updatedAt']) 
+          updatedAt: userData['updatedAt'] != null
+              ? DateTime.parse(userData['updatedAt'])
               : null,
         );
-        
+
         _authStateController.add(_currentUser);
+      } else {
+        // If refresh fails (e.g., token expired on server), sign out locally
+        await signOut();
       }
     } catch (e) {
-      // If refresh fails, user might need to login again
+      // If refresh fails due to network or other error, sign out locally
       await signOut();
+      print('Error refreshing user: $e'); // For debugging
     }
   }
 
@@ -270,6 +309,15 @@ class AuthService {
             Text(message),
           ],
         ),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+  void _showInfoSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.blue,
         duration: Duration(seconds: 2),
       ),
     );

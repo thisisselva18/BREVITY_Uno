@@ -20,7 +20,7 @@ class UserRepository {
   Future<UserModel> getUserProfile(String uid) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/me'),
+        Uri.parse('https://brevitybackend.onrender.com/api/auth/me'),
         headers: {
           'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',

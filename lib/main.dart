@@ -6,11 +6,7 @@ import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/models/news_category.dart';
 import 'package:brevity/views/auth/auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-
-import 'package:brevity/firebase_options.dart';
 import 'package:brevity/views/inner_screens/chat_screen.dart';
 import 'package:brevity/views/inner_screens/profile.dart';
 import 'package:brevity/views/inner_screens/search_result.dart';
@@ -25,34 +21,13 @@ import 'package:brevity/controller/services/news_services.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:brevity/controller/services/firestore_service.dart';
 import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
 import 'package:brevity/views/inner_screens/contact_screen.dart';
+import 'package:brevity/controller/services/auth_service.dart'; // Import your AuthService
 import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_bloc.dart';
 
-// Create a class to manage authentication state
-class AuthService {
-  static final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // Check if user is signed in
-  static bool isUserSignedIn() {
-    return _auth.currentUser != null;
-  }
-}
-
-// Create a router notifier to handle authentication state changes
-class AuthNotifier extends ChangeNotifier {
-  AuthNotifier() {
-    FirebaseAuth.instance.authStateChanges().listen((user) {
-      notifyListeners();
-    });
-  }
-}
-
-// Create the router with auth state handling
-final _authNotifier = AuthNotifier();
+// Create a router with auth state handling
 final _routes = GoRouter(
-  refreshListenable: _authNotifier,
   initialLocation: '/splash',
   routes: [
     GoRoute(
@@ -93,16 +68,15 @@ final _routes = GoRouter(
     GoRoute(
       path: '/sidepage',
       name: 'sidepage',
-      pageBuilder:
-          (context, state) => CustomTransitionPage(
+      pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
         child: const SidePage(),
         transitionsBuilder: (
-            context,
-            animation,
-            secondaryAnimation,
-            child,
-            ) {
+          context,
+          animation,
+          secondaryAnimation,
+          child,
+        ) {
           const begin = Offset(-1.0, 0.0);
           const end = Offset.zero;
           const curve = Curves.easeInOut;
@@ -120,16 +94,15 @@ final _routes = GoRouter(
         GoRoute(
           path: 'bookmark',
           name: 'bookmark',
-          pageBuilder:
-              (context, state) => CustomTransitionPage(
+          pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const BookmarkScreen(),
             transitionsBuilder: (
-                context,
-                animation,
-                secondaryAnimation,
-                child,
-                ) {
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
               // Combine scale and fade animations
               return Align(
                 alignment: Alignment.center,
@@ -153,16 +126,15 @@ final _routes = GoRouter(
         GoRoute(
           path: '/settings',
           name: 'settings',
-          pageBuilder:
-              (context, state) => CustomTransitionPage(
+          pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const SettingsScreen(),
             transitionsBuilder: (
-                context,
-                animation,
-                secondaryAnimation,
-                child,
-                ) {
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
               return Align(
                 alignment: Alignment.center,
                 child: FadeTransition(
@@ -185,16 +157,15 @@ final _routes = GoRouter(
         GoRoute(
           path: '/profile',
           name: 'profile',
-          pageBuilder:
-              (context, state) => CustomTransitionPage(
+          pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const ProfileScreen(),
             transitionsBuilder: (
-                context,
-                animation,
-                secondaryAnimation,
-                child,
-                ) {
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
               return Align(
                 alignment: Alignment.center,
                 child: FadeTransition(
@@ -217,21 +188,17 @@ final _routes = GoRouter(
         GoRoute(
           path: '/searchResults',
           name: 'searchResults',
-          pageBuilder:
-              (context, state) => CustomTransitionPage(
+          pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: SearchResultsScreen(
-              query:
-              state
-                  .uri
-                  .queryParameters['query']!, // Only query parameter
+              query: state.uri.queryParameters['query']!, // Only query parameter
             ),
             transitionsBuilder: (
-                context,
-                animation,
-                secondaryAnimation,
-                child,
-                ) {
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
               // Combine scale and fade animations
               return Align(
                 alignment: Alignment.center,
@@ -283,16 +250,15 @@ final _routes = GoRouter(
     GoRoute(
       path: '/chat',
       name: 'chat',
-      pageBuilder:
-          (context, state) => CustomTransitionPage(
+      pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
         child: ChatScreen(article: state.extra as Article),
         transitionsBuilder: (
-            context,
-            animation,
-            secondaryAnimation,
-            child,
-            ) {
+          context,
+          animation,
+          secondaryAnimation,
+          child,
+        ) {
           // Combine scale and fade animations
           return Align(
             alignment: Alignment.center,
@@ -320,11 +286,11 @@ final _routes = GoRouter(
     if (state.matchedLocation == '/splash') return null;
 
     // Check for routes that should be accessible without authentication
-    final allowedPaths = ['/auth', '/intro'];
+    final allowedPaths = ['/auth', '/intro', '/contactUs', '/aboutUs'];
     if (allowedPaths.contains(state.matchedLocation)) return null;
 
-    // If user is not signed in, redirect to auth
-    if (!AuthService.isUserSignedIn()) {
+    // If user is not signed in, redirect to auth using your AuthService
+    if (!AuthService().isAuthenticated) {
       return '/auth';
     }
 
@@ -335,12 +301,13 @@ final _routes = GoRouter(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+  // Initialize your AuthService
+  await AuthService().initializeAuth();
 
   final bookmarkRepository = BookmarkServices();
   final newsService = NewsService();
-  final userRepository = UserRepository();
 
   await bookmarkRepository.initialize();
 
@@ -355,7 +322,6 @@ void main() async {
       providers: [
         RepositoryProvider.value(value: newsService),
         RepositoryProvider.value(value: bookmarkRepository),
-        RepositoryProvider.value(value: userRepository),
       ],
       child: MultiBlocProvider(
         providers: [

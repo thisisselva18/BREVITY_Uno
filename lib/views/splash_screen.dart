@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:go_router/go_router.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:brevity/controller/services/auth_service.dart'; // Import your AuthService
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -46,7 +45,8 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   void navigateBasedOnAuthStatus() {
-    final isSignedIn = FirebaseAuth.instance.currentUser != null;
+    // Use your AuthService to check authentication status
+    final isSignedIn = AuthService().isAuthenticated;
 
     if (isSignedIn) {
       context.go('/home/0');
@@ -90,7 +90,6 @@ class SplashScreenState extends State<SplashScreen>
                 );
               },
             ),
-
             Center(
               child: ScaleTransition(
                 scale: _logoAnimation,
@@ -104,13 +103,12 @@ class SplashScreenState extends State<SplashScreen>
                     ),
                     const SizedBox(height: 20),
                     ShaderMask(
-                      shaderCallback:
-                          (bounds) => const LinearGradient(
-                            colors: [
-                              Color.fromARGB(255, 26, 175, 255),
-                              Colors.white,
-                            ],
-                          ).createShader(bounds),
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [
+                          Color.fromARGB(255, 26, 175, 255),
+                          Colors.white,
+                        ],
+                      ).createShader(bounds),
                       child: const Text(
                         'BREVITY',
                         style: TextStyle(
@@ -164,10 +162,9 @@ class ParticlePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = const Color(0xFF3B82F6)
-          ..style = PaintingStyle.fill;
+    final paint = Paint()
+      ..color = const Color(0xFF3B82F6)
+      ..style = PaintingStyle.fill;
 
     for (var particle in particles) {
       final dx = (0.5 - particle.x) * progress * size.width;
