@@ -15,27 +15,15 @@ class UserModel {
     this.updatedAt,
   });
   
-  // Create from Firestore document
-  factory UserModel.fromFirestore(Map<String, dynamic> data) {
-    return UserModel(
-      uid: data['uid'] ?? '',
-      displayName: data['displayName'] ?? '',
-      email: data['email'] ?? '',
-      emailVerified: data['emailVerified'] ?? false,
-      createdAt: data['createdAt']?.toDate(),
-      updatedAt: data['updatedAt']?.toDate(),
-    );
-  }
-  
-  // Convert to map for Firestore
+  // Convert to map for sending data to the backend
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
       'displayName': displayName,
       'email': email,
       'emailVerified': emailVerified,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
+      'createdAt': createdAt?.toIso8601String(), // Convert DateTime to ISO 8601 string
+      'updatedAt': updatedAt?.toIso8601String(), // Convert DateTime to ISO 8601 string
     };
   }
   

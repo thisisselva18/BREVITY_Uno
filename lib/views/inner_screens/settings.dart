@@ -707,7 +707,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     onTap: () {
                                       // Implement logout logic
                                       AuthService().signOut().then((value) {
-                                        context.go('/slpash');
+                                        context.go('/splash');
                                       });
                                     },
                                   ),

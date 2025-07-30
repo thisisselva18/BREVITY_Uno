@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:brevity/controller/services/firestore_service.dart';
+import 'package:brevity/controller/services/firestore_service.dart'; // This is your UserRepository
 import 'package:brevity/controller/services/auth_service.dart';
 import '../../../models/user_model.dart';
 import 'user_profile_state.dart';
