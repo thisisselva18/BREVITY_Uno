@@ -1,14 +1,33 @@
-import 'package:brevity/models/news_category.dart';
+part of 'news_scroll_bloc.dart';
 
-abstract class NewsEvent {}
+abstract class NewsEvent extends Equatable {
+  const NewsEvent();
+
+  @override
+  List<Object> get props => [];
+}
 
 class FetchInitialNews extends NewsEvent {
   final NewsCategory category;
-  FetchInitialNews({this.category = NewsCategory.general});
+  const FetchInitialNews({this.category = NewsCategory.general});
+
+  @override
+  List<Object> get props => [category];
 }
 
 class FetchNextPage extends NewsEvent {
   final int currentIndex;
   final NewsCategory category;
-  FetchNextPage(this.currentIndex, this.category);
+  const FetchNextPage(this.currentIndex, this.category);
+
+  @override
+  List<Object> get props => [currentIndex, category];
+}
+
+class UpdateNewsIndex extends NewsEvent {
+  final int newIndex;
+  const UpdateNewsIndex(this.newIndex);
+
+  @override
+  List<Object> get props => [newIndex];
 }

@@ -6,7 +6,7 @@ import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
 import 'package:brevity/controller/services/news_services.dart';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/views/common_widgets/common_appbar.dart';
-import 'package:brevity/views/common_widgets/list_of_article.dart';
+import 'package:brevity/views/common_widgets/List_of_article.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SearchResultsScreen extends StatefulWidget {
@@ -219,7 +219,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                   boxShadow: [
                     BoxShadow(
                       // Apply theme color to empty state shadow
-                      color: currentTheme.primaryColor.withOpacity(0.15),
+                      color: currentTheme.primaryColor.withAlpha((0.15 * 255).toInt()),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -262,7 +262,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                   ),
                   elevation: 4,
                   // Apply theme color to button shadow
-                  shadowColor: currentTheme.primaryColor.withOpacity(0.5),
+                  shadowColor: currentTheme.primaryColor.withAlpha((0.5 * 255).toInt()),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Row(

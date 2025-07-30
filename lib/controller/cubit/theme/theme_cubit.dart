@@ -1,3 +1,4 @@
+import 'package:brevity/utils/logger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../models/theme_model.dart';
 import '../../services/theme_service.dart';
@@ -12,7 +13,7 @@ class ThemeCubit extends Cubit<ThemeState> {
 
   // Initialize theme from storage or use default
   Future<void> initializeTheme() async {
-    print("Initializing theme...");
+    Log.d("Initializing theme...");
     emit(state.copyWith(status: ThemeStatus.loading));
 
     try {
@@ -21,8 +22,8 @@ class ThemeCubit extends Cubit<ThemeState> {
       
       // Load the saved theme
       final savedTheme = await _themeService.loadTheme();
-      print("Theme initialized with: ${savedTheme.name}");
-      
+      Log.i("Theme initialized with: ${savedTheme.name}");
+
       emit(
         state.copyWith(
           currentTheme: savedTheme, 
@@ -30,7 +31,7 @@ class ThemeCubit extends Cubit<ThemeState> {
         ),
       );
     } catch (e) {
-      print("Error initializing theme: $e");
+      Log.e("Error initializing theme: $e");
       emit(
         state.copyWith(
           currentTheme: AppThemes.defaultTheme,
@@ -43,8 +44,8 @@ class ThemeCubit extends Cubit<ThemeState> {
 
   // Change theme and persist it
   Future<void> changeTheme(AppTheme newTheme) async {
-    print("Changing theme to: ${newTheme.name}");
-    
+    Log.d("Changing theme to: ${newTheme.name}");
+
     // Emit loading state
     emit(state.copyWith(status: ThemeStatus.loading));
 
@@ -53,7 +54,7 @@ class ThemeCubit extends Cubit<ThemeState> {
       final success = await _themeService.saveTheme(newTheme);
 
       if (success) {
-        print("Theme saved successfully: ${newTheme.name}");
+        Log.i("Theme saved successfully: ${newTheme.name}");
         emit(
           state.copyWith(
             currentTheme: newTheme, 
@@ -62,7 +63,7 @@ class ThemeCubit extends Cubit<ThemeState> {
           ),
         );
       } else {
-        print("Failed to save theme");
+        Log.w("Failed to save theme");
         emit(
           state.copyWith(
             status: ThemeStatus.error,
@@ -71,7 +72,7 @@ class ThemeCubit extends Cubit<ThemeState> {
         );
       }
     } catch (e) {
-      print("Error changing theme: $e");
+      Log.e("Error changing theme: $e");
       emit(
         state.copyWith(
           status: ThemeStatus.error,
@@ -83,7 +84,7 @@ class ThemeCubit extends Cubit<ThemeState> {
 
   // Reset theme to default
   Future<void> resetTheme() async {
-    print("Resetting theme to default");
+    Log.d("Resetting theme to default");
     emit(state.copyWith(status: ThemeStatus.loading));
 
     try {
@@ -97,10 +98,10 @@ class ThemeCubit extends Cubit<ThemeState> {
           errorMessage: null
         ),
       );
-      
-      print("Theme reset to default successfully");
+
+      Log.i("Theme reset to default successfully");
     } catch (e) {
-      print("Error resetting theme: $e");
+      Log.e("Error resetting theme: $e");
       emit(
         state.copyWith(
           status: ThemeStatus.error,

@@ -493,7 +493,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                               Text(
                                 state.user?.email ?? '',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white.withAlpha(
+                                    (0.8 * 255).toInt(),
+                                  ),
                                   fontSize: 14,
                                   shadows: const [
                                     Shadow(
@@ -599,7 +601,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                             color: themeState
                                                 .currentTheme
                                                 .primaryColor
-                                                .withOpacity(0.4),
+                                                .withAlpha((0.4 * 255).toInt()),
                                             blurRadius: 5,
                                             spreadRadius: 1,
                                           ),
@@ -649,7 +651,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                         themeState.currentTheme.primaryColor,
                                     onTap:
                                         () => Share.share(
-                                          'Check out this awesome news app!',
+                                          'Hey! I\'m using this amazing app. You can try it too! 📲\n\nDownload here: https://play.google.com/store/apps/details?id=com.placeholder',
                                         ),
                                   ),
                                 ),
@@ -708,12 +710,13 @@ class _SettingsScreenState extends State<SettingsScreen>
                                       // Implement logout logic
                                       AuthService().signOut().then((value) {
                                         context.go('/splash');
+
                                       });
                                     },
                                   ),
                                 ),
                                 _buildAnimatedCard(
-                                  color: Colors.red.withOpacity(0.05),
+                                  color: Colors.red.withAlpha((0.05 * 255).toInt()),
                                   child: _buildListTile(
                                     icon: Icons.delete_forever,
                                     iconColor: Colors.red,
@@ -929,7 +932,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       ),
       value: value,
       activeColor: themeColor,
-      activeTrackColor: themeColor.withOpacity(0.3),
+      activeTrackColor: themeColor.withAlpha((0.3 * 255).toInt()),
       inactiveTrackColor: Colors.grey[800],
       inactiveThumbColor: Colors.grey[400],
       onChanged: onChanged,
@@ -950,7 +953,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: (iconColor ?? themeColor).withOpacity(0.1),
+          color: (iconColor ?? themeColor).withAlpha((0.1 * 255).toInt()),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, color: iconColor ?? themeColor, size: 24),

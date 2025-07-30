@@ -24,6 +24,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
 import 'package:brevity/views/inner_screens/contact_screen.dart';
 import 'package:brevity/controller/services/auth_service.dart'; // Import your AuthService
+import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_bloc.dart';
 
 // Create a router with auth state handling
 final _routes = GoRouter(
@@ -324,6 +325,7 @@ void main() async {
       ],
       child: MultiBlocProvider(
         providers: [
+          BlocProvider(create: (context) => NewsBloc(newsService: newsService)),
           BlocProvider(create: (context) => BookmarkBloc(bookmarkRepository)),
           BlocProvider(create: (context) => UserProfileCubit()),
           BlocProvider(create: (context) => ThemeCubit()..initializeTheme()),

@@ -212,7 +212,9 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            currentTheme.primaryColor.withOpacity(0.1),
+                            currentTheme.primaryColor.withAlpha(
+                              (0.1 * 255).toInt(),
+                            ),
                             Colors.transparent,
                           ],
                         ),

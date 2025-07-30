@@ -99,7 +99,7 @@ class AppThemes {
   // Get theme by color value
   static AppTheme getThemeByColor(Color color) {
     return availableThemes.firstWhere(
-      (theme) => theme.colorValue == color.value,
+      (theme) => theme.colorValue == color.toARGB32(),
       orElse: () => defaultTheme,
     );
   }
@@ -144,7 +144,7 @@ class AppThemes {
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return appTheme.primaryColor.withOpacity(0.3);
+            return appTheme.primaryColor.withAlpha((0.3 * 255).toInt());
           }
           return Colors.grey[800];
         }),
@@ -156,7 +156,9 @@ class AppThemes {
   static MaterialColor _createMaterialColor(Color color) {
     final strengths = <double>[.05];
     final swatch = <int, Color>{};
-    final int r = color.red, g = color.green, b = color.blue;
+    final int r = (color.r * 255.0).round() & 0xff,
+        g = (color.g * 255.0).round() & 0xff,
+        b = (color.b * 255.0).round() & 0xff;
 
     for (int i = 1; i < 10; i++) {
       strengths.add(0.1 * i);
@@ -172,6 +174,6 @@ class AppThemes {
       );
     }
 
-    return MaterialColor(color.value, swatch);
+    return MaterialColor(color.toARGB32(), swatch);
   }
 }

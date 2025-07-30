@@ -33,7 +33,7 @@ jobs:
       run: |
         issue_count=$(wc -l < issue_numbers.txt)
 
-        if [ "$issue_count" -gt 0 ]; then
+        if [ "$issue_count" -gt 2 ]; then
           echo "Duplicate issue(s) found."
           exit 0
         else

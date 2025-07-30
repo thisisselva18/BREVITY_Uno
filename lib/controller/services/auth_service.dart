@@ -93,7 +93,7 @@ class AuthService {
               : null,
         );
 
-        if (context != null) {
+        if (context != null && context.mounted) {
           _showSuccessSnackBar(context, 'Account created successfully!');
           context.go('/intro');
         }
@@ -106,7 +106,7 @@ class AuthService {
         throw Exception(errorData['message'] ?? 'Failed to create account');
       }
     } catch (e) {
-      if (context != null) {
+      if (context != null && context.mounted) {
         _showErrorSnackBar(context, e.toString());
       }
       rethrow;
@@ -155,7 +155,7 @@ class AuthService {
               : null,
         );
 
-        if (context != null) {
+        if (context != null && context.mounted) {
           _showSuccessSnackBar(context, 'Welcome back!');
           context.go('/home/0');
         }
@@ -168,7 +168,7 @@ class AuthService {
         throw Exception(errorData['message'] ?? 'Login failed');
       }
     } catch (e) {
-      if (context != null) {
+      if (context != null && context.mounted) {
         _showErrorSnackBar(context, e.toString());
       }
       rethrow;
@@ -199,7 +199,7 @@ class AuthService {
       // Notify listeners of auth state change
       _authStateController.add(null);
 
-      if (context != null) {
+      if (context != null && context.mounted) {
         _showSuccessSnackBar(context, 'Successfully signed out');
         context.go('/login'); // Redirect to login page
       }
@@ -214,6 +214,7 @@ class AuthService {
       await prefs.remove('accessToken');
 
       if (context != null) {
+        if(!context.mounted) return;
         _showErrorSnackBar(context, 'Error signing out, but you have been logged out locally');
         context.go('/login');
       }
@@ -312,7 +313,6 @@ class AuthService {
       ),
     );
   }
-
   void _showInfoSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

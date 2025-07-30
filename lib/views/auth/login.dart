@@ -113,6 +113,7 @@ class _LoginScreenState extends State<LoginScreen>
       );
     } catch (e) {
       // Handle error
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Login failed: ${e.toString()}'),
@@ -177,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen>
                                         26,
                                         175,
                                         255,
-                                      ).withOpacity(0.3),
+                                      ).withAlpha((0.3 * 255).toInt()),
                                       blurRadius: 20,
                                       spreadRadius: 5,
                                     ),
@@ -457,7 +458,7 @@ class _AnimatedTextFormFieldState extends State<AnimatedTextFormField>
                             26,
                             175,
                             255,
-                          ).withOpacity(0.3),
+                          ).withAlpha((0.3 * 255).toInt()),
                           blurRadius: 10,
                           spreadRadius: 2,
                         ),
@@ -580,7 +581,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
                     26,
                     175,
                     255,
-                  ).withOpacity(0.3),
+                  ).withAlpha((0.3 * 255).toInt()),
                   blurRadius: 15,
                   spreadRadius: 2,
                 ),

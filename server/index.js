@@ -9,6 +9,9 @@ const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 
+// Import controllers
+const { verifyEmail } = require('./controllers/auth');
+
 // Import middleware
 const { errorHandler } = require('./middleware/error');
 
@@ -59,6 +62,9 @@ app.get('/api/health', (req, res) => {
         timestamp: new Date().toISOString()
     });
 });
+
+// Email verification route
+app.get('/auth/verify-email', verifyEmail);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

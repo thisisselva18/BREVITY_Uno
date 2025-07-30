@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_event.dart';
-import 'package:brevity/views/common_widgets/list_of_article.dart';
+import 'package:brevity/views/common_widgets/List_of_article.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_state.dart';
@@ -141,7 +141,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 boxShadow: [
                   BoxShadow(
                     // Apply theme color to shadow with opacity
-                    color: currentTheme.primaryColor.withOpacity(0.15),
+                    color: currentTheme.primaryColor.withAlpha((0.15 * 255).toInt()),
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),
@@ -189,7 +189,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 ),
                 elevation: 4,
                 // Apply theme color to button shadow
-                shadowColor: currentTheme.primaryColor.withOpacity(0.5),
+                shadowColor: currentTheme.primaryColor.withAlpha((0.5 * 255).toInt()),
               ),
               onPressed: () => Navigator.of(context).pop(),
               child: const Row(
