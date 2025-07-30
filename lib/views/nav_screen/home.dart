@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -35,7 +34,7 @@ class _HomeScreenContent extends StatefulWidget {
 }
 
 class _HomeScreenContentState extends State<_HomeScreenContent> {
-  final CardSwiperController controller = CardSwiperController();
+  late PageController _pageController;
 
   @override
   void initState() {
@@ -43,9 +42,20 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     final newsBloc = context.read<NewsBloc>();
     final currentState = newsBloc.state;
 
-    if (currentState is! NewsLoaded || currentState.category != widget.category) {
+    int initialPage = 0;
+    if (currentState is NewsLoaded && currentState.category == widget.category) {
+      initialPage = currentState.currentIndex;
+    } else {
       newsBloc.add(FetchInitialNews(category: widget.category));
     }
+
+    _pageController = PageController(initialPage: initialPage);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   String _getCategoryName(NewsCategory category) {
@@ -57,7 +67,8 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 24, 24, 24),
-      body: BlocBuilder<NewsBloc, NewsState>(
+      body: BlocConsumer<NewsBloc, NewsState>(
+        listener: (context, state) {},
         builder: (context, state) {
           if (state is NewsLoading) {
             return _buildLoadingShimmer();
@@ -65,7 +76,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
             if (state.category != widget.category) {
               return _buildLoadingShimmer();
             }
-            return _buildNewsSwiper(context, state);
+            return _buildNewsViewPager(context, state);
           } else if (state is NewsError) {
             return Center(
               child: Text(
@@ -80,105 +91,85 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     );
   }
 
-  Widget _buildNewsSwiper(BuildContext context, NewsLoaded state) {
+  Widget _buildNewsViewPager(BuildContext context, NewsLoaded state) {
     final articles = state.articles;
     if (articles.isEmpty) {
       return const Center(child: Text("No articles found.", style: TextStyle(color: Colors.white)));
     }
-    return Stack(
-      children: [
-        CardSwiper(
-          controller: controller,
-          cardsCount: articles.length,
-          initialIndex: state.currentIndex,
-          cardBuilder: (context, index, horizontalOffset, verticalOffset) {
-            final article = articles[index];
-            double offsetY = verticalOffset.toDouble();
 
-            if (offsetY > 0) {
-              offsetY = -offsetY;
-            }
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        final velocity = details.primaryVelocity;
+        if (velocity != null && velocity > 300) {
+          context.goNamed('sidepage');
+        }
+      },
+      child: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            scrollDirection: Axis.vertical,
+            itemCount: state.hasReachedMax ? articles.length : articles.length + 1,
+            onPageChanged: (index) {
+              // DEBUG: Print the state every time you swipe
+              print('Page changed to: $index. Articles: ${articles.length}. HasReachedMax: ${state.hasReachedMax}');
 
-            return Transform.translate(
-              offset: Offset(0, offsetY),
-              child: GestureDetector(
-                onVerticalDragEnd: (details) {
-                  final velocity = details.primaryVelocity;
-                  if (velocity != null) {
-                    if (velocity < -300) {
-                      controller.swipe(CardSwiperDirection.bottom);
-                    } else if (velocity > 300) {
-                      controller.undo();
-                    }
-                  }
-                },
-                onHorizontalDragEnd: (details) {
-                  final velocity = details.primaryVelocity;
-                  if (velocity != null && velocity > 200) {
-                    context.goNamed('sidepage');
-                  }
-                },
-                child: _NewsCard(article: article, controller: controller),
+              context.read<NewsBloc>().add(UpdateNewsIndex(index));
+
+              if (!state.hasReachedMax && index >= articles.length - 3) {
+                // DEBUG: Print when the trigger condition is met
+                print('---!!! TRIGGERING FETCH FOR NEXT PAGE !!!---');
+                context
+                    .read<NewsBloc>()
+                    .add(FetchNextPage(index, widget.category));
+              }
+            },
+            itemBuilder: (context, index) {
+              if (index >= articles.length) {
+                return const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                );
+              }
+              final article = articles[index];
+              return _NewsCard(article: article);
+            },
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                children: [
+                  Text(
+                    _getCategoryName(widget.category),
+                    style: const TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                      shadows: [
+                        Shadow(
+                          blurRadius: 15.0,
+                          color: Color.fromRGBO(0, 0, 0, 0.5),
+                          offset: Offset(2.0, 2.0),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.info_outline,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                    onPressed: () => context.pushNamed("contactUs"),
+                  ),
+                ],
               ),
-            );
-          },
-          onSwipe: (previousIndex, currentIndex, direction) {
-            if (currentIndex == null) return true;
-
-            context.read<NewsBloc>().add(UpdateNewsIndex(currentIndex));
-            if (!state.hasReachedMax && currentIndex >= articles.length - 3) {
-              context
-                  .read<NewsBloc>()
-                  .add(FetchNextPage(currentIndex, widget.category));
-            }
-            return true;
-          },
-          onUndo: (previousIndex, currentIndex, direction) {
-            context.read<NewsBloc>().add(UpdateNewsIndex(currentIndex));
-            return true;
-          },
-          allowedSwipeDirection: AllowedSwipeDirection.none(),
-          duration: const Duration(milliseconds: 150),
-          numberOfCardsDisplayed: 3,
-          backCardOffset: const Offset(0, 40),
-          scale: 0.9,
-          padding: EdgeInsets.zero,
-        ),
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Row(
-              children: [
-                Text(
-                  _getCategoryName(widget.category),
-                  style: const TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontFamily: 'Poppins',
-                    shadows: [
-                      Shadow(
-                        blurRadius: 15.0,
-                        color: Color.fromRGBO(0, 0, 0, 0.5),
-                        offset: Offset(2.0, 2.0),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(
-                    Icons.info_outline,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                  onPressed: () => context.pushNamed("contactUs"),
-                ),
-              ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -189,11 +180,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
       child: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 27, 27, 27),
-          borderRadius: BorderRadius.circular(16),
-        ),
+        color: const Color.fromARGB(255, 27, 27, 27),
       ),
     );
   }
@@ -201,11 +188,9 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
 
 class _NewsCard extends StatelessWidget {
   final Article article;
-  final CardSwiperController controller;
 
   const _NewsCard({
     required this.article,
-    required this.controller,
   });
 
   @override
@@ -214,152 +199,134 @@ class _NewsCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: const Color.fromRGBO(0, 0, 0, 0.3),
-            blurRadius: 20,
-            spreadRadius: 2,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: Colors.black,
+        image: DecorationImage(
+          image: CachedNetworkImageProvider(article.urlToImage),
+          fit: BoxFit.cover,
+          onError: (exception, stackTrace) {},
+        ),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CachedNetworkImage(
-              imageUrl: article.urlToImage,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(color: Colors.grey[200]),
-              errorWidget: (context, url, error) => Container(
-                color: const Color.fromRGBO(128, 128, 128, 0.8),
-                child: const Icon(
-                  Icons.broken_image,
-                  color: Colors.white54,
-                ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  const Color.fromARGB(230, 4, 4, 4),
+                  Colors.transparent,
+                  const Color.fromARGB(230, 4, 4, 4),
+                ],
+                stops: const [0.1, 0.7, 1.0],
               ),
             ),
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [
-                    const Color.fromARGB(230, 4, 4, 4),
-                    Colors.transparent,
-                    const Color.fromARGB(230, 4, 4, 4),
-                  ],
-                  stops: const [0.1, 0.7, 1.0],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: currentTheme.primaryColor,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          article.sourceName.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.2,
-                          ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: currentTheme.primaryColor,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        article.sourceName.toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
                         ),
                       ),
-                      const Gap(12),
-                      Text(
-                        DateFormat('MMM dd, y • h:mm a').format(article.publishedAt),
-                        style: TextStyle(
-                          color: Colors.white.withAlpha(229),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Gap(20),
-                  _TappableHeadline(title: article.title, article: article),
-                  const Gap(16),
-                  Text(
-                    article.description,
-                    style: TextStyle(
-                      color: Colors.white.withAlpha(229),
-                      fontSize: 16,
-                      height: 1.4,
                     ),
-                    maxLines: 7,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (article.author.trim().isNotEmpty) ...[
                     const Gap(12),
                     Text(
-                      'By ${article.author}',
+                      DateFormat('MMM dd, y • h:mm a').format(article.publishedAt),
                       style: TextStyle(
-                        color: Colors.white.withAlpha((0.6 * 255).toInt()),
-                        fontSize: 13,
-                        fontStyle: FontStyle.italic,
+                        color: Colors.white.withAlpha(229),
+                        fontSize: 14,
                       ),
                     ),
                   ],
-                  const Gap(24),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.arrow_upward_rounded,
-                        color: Color.fromRGBO(255, 255, 255, 0.7),
-                        size: 24,
-                      ),
-                      const Gap(8),
-                      Text(
-                        'Swipe to continue',
-                        style: TextStyle(
-                          color: Colors.white.withAlpha(204),
-                          fontSize: 16,
-                        ),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.open_in_new_rounded,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                        onPressed: () => _launchUrl(article.url),
-                      ),
-                      IconButton(
-                        onPressed: () => context.pushNamed(
-                          'chat',
-                          extra: article,
-                        ),
-                        icon: Image.asset(
-                          'assets/logos/ai.gif',
-                          width: 90,
-                          height: 70,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ],
+                ),
+                const Gap(20),
+                _TappableHeadline(title: article.title, article: article),
+                const Gap(16),
+                Text(
+                  article.description,
+                  style: TextStyle(
+                    color: Colors.white.withAlpha(229),
+                    fontSize: 16,
+                    height: 1.4,
+                  ),
+                  maxLines: 7,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (article.author.trim().isNotEmpty) ...[
+                  const Gap(12),
+                  Text(
+                    'By ${article.author}',
+                    style: TextStyle(
+                      color: Colors.white.withAlpha((0.6 * 255).toInt()),
+                      fontSize: 13,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
                 ],
-              ),
+                const Gap(24),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.arrow_upward_rounded,
+                      color: Color.fromRGBO(255, 255, 255, 0.7),
+                      size: 24,
+                    ),
+                    const Gap(8),
+                    Text(
+                      'Swipe to continue',
+                      style: TextStyle(
+                        color: Colors.white.withAlpha(204),
+                        fontSize: 16,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.open_in_new_rounded,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      onPressed: () => _launchUrl(article.url),
+                    ),
+                    IconButton(
+                      onPressed: () => context.pushNamed(
+                        'chat',
+                        extra: article,
+                      ),
+                      icon: Image.asset(
+                        'assets/logos/ai.gif',
+                        width: 90,
+                        height: 70,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

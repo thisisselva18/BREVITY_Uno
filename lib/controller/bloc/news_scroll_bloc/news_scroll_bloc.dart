@@ -11,7 +11,9 @@ part 'news_scroll_state.dart';
 class NewsBloc extends Bloc<NewsEvent, NewsState> {
   final NewsService newsService;
   int _page = 1;
-  final int _pageSize = 10;
+  // --- CHANGE THIS VALUE ---
+  final int _pageSize = 8; // Change from 10 to 8
+  // -------------------------
   NewsCategory _currentCategory = NewsCategory.general;
 
   NewsBloc({required this.newsService}) : super(NewsInitial()) {
@@ -47,28 +49,37 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
       FetchNextPage event,
       Emitter<NewsState> emit,
       ) async {
-    final currentState = state;
-    if (currentState is! NewsLoaded ||
-        currentState.hasReachedMax ||
-        currentState.isLoadingMore ||
-        _currentCategory != event.category) {
+    if (state is! NewsLoaded) return;
+    final currentState = state as NewsLoaded;
+
+    if (currentState.hasReachedMax || currentState.isLoadingMore || _currentCategory != event.category) {
       return;
     }
 
-    try {
-      emit(currentState.copyWith(isLoadingMore: true));
+    emit(currentState.copyWith(isLoadingMore: true));
 
+    try {
       _page++;
+
+      // DEBUG: Print which page you are fetching
+      print('--- FETCHING PAGE: $_page FOR CATEGORY: $_currentCategory ---');
+
       final newArticles = await _fetchCategoryNews(page: _page);
 
-      emit(
-        currentState.copyWith(
-          articles: List.of(currentState.articles)..addAll(newArticles),
-          hasReachedMax: newArticles.length < _pageSize,
-          isLoadingMore: false,
-        ),
-      );
+      // DEBUG: Print the number of new articles received
+      print('--- RECEIVED ${newArticles.length} NEW ARTICLES ---');
+
+      emit(NewsLoaded(
+        articles: List.of(currentState.articles)..addAll(newArticles),
+        hasReachedMax: newArticles.length < _pageSize,
+        isLoadingMore: false,
+        category: currentState.category,
+        currentIndex: currentState.currentIndex,
+      ));
+
     } catch (e) {
+      // DEBUG: Print any errors that occur during the fetch
+      print('---!!! ERROR FETCHING PAGE $_page: $e !!!---');
       _page--;
       emit(currentState.copyWith(isLoadingMore: false));
     }
