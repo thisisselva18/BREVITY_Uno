@@ -66,6 +66,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // UPDATED: Reverted to a static dark background color
       backgroundColor: const Color.fromARGB(255, 24, 24, 24),
       body: BlocConsumer<NewsBloc, NewsState>(
         listener: (context, state) {},
@@ -94,7 +95,9 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   Widget _buildNewsViewPager(BuildContext context, NewsLoaded state) {
     final articles = state.articles;
     if (articles.isEmpty) {
-      return const Center(child: Text("No articles found.", style: TextStyle(color: Colors.white)));
+      return const Center(
+          child: Text("No articles found.",
+              style: TextStyle(color: Colors.white)));
     }
 
     return GestureDetector(
@@ -109,16 +112,12 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
           PageView.builder(
             controller: _pageController,
             scrollDirection: Axis.vertical,
-            itemCount: state.hasReachedMax ? articles.length : articles.length + 1,
+            itemCount:
+            state.hasReachedMax ? articles.length : articles.length + 1,
             onPageChanged: (index) {
-              // DEBUG: Print the state every time you swipe
-              print('Page changed to: $index. Articles: ${articles.length}. HasReachedMax: ${state.hasReachedMax}');
-
               context.read<NewsBloc>().add(UpdateNewsIndex(index));
 
               if (!state.hasReachedMax && index >= articles.length - 3) {
-                // DEBUG: Print when the trigger condition is met
-                print('---!!! TRIGGERING FETCH FOR NEXT PAGE !!!---');
                 context
                     .read<NewsBloc>()
                     .add(FetchNextPage(index, widget.category));
@@ -199,6 +198,7 @@ class _NewsCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
+        // UPDATED: Reverted to static dark color
         color: Colors.black,
         image: DecorationImage(
           image: CachedNetworkImageProvider(article.urlToImage),
@@ -210,16 +210,17 @@ class _NewsCard extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
+              // UPDATED: Reverted to static dark gradient
               gradient: LinearGradient(
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
                 colors: [
-                  const Color.fromARGB(230, 4, 4, 4),
+                  Color.fromARGB(230, 4, 4, 4),
                   Colors.transparent,
-                  const Color.fromARGB(230, 4, 4, 4),
+                  Color.fromARGB(230, 4, 4, 4),
                 ],
-                stops: const [0.1, 0.7, 1.0],
+                stops: [0.1, 0.7, 1.0],
               ),
             ),
           ),
@@ -252,7 +253,9 @@ class _NewsCard extends StatelessWidget {
                     ),
                     const Gap(12),
                     Text(
-                      DateFormat('MMM dd, y • h:mm a').format(article.publishedAt),
+                      DateFormat('MMM dd, y • h:mm a')
+                          .format(article.publishedAt),
+                      // UPDATED: Reverted to static white color
                       style: TextStyle(
                         color: Colors.white.withAlpha(229),
                         fontSize: 14,
@@ -265,6 +268,7 @@ class _NewsCard extends StatelessWidget {
                 const Gap(16),
                 Text(
                   article.description,
+                  // UPDATED: Reverted to static white color
                   style: TextStyle(
                     color: Colors.white.withAlpha(229),
                     fontSize: 16,
@@ -277,6 +281,7 @@ class _NewsCard extends StatelessWidget {
                   const Gap(12),
                   Text(
                     'By ${article.author}',
+                    // UPDATED: Reverted to static white color
                     style: TextStyle(
                       color: Colors.white.withAlpha((0.6 * 255).toInt()),
                       fontSize: 13,
@@ -295,6 +300,7 @@ class _NewsCard extends StatelessWidget {
                     const Gap(8),
                     Text(
                       'Swipe to continue',
+                      // UPDATED: Reverted to static white color
                       style: TextStyle(
                         color: Colors.white.withAlpha(204),
                         fontSize: 16,
@@ -302,6 +308,7 @@ class _NewsCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     IconButton(
+                      // UPDATED: Reverted to static white color
                       icon: const Icon(
                         Icons.open_in_new_rounded,
                         color: Colors.white,
@@ -354,6 +361,7 @@ class _TappableHeadline extends StatelessWidget {
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
+              // UPDATED: Reverted to static white color for non-bookmarked items
               color: isBookmarked ? currentTheme.primaryColor : Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.w700,

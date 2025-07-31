@@ -8,6 +8,7 @@ import 'package:brevity/models/article_model.dart';
 import 'package:brevity/views/common_widgets/common_appbar.dart';
 import 'package:brevity/views/common_widgets/List_of_article.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:brevity/models/theme_model.dart';
 
 class SearchResultsScreen extends StatefulWidget {
   final String query;
@@ -62,10 +63,11 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Access current theme from ThemeCubit for dynamic theming
-    final currentTheme = context.read<ThemeCubit>().currentTheme;
+    final currentTheme = context.watch<ThemeCubit>().currentTheme;
+    final theme = Theme.of(context);
 
-    return AppScaffold(
+    return Scaffold(
+      backgroundColor: theme.colorScheme.background,
       body: FutureBuilder<List<Article>>(
         future: _searchResults,
         builder: (context, snapshot) {
@@ -73,14 +75,13 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
             physics: const BouncingScrollPhysics(),
             slivers: [
               SliverAppBar(
-                backgroundColor: const Color.fromARGB(210, 0, 0, 0),
+                backgroundColor: theme.colorScheme.surface.withOpacity(0.85),
                 expandedHeight: 70,
                 pinned: true,
                 elevation: 0,
                 flexibleSpace: FlexibleSpaceBar(
                   background: ParticlesHeader(
                     title: "Results for ${widget.query}",
-                    // Apply theme's primary color to particle header
                     themeColor: currentTheme.primaryColor,
                     particleAnimation: _particleAnimationController,
                   ),
@@ -88,7 +89,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                 centerTitle: true,
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                  color: Colors.white70,
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ),
@@ -102,7 +103,6 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
   }
 
   void _launchArticle(String url) async {
-    // Access current theme for themed error messages
     final currentTheme = context.read<ThemeCubit>().currentTheme;
 
     try {
@@ -113,14 +113,13 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: const Color(0xFF4F5B73),
+            backgroundColor: Theme.of(context).colorScheme.error,
             content: Text(
               'Failed to open article: $e',
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: Theme.of(context).colorScheme.onError),
             ),
             action: SnackBarAction(
               label: 'DISMISS',
-              // Apply theme's primary color to snackbar action
               textColor: currentTheme.primaryColor,
               onPressed: () {},
             ),
@@ -130,16 +129,16 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
     }
   }
 
-  // Updated content slivers with theme parameter for dynamic styling
   Widget _buildContentSlivers(
-    AsyncSnapshot<List<Article>> snapshot,
-    currentTheme,
-  ) {
+      AsyncSnapshot<List<Article>> snapshot,
+      AppTheme currentTheme,
+      ) {
+    final theme = Theme.of(context);
+
     if (snapshot.connectionState == ConnectionState.waiting) {
       return SliverFillRemaining(
         child: Center(
           child: CircularProgressIndicator(
-            // Apply theme's primary color to loading indicator
             color: currentTheme.primaryColor,
           ),
         ),
@@ -155,15 +154,13 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
               Icon(
                 Icons.error_outline,
                 size: 60,
-                // Apply theme's secondary color to error icon for visual variety
-                color: currentTheme.secondaryColor,
+                color: theme.colorScheme.error,
               ),
               const SizedBox(height: 16),
               Text(
                 'Error: ${snapshot.error}',
                 style: TextStyle(
-                  // Apply theme's secondary color to error text
-                  color: currentTheme.secondaryColor,
+                  color: theme.colorScheme.error,
                   fontSize: 16,
                 ),
                 textAlign: TextAlign.center,
@@ -171,9 +168,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
               const SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  // Apply theme's primary color to retry button
                   backgroundColor: currentTheme.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: theme.colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                     vertical: 12,
@@ -183,7 +179,6 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                   ),
                 ),
                 onPressed: () {
-                  // Refresh search results
                   setState(() {
                     _searchResults = _newsService.searchNews(widget.query);
                   });
@@ -214,12 +209,11 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E222A),
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(100),
                   boxShadow: [
                     BoxShadow(
-                      // Apply theme color to empty state shadow
-                      color: currentTheme.primaryColor.withAlpha((0.15 * 255).toInt()),
+                      color: currentTheme.primaryColor.withOpacity(0.15),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -228,31 +222,29 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                 child: Icon(
                   Icons.search_off,
                   size: 70,
-                  // Apply theme's primary color to empty search icon
                   color: currentTheme.primaryColor,
                 ),
               ),
               const SizedBox(height: 24),
               Text(
                 'No results found for "${widget.query}"',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
+                style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Try a different search term',
-                style: TextStyle(color: Color(0xFFB0BEC5), fontSize: 16),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  // Apply theme's primary color to search again button
                   backgroundColor: currentTheme.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: theme.colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
                     vertical: 16,
@@ -261,8 +253,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                     borderRadius: BorderRadius.circular(12),
                   ),
                   elevation: 4,
-                  // Apply theme color to button shadow
-                  shadowColor: currentTheme.primaryColor.withAlpha((0.5 * 255).toInt()),
+                  shadowColor: currentTheme.primaryColor.withOpacity(0.5),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Row(
@@ -299,10 +290,9 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
             child: Padding(
               padding: const EdgeInsets.only(bottom: 10, left: 22, right: 22),
               child: ArticleListItem(
-                onSide:
-                    () => context.read<BookmarkBloc>().add(
-                      ToggleBookmarkEvent(article),
-                    ),
+                onSide: () => context.read<BookmarkBloc>().add(
+                  ToggleBookmarkEvent(article),
+                ),
                 article: article,
                 onTap: () => _launchArticle(article.url),
                 showBookmark: true,

@@ -54,7 +54,7 @@ class ThemeService {
     }
 
     // Return default theme if loading fails
-    return AppThemes.defaultTheme;
+    return AppTheme.defaultTheme;
   }
 
   // Clear saved theme
