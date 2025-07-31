@@ -29,7 +29,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   Future<void> _onSendMessage(SendMessage event, Emitter<ChatState> emit) async {
-    if (state is! ChatLoaded) return;
+    if (state is! ChatLoaded) {
+      print('Cannot send message: Chat is not in ChatLoaded state. Current state: $state');
+      return;
+    }
 
     final currentState = state as ChatLoaded;
         
@@ -78,8 +81,32 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     }
   }
 
+  // Emit ChatLoaded with empty conversations instead of ChatInitial
   void _onClearChat(ClearChat event, Emitter<ChatState> emit) {
-    emit(ChatInitial());
+    // Get the current article context from the existing state
+    Article currentArticle;
+    if (state is ChatLoaded) {
+      currentArticle = (state as ChatLoaded).chatWindow.article;
+    } else if (state is MessageSending) {
+      currentArticle = (state as MessageSending).chatWindow.article;
+    } else {
+      // This case should ideally not be hit if the app flow is correct,
+      // as ChatBloc is initialized with an article.
+      // create a ChatLoaded state properly. Revert to ChatInitial as a fallback.
+      emit(ChatInitial());
+      return;
+    }
+
+    // Emit ChatLoaded with an empty list of conversations,
+    // making the chat ready to receive new messages.
+    emit(ChatLoaded(
+      chatWindow: ChatWindow(
+        article: currentArticle,
+        conversations: [],
+        createdAt: DateTime.now(), 
+      ),
+      shouldAnimateLatest: false, 
+    ));
   }
 
   String _buildContextualPrompt(ChatWindow chatWindow, String userQuery) {

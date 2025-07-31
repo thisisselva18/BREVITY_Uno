@@ -393,7 +393,34 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ),
             ),
           );
+        } else if (state is ChatInitial) { // <--- ADDED FIX: Explicitly handle ChatInitial state
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.chat_bubble_outline,
+                  color: theme.primaryColor.withAlpha((0.5 * 255).toInt()),
+                  size: 60,
+                ),
+                Gap(20),
+                Text(
+                  'Start a conversation about the article!',
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                Gap(10),
+                Text(
+                  'Your chat history will appear here.',
+                  style: TextStyle(color: Colors.white54, fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
         }
+        // This 'return' should only catch truly unexpected states,
+        // or a genuine loading state if introduced separately from ChatInitial.
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
