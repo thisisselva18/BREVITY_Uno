@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -9,8 +10,6 @@ import 'package:brevity/controller/services/auth_service.dart';
 import 'package:brevity/models/user_model.dart';
 import 'package:brevity/views/common_widgets/common_appbar.dart';
 import 'package:share_plus/share_plus.dart';
-
-// Import theme system
 import '../../controller/cubit/theme/theme_cubit.dart';
 import '../../controller/cubit/theme/theme_state.dart';
 import '../../models/theme_model.dart';
@@ -25,7 +24,6 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen>
     with TickerProviderStateMixin {
   bool _notificationsEnabled = true;
-  bool _darkModeEnabled = true;
   String _selectedLanguage = 'English';
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -53,8 +51,6 @@ class _SettingsScreenState extends State<SettingsScreen>
     _particleAnimationController.addListener(() {
       setState(() {});
     });
-
-    // _userProfileCubit.startProfileSubscription();
   }
 
   @override
@@ -67,84 +63,80 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   void _showLanguageDialog() {
     final themeCubit = context.read<ThemeCubit>();
+    final theme = Theme.of(context);
 
     showDialog(
       context: context,
-      builder:
-          (context) => BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: Dialog(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: themeCubit.currentTheme.primaryColor.withAlpha(50),
-                      blurRadius: 15,
-                      spreadRadius: 2,
-                    ),
-                  ],
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: themeCubit.currentTheme.primaryColor.withAlpha(50),
+                  blurRadius: 15,
+                  spreadRadius: 2,
                 ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 20,
-                  horizontal: 5,
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(
+              vertical: 20,
+              horizontal: 5,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Select Language',
+                  style: theme.textTheme.titleLarge,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Select Language',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                const SizedBox(height: 15),
+                Container(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.4,
+                  ),
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildLanguageOption('English'),
+                        _buildLanguageOption('Spanish'),
+                        _buildLanguageOption('French'),
+                        _buildLanguageOption('German'),
+                        _buildLanguageOption('Hindi'),
+                        _buildLanguageOption('Chinese'),
+                        _buildLanguageOption('Japanese'),
+                        _buildLanguageOption('Russian'),
+                      ],
                     ),
-                    const SizedBox(height: 15),
-                    Container(
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height * 0.4,
-                      ),
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _buildLanguageOption('English'),
-                            _buildLanguageOption('Spanish'),
-                            _buildLanguageOption('French'),
-                            _buildLanguageOption('German'),
-                            _buildLanguageOption('Hindi'),
-                            _buildLanguageOption('Chinese'),
-                            _buildLanguageOption('Japanese'),
-                            _buildLanguageOption('Russian'),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
+        ),
+      ),
     );
   }
 
   Widget _buildLanguageOption(String language) {
     final isSelected = _selectedLanguage == language;
+    final theme = Theme.of(context);
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, themeState) {
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           decoration: BoxDecoration(
-            color:
-                isSelected
-                    ? themeState.currentTheme.primaryColor.withAlpha(50)
-                    : Colors.transparent,
+            color: isSelected
+                ? themeState.currentTheme.primaryColor.withOpacity(0.1)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: ListTile(
@@ -154,20 +146,18 @@ class _SettingsScreenState extends State<SettingsScreen>
             title: Text(
               language,
               style: TextStyle(
-                color:
-                    isSelected
-                        ? themeState.currentTheme.primaryColor
-                        : Colors.white,
+                color: isSelected
+                    ? themeState.currentTheme.primaryColor
+                    : theme.colorScheme.onSurface,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
-            trailing:
-                isSelected
-                    ? Icon(
-                      Icons.check_circle,
-                      color: themeState.currentTheme.primaryColor,
-                    )
-                    : null,
+            trailing: isSelected
+                ? Icon(
+              Icons.check_circle,
+              color: themeState.currentTheme.primaryColor,
+            )
+                : null,
             onTap: () {
               setState(() => _selectedLanguage = language);
               Navigator.pop(context);
@@ -179,221 +169,213 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _showThemeColorPicker() {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
-      builder:
-          (context) => BlocBuilder<ThemeCubit, ThemeState>(
-            builder: (context, themeState) {
-              return BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                child: Dialog(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E1E),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: themeState.currentTheme.primaryColor.withAlpha(
-                            50,
-                          ),
-                          blurRadius: 15,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Select Theme Color',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Wrap(
-                          spacing: 15,
-                          runSpacing: 15,
-                          alignment: WrapAlignment.center,
-                          children:
-                              AppThemes.availableThemes.map((theme) {
-                                final isSelected =
-                                    themeState.currentTheme == theme;
-                                return GestureDetector(
-                                  onTap: () {
-                                    context.read<ThemeCubit>().changeTheme(
-                                      theme,
-                                    );
-                                    Navigator.pop(context);
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
-                                    height: 50,
-                                    width: 50,
-                                    decoration: BoxDecoration(
-                                      color: theme.primaryColor,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color:
-                                            isSelected
-                                                ? Colors.white
-                                                : Colors.transparent,
-                                        width: 3,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: theme.primaryColor.withAlpha(
-                                            100,
-                                          ),
-                                          blurRadius: isSelected ? 12 : 5,
-                                          spreadRadius: isSelected ? 2 : 0,
-                                        ),
-                                      ],
-                                    ),
-                                    child:
-                                        isSelected
-                                            ? const Icon(
-                                              Icons.check,
-                                              color: Colors.white,
-                                            )
-                                            : null,
-                                  ),
-                                );
-                              }).toList(),
-                        ),
-                        const SizedBox(height: 20),
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(
-                            'Close',
-                            style: TextStyle(
-                              color: themeState.currentTheme.primaryColor,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-    );
-  }
-
-  void _confirmDeleteProfile() {
-    showDialog(
-      context: context,
-      builder:
-          (context) => BackdropFilter(
+      builder: (context) => BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, themeState) {
+          return BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Dialog(
               backgroundColor: Colors.transparent,
               elevation: 0,
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.red.withAlpha(50),
+                      color: themeState.currentTheme.primaryColor.withAlpha(50),
                       blurRadius: 15,
                       spreadRadius: 2,
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.warning_amber_rounded,
-                      color: Color.fromARGB(255, 198, 48, 37),
-                      size: 60,
+                    Text(
+                      'Select Theme Color',
+                      style: theme.textTheme.titleLarge,
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Delete Profile',
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 198, 48, 37),
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Are you sure you want to delete your profile? This action cannot be undone.',
-                      style: TextStyle(color: Colors.white70, fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[800],
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text('Cancel'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Implement delete profile logic
+                    const SizedBox(height: 20),
+                    Wrap(
+                      spacing: 15,
+                      runSpacing: 15,
+                      alignment: WrapAlignment.center,
+                      children: AppTheme.availableThemes.map((appTheme) {
+                        final isSelected =
+                            themeState.currentTheme.name == appTheme.name;
+                        return GestureDetector(
+                          onTap: () {
+                            context.read<ThemeCubit>().changeTheme(
+                              appTheme.copyWith(
+                                isDarkMode:
+                                themeState.currentTheme.isDarkMode,
+                              ),
+                            );
                             Navigator.pop(context);
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color.fromARGB(255, 198, 48, 37),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(
+                              color: appTheme.primaryColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected
+                                    ? theme.colorScheme.onSurface
+                                    : Colors.transparent,
+                                width: 3,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: appTheme.primaryColor.withAlpha(100),
+                                  blurRadius: isSelected ? 12 : 5,
+                                  spreadRadius: isSelected ? 2 : 0,
+                                ),
+                              ],
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                            child: isSelected
+                                ? Icon(
+                              Icons.check,
+                              color: theme.colorScheme.onPrimary,
+                            )
+                                : null,
                           ),
-                          child: const Text('Delete'),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'Close',
+                        style: TextStyle(
+                          color: themeState.currentTheme.primaryColor,
+                          fontSize: 16,
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _confirmDeleteProfile() {
+    final theme = Theme.of(context);
+    showDialog(
+      context: context,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.red.withAlpha(50),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.warning_amber_rounded,
+                  color: Color.fromARGB(255, 198, 48, 37),
+                  size: 60,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Delete Profile',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 198, 48, 37),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Are you sure you want to delete your profile? This action cannot be undone.',
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey.shade700,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 198, 48, 37),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('Delete'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return BlocProvider(
       create: (context) => _userProfileCubit,
-      child: AppScaffold(
+      child: Scaffold(
+        backgroundColor: theme.colorScheme.background,
         body: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, themeState) {
             return BlocBuilder<UserProfileCubit, UserProfileState>(
               builder: (context, state) {
-                // Create a loading widget to show while user data is loading
                 if (state.status == UserProfileStatus.loading) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                // Show error if loading failed
                 if (state.status == UserProfileStatus.error) {
                   return Center(
                     child: Column(
@@ -407,15 +389,12 @@ class _SettingsScreenState extends State<SettingsScreen>
                         const SizedBox(height: 16),
                         Text(
                           'Error: ${state.errorMessage}',
-                          style: const TextStyle(color: Colors.white),
+                          style: theme.textTheme.bodyLarge,
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          onPressed: (){},
-                          // onPressed:
-                          //     () =>
-                                  // _userProfileCubit.startProfileSubscription(),
+                          onPressed: () {},
                           child: const Text('Retry'),
                         ),
                       ],
@@ -423,18 +402,17 @@ class _SettingsScreenState extends State<SettingsScreen>
                   );
                 }
 
-                // Show user data when loaded
                 return CustomScrollView(
                   physics: const BouncingScrollPhysics(),
                   slivers: [
                     SliverAppBar(
-                      backgroundColor: const Color.fromARGB(210, 0, 0, 0),
+                      backgroundColor: theme.colorScheme.surface.withOpacity(0.85),
                       expandedHeight: 220,
                       pinned: true,
                       elevation: 0,
                       leading: IconButton(
                         icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                        color: Colors.white70,
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       flexibleSpace: FlexibleSpaceBar(
@@ -458,8 +436,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   boxShadow: [
                                     BoxShadow(
                                       color: themeState
-                                          .currentTheme
-                                          .primaryColor
+                                          .currentTheme.primaryColor
                                           .withAlpha(125),
                                       blurRadius: 20,
                                       spreadRadius: 2,
@@ -477,11 +454,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                               const SizedBox(height: 16),
                               Text(
                                 state.user?.displayName ?? 'User',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
+                                style: theme.textTheme.headlineSmall?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  shadows: [
+                                  shadows: const [
                                     Shadow(
                                       color: Colors.black45,
                                       blurRadius: 5,
@@ -492,11 +467,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                               const SizedBox(height: 4),
                               Text(
                                 state.user?.email ?? '',
-                                style: TextStyle(
-                                  color: Colors.white.withAlpha(
-                                    (0.8 * 255).toInt(),
-                                  ),
-                                  fontSize: 14,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurface.withOpacity(0.8),
                                   shadows: const [
                                     Shadow(
                                       color: Colors.black45,
@@ -522,23 +494,16 @@ class _SettingsScreenState extends State<SettingsScreen>
                             child: Column(
                               children: [
                                 const SizedBox(height: 20),
-                                const Align(
+                                Align(
                                   alignment: Alignment.topLeft,
                                   child: Padding(
-                                    padding: EdgeInsets.fromLTRB(20, 8, 0, 8),
+                                    padding:
+                                    const EdgeInsets.fromLTRB(20, 8, 0, 8),
                                     child: Text(
                                       'Settings',
-                                      style: TextStyle(
-                                        fontFamily: 'Roboto',
-                                        letterSpacing: 1.2,
-                                        color: Color.fromARGB(
-                                          255,
-                                          223,
-                                          223,
-                                          223,
-                                        ),
+                                      style: theme.textTheme.headlineMedium?.copyWith(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 28,
+                                        letterSpacing: 1.2,
                                       ),
                                     ),
                                   ),
@@ -551,16 +516,13 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   child: _buildListTile(
                                     icon: Icons.person,
                                     title: 'Edit Profile',
-                                    subtitle:
-                                        'Update your personal information',
-                                    themeColor:
-                                        themeState.currentTheme.primaryColor,
-                                    onTap:
-                                        () => _showEditProfileDialog(
-                                          context,
-                                          state.user,
-                                          themeState.currentTheme.primaryColor,
-                                        ),
+                                    subtitle: 'Update your personal information',
+                                    themeColor: themeState.currentTheme.primaryColor,
+                                    onTap: () => _showEditProfileDialog(
+                                      context,
+                                      state.user,
+                                      themeState.currentTheme.primaryColor,
+                                    ),
                                   ),
                                 ),
                                 _buildSectionHeader(
@@ -571,13 +533,11 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   child: _buildSwitchTile(
                                     icon: Icons.dark_mode,
                                     title: 'Dark Mode',
-                                    value: _darkModeEnabled,
-                                    themeColor:
-                                        themeState.currentTheme.primaryColor,
-                                    onChanged:
-                                        (val) => setState(
-                                          () => _darkModeEnabled = val,
-                                        ),
+                                    value: themeState.currentTheme.isDarkMode,
+                                    themeColor: themeState.currentTheme.primaryColor,
+                                    onChanged: (val) => context
+                                        .read<ThemeCubit>()
+                                        .toggleDarkMode(val),
                                   ),
                                 ),
                                 _buildAnimatedCard(
@@ -585,23 +545,18 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     icon: Icons.color_lens,
                                     title: 'App Theme',
                                     subtitle: 'Change app accent color',
-                                    themeColor:
-                                        themeState.currentTheme.primaryColor,
+                                    themeColor: themeState.currentTheme.primaryColor,
                                     trailingWidget: Container(
                                       width: 24,
                                       height: 24,
                                       decoration: BoxDecoration(
-                                        color:
-                                            themeState
-                                                .currentTheme
-                                                .primaryColor,
+                                        color: themeState.currentTheme.primaryColor,
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
                                             color: themeState
-                                                .currentTheme
-                                                .primaryColor
-                                                .withAlpha((0.4 * 255).toInt()),
+                                                .currentTheme.primaryColor
+                                                .withOpacity(0.4),
                                             blurRadius: 5,
                                             spreadRadius: 1,
                                           ),
@@ -619,13 +574,10 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   child: _buildSwitchTile(
                                     icon: Icons.notifications_active,
                                     title: 'Push Notifications',
-                                    themeColor:
-                                        themeState.currentTheme.primaryColor,
+                                    themeColor: themeState.currentTheme.primaryColor,
                                     value: _notificationsEnabled,
-                                    onChanged:
-                                        (val) => setState(
-                                          () => _notificationsEnabled = val,
-                                        ),
+                                    onChanged: (val) =>
+                                        setState(() => _notificationsEnabled = val),
                                   ),
                                 ),
                                 _buildAnimatedCard(
@@ -633,8 +585,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     icon: Icons.language,
                                     title: 'Language',
                                     subtitle: _selectedLanguage,
-                                    themeColor:
-                                        themeState.currentTheme.primaryColor,
+                                    themeColor: themeState.currentTheme.primaryColor,
                                     onTap: _showLanguageDialog,
                                   ),
                                 ),
@@ -647,12 +598,10 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     icon: Icons.share,
                                     title: 'Share App',
                                     subtitle: 'Tell your friends about us',
-                                    themeColor:
-                                        themeState.currentTheme.primaryColor,
-                                    onTap:
-                                        () => Share.share(
-                                          'Hey! I\'m using this amazing app. You can try it too! 📲\n\nDownload here: https://play.google.com/store/apps/details?id=com.placeholder',
-                                        ),
+                                    themeColor: themeState.currentTheme.primaryColor,
+                                    onTap: () => Share.share(
+                                      'Hey! I\'m using this amazing app. You can try it too! 📲\n\nDownload here: https://play.google.com/store/apps/details?id=com.placeholder',
+                                    ),
                                   ),
                                 ),
                                 _buildAnimatedCard(
@@ -660,11 +609,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     icon: Icons.star_rate,
                                     title: 'Rate App',
                                     subtitle: 'Leave feedback on the store',
-                                    themeColor:
-                                        themeState.currentTheme.primaryColor,
-                                    onTap: () {
-                                      // Implement app rating logic
-                                    },
+                                    themeColor: themeState.currentTheme.primaryColor,
+                                    onTap: () {},
                                   ),
                                 ),
                                 _buildSectionHeader(
@@ -676,8 +622,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     icon: Icons.contact_mail,
                                     title: 'Contact Us',
                                     subtitle: 'Get in touch with support',
-                                    themeColor:
-                                        themeState.currentTheme.primaryColor,
+                                    themeColor: themeState.currentTheme.primaryColor,
                                     onTap: () => context.push('/contactUs'),
                                   ),
                                 ),
@@ -686,8 +631,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     icon: Icons.info,
                                     title: 'About Us',
                                     subtitle: 'Learn more about us',
-                                    themeColor:
-                                        themeState.currentTheme.primaryColor,
+                                    themeColor: themeState.currentTheme.primaryColor,
                                     onTap: () {
                                       context.push('/aboutUs');
                                     },
@@ -702,21 +646,19 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     icon: Icons.logout,
                                     title: 'Log Out',
                                     subtitle: 'See you again soon',
-                                    themeColor:
-                                        themeState.currentTheme.primaryColor,
-                                    titleColor:
-                                        themeState.currentTheme.primaryColor,
+                                    themeColor: themeState.currentTheme.primaryColor,
+                                    titleColor: themeState.currentTheme.primaryColor,
                                     onTap: () {
-                                      // Implement logout logic
                                       AuthService().signOut().then((value) {
-                                        context.go('/splash');
-
+                                        if (context.mounted) {
+                                          context.go('/splash');
+                                        }
                                       });
                                     },
                                   ),
                                 ),
                                 _buildAnimatedCard(
-                                  color: Colors.red.withAlpha((0.05 * 255).toInt()),
+                                  color: Colors.red.withOpacity(0.1),
                                   child: _buildListTile(
                                     icon: Icons.delete_forever,
                                     iconColor: Colors.red,
@@ -745,128 +687,121 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _showEditProfileDialog(
-    BuildContext context,
-    UserModel? user,
-    Color themeColor,
-  ) {
+      BuildContext context,
+      UserModel? user,
+      Color themeColor,
+      ) {
     if (user == null) return;
+    final theme = Theme.of(context);
 
-    final TextEditingController displayNameController = TextEditingController(
-      text: user.displayName,
-    );
+    final TextEditingController displayNameController =
+    TextEditingController(text: user.displayName);
 
     showDialog(
       context: context,
-      builder:
-          (BuildContext context) => BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: Dialog(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: themeColor.withAlpha(50),
-                      blurRadius: 15,
-                      spreadRadius: 2,
-                    ),
-                  ],
+      builder: (BuildContext context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: themeColor.withAlpha(50),
+                  blurRadius: 15,
+                  spreadRadius: 2,
                 ),
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+              ],
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Edit Profile',
+                  style: theme.textTheme.titleLarge,
+                ),
+                const SizedBox(height: 24),
+                TextField(
+                  controller: displayNameController,
+                  style: theme.textTheme.bodyLarge,
+                  decoration: InputDecoration(
+                    labelText: 'Display Name',
+                    labelStyle: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7)),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.3)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: themeColor),
+                    ),
+                    prefixIcon: Icon(Icons.person, color: themeColor),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Edit Profile',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    TextField(
-                      controller: displayNameController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'Display Name',
-                        labelStyle: TextStyle(color: Colors.grey[400]),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.grey[700]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: themeColor),
-                        ),
-                        prefixIcon: Icon(Icons.person, color: themeColor),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.pop(context),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: themeColor),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(color: themeColor),
-                            ),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: themeColor),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Update profile using the cubit
-                              BlocProvider.of<UserProfileCubit>(
-                                context,
-                              ).updateProfile(
-                                displayName: displayNameController.text,
-                              );
-                              Navigator.pop(context);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: themeColor,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: const Text('Save'),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(color: themeColor),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          context.read<UserProfileCubit>().updateProfile(
+                            displayName: displayNameController.text,
+                          );
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: themeColor,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                      ],
+                        child: const Text('Save'),
+                      ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
+        ),
+      ),
     );
   }
 
   Widget _buildAnimatedCard({required Widget child, Color? color}) {
+    final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: color ?? Colors.white.withAlpha(10),
+        color: color ?? theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(25),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -896,7 +831,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               height: 1,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [themeColor.withAlpha(125), Colors.transparent],
+                  colors: [themeColor.withOpacity(0.5), Colors.transparent],
                 ),
               ),
             ),
@@ -913,28 +848,21 @@ class _SettingsScreenState extends State<SettingsScreen>
     required bool value,
     required Function(bool) onChanged,
   }) {
+    final theme = Theme.of(context);
     return SwitchListTile.adaptive(
       secondary: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: themeColor.withAlpha(25),
+          color: themeColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, color: themeColor, size: 24),
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-        ),
+        style: theme.textTheme.titleMedium,
       ),
       value: value,
-      activeColor: themeColor,
-      activeTrackColor: themeColor.withAlpha((0.3 * 255).toInt()),
-      inactiveTrackColor: Colors.grey[800],
-      inactiveThumbColor: Colors.grey[400],
       onChanged: onChanged,
     );
   }
@@ -949,33 +877,31 @@ class _SettingsScreenState extends State<SettingsScreen>
     Widget? trailingWidget,
     VoidCallback? onTap,
   }) {
+    final theme = Theme.of(context);
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: (iconColor ?? themeColor).withAlpha((0.1 * 255).toInt()),
+          color: (iconColor ?? themeColor).withOpacity(0.1),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, color: iconColor ?? themeColor, size: 24),
       ),
       title: Text(
         title,
-        style: TextStyle(
-          color: titleColor ?? Colors.white,
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-        ),
+        style: theme.textTheme.titleMedium?.copyWith(color: titleColor),
       ),
-      subtitle:
-          subtitle != null
-              ? Text(
-                subtitle,
-                style: TextStyle(color: Colors.grey[400], fontSize: 14),
-              )
-              : null,
-      trailing:
-          trailingWidget ??
-          Icon(Icons.arrow_forward_ios, color: Colors.grey[600], size: 16),
+      subtitle: subtitle != null
+          ? Text(
+        subtitle,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.onSurface.withOpacity(0.7),
+        ),
+      )
+          : null,
+      trailing: trailingWidget ??
+          Icon(Icons.arrow_forward_ios,
+              color: theme.colorScheme.onSurface.withOpacity(0.4), size: 16),
       onTap: onTap,
     );
   }

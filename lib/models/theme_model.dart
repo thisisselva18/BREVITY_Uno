@@ -4,54 +4,26 @@ class AppTheme {
   final String name;
   final Color primaryColor;
   final Color secondaryColor;
-  final int colorValue; // For persistence
+  final int colorValue;
+  final bool isDarkMode;
 
   const AppTheme({
     required this.name,
     required this.primaryColor,
     required this.secondaryColor,
     required this.colorValue,
+    this.isDarkMode = true,
   });
 
-  // Convert to JSON for persistence
-  Map<String, dynamic> toJson() {
-    return {'name': name, 'colorValue': colorValue};
-  }
-
-  // Create from JSON
-  factory AppTheme.fromJson(Map<String, dynamic> json) {
-    final colorValue = json['colorValue'] as int;
-    return AppThemes.availableThemes.firstWhere(
-      (theme) => theme.colorValue == colorValue,
-      orElse: () => AppThemes.defaultTheme,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is AppTheme && other.colorValue == colorValue;
-  }
-
-  @override
-  int get hashCode => colorValue.hashCode;
-}
-
-class AppThemes {
-  static const AppTheme defaultTheme = AppTheme(
+  static const defaultTheme = AppTheme(
     name: 'Blue',
     primaryColor: Colors.blue,
     secondaryColor: Colors.blueAccent,
     colorValue: 0xFF2196F3,
   );
 
-  static const List<AppTheme> availableThemes = [
-    AppTheme(
-      name: 'Blue',
-      primaryColor: Colors.blue,
-      secondaryColor: Colors.blueAccent,
-      colorValue: 0xFF2196F3,
-    ),
+  static const availableThemes = [
+    defaultTheme,
     AppTheme(
       name: 'Purple',
       primaryColor: Colors.purple,
@@ -96,84 +68,129 @@ class AppThemes {
     ),
   ];
 
-  // Get theme by color value
-  static AppTheme getThemeByColor(Color color) {
-    return availableThemes.firstWhere(
-      (theme) => theme.colorValue == color.toARGB32(),
-      orElse: () => defaultTheme,
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'colorValue': colorValue,
+    'isDarkMode': isDarkMode,
+  };
+
+  factory AppTheme.fromJson(Map<String, dynamic> json) {
+    return AppTheme(
+      name: json['name'],
+      primaryColor: Color(json['colorValue']),
+      secondaryColor: Color(json['colorValue']).withOpacity(0.8),
+      colorValue: json['colorValue'],
+      isDarkMode: json['isDarkMode'] ?? true,
     );
   }
 
-  // Generate MaterialApp theme from AppTheme
-  static ThemeData generateThemeData(AppTheme appTheme) {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      primarySwatch: _createMaterialColor(appTheme.primaryColor),
-      primaryColor: appTheme.primaryColor,
-      colorScheme: ColorScheme.dark(
-        primary: appTheme.primaryColor,
-        secondary: appTheme.secondaryColor,
-        surface: const Color(0xFF1E1E1E),
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
-        onSurface: Colors.white,
-      ),
-      appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFF1E1E1E),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: IconThemeData(color: appTheme.primaryColor),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: appTheme.primaryColor,
-          foregroundColor: Colors.white,
-        ),
-      ),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
+  AppTheme copyWith({
+    String? name,
+    Color? primaryColor,
+    Color? secondaryColor,
+    int? colorValue,
+    bool? isDarkMode,
+  }) {
+    return AppTheme(
+      name: name ?? this.name,
+      primaryColor: primaryColor ?? this.primaryColor,
+      secondaryColor: secondaryColor ?? this.secondaryColor,
+      colorValue: colorValue ?? this.colorValue,
+      isDarkMode: isDarkMode ?? this.isDarkMode,
+    );
+  }
+}
+
+MaterialColor _createMaterialColor(Color color) {
+  final strengths = <double>[.05];
+  final swatch = <int, Color>{};
+  final int r = color.red, g = color.green, b = color.blue;
+
+  for (int i = 1; i < 10; i++) {
+    strengths.add(0.1 * i);
+  }
+
+  for (final strength in strengths) {
+    final double ds = 0.5 - strength;
+    swatch[(strength * 1000).round()] = Color.fromRGBO(
+      r + ((ds < 0 ? r : (255 - r)) * ds).round(),
+      g + ((ds < 0 ? g : (255 - g)) * ds).round(),
+      b + ((ds < 0 ? b : (255 - b)) * ds).round(),
+      1,
+    );
+  }
+
+  return MaterialColor(color.value, swatch);
+}
+
+ThemeData createAppTheme(AppTheme appTheme) {
+  final brightness = appTheme.isDarkMode ? Brightness.dark : Brightness.light;
+  final surfaceColor = appTheme.isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+  final onSurfaceColor = appTheme.isDarkMode ? Colors.white : Colors.black87;
+
+  return ThemeData(
+    useMaterial3: true,
+    brightness: brightness,
+    primarySwatch: _createMaterialColor(appTheme.primaryColor),
+    primaryColor: appTheme.primaryColor,
+    colorScheme: ColorScheme(
+      brightness: brightness,
+      primary: appTheme.primaryColor,
+      secondary: appTheme.secondaryColor,
+      surface: surfaceColor,
+      background: appTheme.isDarkMode ? const Color(0xFF121212) : Colors.grey[50]!,
+      error: Colors.red,
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
+      onSurface: onSurfaceColor,
+      onBackground: onSurfaceColor,
+      onError: Colors.white,
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: surfaceColor,
+      foregroundColor: onSurfaceColor,
+      elevation: 0,
+      iconTheme: IconThemeData(color: appTheme.primaryColor),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
         backgroundColor: appTheme.primaryColor,
         foregroundColor: Colors.white,
       ),
-      switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return appTheme.primaryColor;
-          }
-          return Colors.grey[400];
-        }),
-        trackColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return appTheme.primaryColor.withAlpha((0.3 * 255).toInt());
-          }
-          return Colors.grey[800];
-        }),
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: appTheme.primaryColor,
+      foregroundColor: Colors.white,
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.selected)) {
+          return appTheme.primaryColor;
+        }
+        return Colors.grey[400];
+      }),
+      trackColor: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.selected)) {
+          return appTheme.primaryColor.withAlpha((0.3 * 255).toInt());
+        }
+        return Colors.grey[800];
+      }),
+    ),
+    cardTheme: CardThemeData(
+      color: surfaceColor,
+      elevation: 1,
+      margin: const EdgeInsets.all(8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
-    );
-  }
-
-  // Helper method to create MaterialColor from Color
-  static MaterialColor _createMaterialColor(Color color) {
-    final strengths = <double>[.05];
-    final swatch = <int, Color>{};
-    final int r = (color.r * 255.0).round() & 0xff,
-        g = (color.g * 255.0).round() & 0xff,
-        b = (color.b * 255.0).round() & 0xff;
-
-    for (int i = 1; i < 10; i++) {
-      strengths.add(0.1 * i);
-    }
-
-    for (final strength in strengths) {
-      final double ds = 0.5 - strength;
-      swatch[(strength * 1000).round()] = Color.fromRGBO(
-        r + ((ds < 0 ? r : (255 - r)) * ds).round(),
-        g + ((ds < 0 ? g : (255 - g)) * ds).round(),
-        b + ((ds < 0 ? b : (255 - b)) * ds).round(),
-        1,
-      );
-    }
-
-    return MaterialColor(color.toARGB32(), swatch);
-  }
+    ),
+    textTheme: TextTheme(
+      bodyLarge: TextStyle(color: onSurfaceColor),
+      bodyMedium: TextStyle(color: onSurfaceColor),
+      titleLarge: TextStyle(
+        color: onSurfaceColor,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  );
 }

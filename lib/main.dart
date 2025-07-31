@@ -6,7 +6,8 @@ import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/models/news_category.dart';
 import 'package:brevity/views/auth/auth.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:brevity/firebase_options.dart';
 import 'package:brevity/views/inner_screens/chat_screen.dart';
 import 'package:brevity/views/inner_screens/profile.dart';
 import 'package:brevity/views/inner_screens/search_result.dart';
@@ -23,8 +24,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
 import 'package:brevity/views/inner_screens/contact_screen.dart';
-import 'package:brevity/controller/services/auth_service.dart'; // Import your AuthService
+import 'package:brevity/controller/services/auth_service.dart';
 import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_bloc.dart';
+// UPDATED: Import theme model and state for the builder
+import 'package:brevity/controller/cubit/theme/theme_state.dart';
+import 'package:brevity/models/theme_model.dart';
 
 // Create a router with auth state handling
 final _routes = GoRouter(
@@ -72,11 +76,11 @@ final _routes = GoRouter(
         key: state.pageKey,
         child: const SidePage(),
         transitionsBuilder: (
-          context,
-          animation,
-          secondaryAnimation,
-          child,
-        ) {
+            context,
+            animation,
+            secondaryAnimation,
+            child,
+            ) {
           const begin = Offset(-1.0, 0.0);
           const end = Offset.zero;
           const curve = Curves.easeInOut;
@@ -92,17 +96,17 @@ final _routes = GoRouter(
       ),
       routes: [
         GoRoute(
-          path: 'bookmark',
+          path: 'bookmark', // CORRECTED: Removed leading '/'
           name: 'bookmark',
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const BookmarkScreen(),
             transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+                ) {
               // Combine scale and fade animations
               return Align(
                 alignment: Alignment.center,
@@ -124,17 +128,17 @@ final _routes = GoRouter(
           ),
         ),
         GoRoute(
-          path: '/settings',
+          path: 'settings', // CORRECTED: Removed leading '/'
           name: 'settings',
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const SettingsScreen(),
             transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+                ) {
               return Align(
                 alignment: Alignment.center,
                 child: FadeTransition(
@@ -155,17 +159,17 @@ final _routes = GoRouter(
           ),
         ),
         GoRoute(
-          path: '/profile',
+          path: 'profile', // CORRECTED: Removed leading '/'
           name: 'profile',
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const ProfileScreen(),
             transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+                ) {
               return Align(
                 alignment: Alignment.center,
                 child: FadeTransition(
@@ -186,7 +190,7 @@ final _routes = GoRouter(
           ),
         ),
         GoRoute(
-          path: '/searchResults',
+          path: 'searchResults', // CORRECTED: Removed leading '/'
           name: 'searchResults',
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
@@ -194,11 +198,11 @@ final _routes = GoRouter(
               query: state.uri.queryParameters['query']!, // Only query parameter
             ),
             transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+                ) {
               // Combine scale and fade animations
               return Align(
                 alignment: Alignment.center,
@@ -254,11 +258,11 @@ final _routes = GoRouter(
         key: state.pageKey,
         child: ChatScreen(article: state.extra as Article),
         transitionsBuilder: (
-          context,
-          animation,
-          secondaryAnimation,
-          child,
-        ) {
+            context,
+            animation,
+            secondaryAnimation,
+            child,
+            ) {
           // Combine scale and fade animations
           return Align(
             alignment: Alignment.center,
@@ -286,7 +290,7 @@ final _routes = GoRouter(
     if (state.matchedLocation == '/splash') return null;
 
     // Check for routes that should be accessible without authentication
-    final allowedPaths = ['/auth', '/intro', '/contactUs', '/aboutUs'];
+    final allowedPaths = ['/auth', '/intro'];
     if (allowedPaths.contains(state.matchedLocation)) return null;
 
     // If user is not signed in, redirect to auth using your AuthService
@@ -301,10 +305,12 @@ final _routes = GoRouter(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   // Initialize your AuthService
   await AuthService().initializeAuth();
+  await dotenv.load(fileName: ".env");
 
   final bookmarkRepository = BookmarkServices();
   final newsService = NewsService();
@@ -315,7 +321,6 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  await dotenv.load(fileName: ".env");
 
   runApp(
     MultiRepositoryProvider(
@@ -340,10 +345,17 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Brevity',
-      debugShowCheckedModeBanner: false,
-      routerConfig: _routes,
+    // UPDATED: Wrap with BlocBuilder to react to theme changes
+    return BlocBuilder<ThemeCubit, ThemeState>(
+      builder: (context, state) {
+        return MaterialApp.router(
+          title: 'Brevity',
+          debugShowCheckedModeBanner: false,
+          routerConfig: _routes,
+          // UPDATED: Apply the dynamic theme from the ThemeCubit state
+          theme: createAppTheme(state.currentTheme),
+        );
+      },
     );
   }
 }
