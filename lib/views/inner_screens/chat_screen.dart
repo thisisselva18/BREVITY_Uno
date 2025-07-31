@@ -75,8 +75,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     final theme = Theme.of(context);
 
     return BlocProvider(
-      create: (context) => ChatBloc(geminiService: GeminiFlashService())
-        ..add(InitializeChat(article: widget.article)),
+      create:
+          (context) =>
+              ChatBloc(geminiService: GeminiFlashService())
+                ..add(InitializeChat(article: widget.article)),
       child: Scaffold(
         backgroundColor: theme.colorScheme.background,
         body: Container(
@@ -130,7 +132,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 _buildGlassButton(
                   Icons.arrow_back_ios_new,
                   appTheme.primaryColor,
-                      () => Navigator.pop(context),
+                  () => Navigator.pop(context),
                 ),
                 const Gap(16),
                 Expanded(
@@ -138,24 +140,30 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ShaderMask(
-                        shaderCallback: (bounds) => LinearGradient(
-                          colors: [
-                            theme.colorScheme.onSurface,
-                            appTheme.primaryColor
-                          ],
-                        ).createShader(bounds),
+                        shaderCallback:
+                            (bounds) => LinearGradient(
+                              colors: [
+                                theme.colorScheme.onSurface,
+                                appTheme.primaryColor,
+                              ],
+                            ).createShader(bounds),
                         child: Text(
                           'NewsAI Assistant',
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Colors.white, // Color must be white for ShaderMask
+                            color:
+                                Colors
+                                    .white, // Color must be white for ShaderMask
                           ),
                         ),
                       ),
-                      Text('Powered by Gemini',
-                          style: TextStyle(
-                              color: appTheme.primaryColor.withOpacity(0.8),
-                              fontSize: 12)),
+                      Text(
+                        'Powered by Gemini',
+                        style: TextStyle(
+                          color: appTheme.primaryColor.withOpacity(0.8),
+                          fontSize: 12,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -164,7 +172,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     return _buildGlassButton(
                       Icons.delete_outline,
                       Colors.red,
-                          () {
+                      () {
                         context.read<ChatBloc>().add(ClearChat());
                       },
                     );
@@ -242,14 +250,19 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     gradient: RadialGradient(
                       colors: [
                         appTheme.primaryColor.withOpacity(0.4),
-                        appTheme.primaryColor.withOpacity(0.2)
+                        appTheme.primaryColor.withOpacity(0.2),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                        color: appTheme.primaryColor.withOpacity(0.5)),
+                      color: appTheme.primaryColor.withOpacity(0.5),
+                    ),
                   ),
-                  child: Icon(Icons.article, color: appTheme.primaryColor, size: 24),
+                  child: Icon(
+                    Icons.article,
+                    color: appTheme.primaryColor,
+                    size: 24,
+                  ),
                 ),
                 const Gap(16),
                 Expanded(
@@ -314,7 +327,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             conversation.response,
                             appTheme,
                             shouldAnimate:
-                            index == state.chatWindow.conversations.length - 1,
+                                index ==
+                                state.chatWindow.conversations.length - 1,
                           ),
                           const Gap(24),
                         ],
@@ -365,7 +379,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 gradient: LinearGradient(
                   colors: [
                     Colors.red.withOpacity(0.15),
-                    Colors.red.withOpacity(0.05)
+                    Colors.red.withOpacity(0.05),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -379,10 +393,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: RadialGradient(colors: [
-                        Colors.red.withOpacity(0.3),
-                        Colors.red.withOpacity(0.1)
-                      ]),
+                      gradient: RadialGradient(
+                        colors: [
+                          Colors.red.withOpacity(0.3),
+                          Colors.red.withOpacity(0.1),
+                        ],
+                      ),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Icon(
@@ -410,14 +426,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ),
             ),
           );
-        } else if (state is ChatInitial) { // <--- ADDED FIX: Explicitly handle ChatInitial state
+        } else if (state is ChatInitial) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   Icons.chat_bubble_outline,
-                  color: theme.primaryColor.withAlpha((0.5 * 255).toInt()),
+                  color: appTheme.primaryColor.withAlpha((0.5 * 255).toInt()),
                   size: 60,
                 ),
                 Gap(20),
@@ -445,10 +461,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: RadialGradient(colors: [
-                    appTheme.primaryColor.withOpacity(0.2),
-                    appTheme.primaryColor.withOpacity(0.05)
-                  ]),
+                  gradient: RadialGradient(
+                    colors: [
+                      appTheme.primaryColor.withOpacity(0.2),
+                      appTheme.primaryColor.withOpacity(0.05),
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: CircularProgressIndicator(
@@ -460,8 +478,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               Text(
                 'Initializing chat...',
                 style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                    fontSize: 16),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
+                  fontSize: 16,
+                ),
               ),
             ],
           ),
@@ -493,7 +514,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     gradient: LinearGradient(
                       colors: [
                         appTheme.primaryColor,
-                        appTheme.primaryColor.withOpacity(0.7)
+                        appTheme.primaryColor.withOpacity(0.7),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -530,8 +551,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildAiMessage(String message, AppTheme appTheme,
-      {bool shouldAnimate = false}) {
+  Widget _buildAiMessage(
+    String message,
+    AppTheme appTheme, {
+    bool shouldAnimate = false,
+  }) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final baseColor = isDarkMode ? Colors.white : Colors.black;
@@ -579,30 +603,36 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           gradient: RadialGradient(
                             colors: [
                               appTheme.primaryColor.withOpacity(0.4),
-                              appTheme.primaryColor.withOpacity(0.2)
+                              appTheme.primaryColor.withOpacity(0.2),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                              color: appTheme.primaryColor.withOpacity(0.5)),
+                            color: appTheme.primaryColor.withOpacity(0.5),
+                          ),
                         ),
-                        child: Icon(Icons.auto_awesome, color: appTheme.primaryColor, size: 18),
+                        child: Icon(
+                          Icons.auto_awesome,
+                          color: appTheme.primaryColor,
+                          size: 18,
+                        ),
                       ),
                       const Gap(16),
                       Expanded(
-                        child: shouldAnimate
-                            ? TypewriterText(
-                          text: message,
-                          style: theme.textTheme.bodyLarge!.copyWith(
-                            height: 1.4,
-                          ),
-                        )
-                            : Text(
-                          message,
-                          style: theme.textTheme.bodyLarge!.copyWith(
-                            height: 1.4,
-                          ),
-                        ),
+                        child:
+                            shouldAnimate
+                                ? TypewriterText(
+                                  text: message,
+                                  style: theme.textTheme.bodyLarge!.copyWith(
+                                    height: 1.4,
+                                  ),
+                                )
+                                : Text(
+                                  message,
+                                  style: theme.textTheme.bodyLarge!.copyWith(
+                                    height: 1.4,
+                                  ),
+                                ),
                       ),
                     ],
                   ),
@@ -653,7 +683,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         gradient: RadialGradient(
                           colors: [
                             appTheme.primaryColor.withOpacity(0.4),
-                            appTheme.primaryColor.withOpacity(0.2)
+                            appTheme.primaryColor.withOpacity(0.2),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(12),
@@ -681,9 +711,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     ),
                     const Gap(16),
                     ShaderMask(
-                      shaderCallback: (bounds) => LinearGradient(
-                        colors: [appTheme.primaryColor, theme.colorScheme.onSurface],
-                      ).createShader(bounds),
+                      shaderCallback:
+                          (bounds) => LinearGradient(
+                            colors: [
+                              appTheme.primaryColor,
+                              theme.colorScheme.onSurface,
+                            ],
+                          ).createShader(bounds),
                       child: const Text(
                         'Thinking...',
                         style: TextStyle(
@@ -735,15 +769,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   style: theme.textTheme.bodyLarge,
                   maxLines: null,
                   textCapitalization: TextCapitalization.sentences,
-                  onChanged: (text) =>
-                      setState(() => _isComposing = text.isNotEmpty),
+                  onChanged:
+                      (text) => setState(() => _isComposing = text.isNotEmpty),
                   decoration: InputDecoration(
                     hintText: 'Ask me anything about this article...',
                     hintStyle: TextStyle(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6)),
-                    prefixIcon: Icon(Icons.auto_awesome_outlined,
-                        color: appTheme.primaryColor.withOpacity(0.8),
-                        size: 22),
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.auto_awesome_outlined,
+                      color: appTheme.primaryColor.withOpacity(0.8),
+                      size: 22,
+                    ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 20,
@@ -759,71 +796,76 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     decoration: BoxDecoration(
-                      gradient: _isComposing && !isLoading
-                          ? LinearGradient(
-                        colors: [
-                          appTheme.primaryColor,
-                          appTheme.primaryColor.withOpacity(0.7)
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      )
-                          : LinearGradient(
-                        colors: [
-                          theme.disabledColor.withOpacity(0.3),
-                          theme.disabledColor.withOpacity(0.1)
-                        ],
-                      ),
+                      gradient:
+                          _isComposing && !isLoading
+                              ? LinearGradient(
+                                colors: [
+                                  appTheme.primaryColor,
+                                  appTheme.primaryColor.withOpacity(0.7),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              )
+                              : LinearGradient(
+                                colors: [
+                                  theme.disabledColor.withOpacity(0.3),
+                                  theme.disabledColor.withOpacity(0.1),
+                                ],
+                              ),
                       borderRadius: BorderRadius.circular(24),
-                      boxShadow: _isComposing && !isLoading
-                          ? [
-                        BoxShadow(
-                          color: appTheme.primaryColor.withOpacity(0.4),
-                          blurRadius: 16,
-                          offset: const Offset(0, 8),
-                        ),
-                      ]
-                          : null,
+                      boxShadow:
+                          _isComposing && !isLoading
+                              ? [
+                                BoxShadow(
+                                  color: appTheme.primaryColor.withOpacity(0.4),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ]
+                              : null,
                     ),
                     child: IconButton(
-                      icon: isLoading
-                          ? SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            theme.colorScheme.onPrimary,
-                          ),
-                        ),
-                      )
-                          : Icon(
-                        Icons.send_rounded,
-                        color: _isComposing
-                            ? theme.colorScheme.onPrimary
-                            : theme.disabledColor,
-                        size: 24,
-                      ),
-                      onPressed: _isComposing && !isLoading
-                          ? () {
-                        final message = _controller.text.trim();
-                        if (message.isNotEmpty) {
-                          final currentState =
-                              context.read<ChatBloc>().state;
-                          if (currentState is ChatLoaded) {
-                            _pendingMessage = message;
-                            context.read<ChatBloc>().add(
-                              SendMessage(
-                                message: message,
-                                chatWindow: currentState.chatWindow,
+                      icon:
+                          isLoading
+                              ? SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    theme.colorScheme.onPrimary,
+                                  ),
+                                ),
+                              )
+                              : Icon(
+                                Icons.send_rounded,
+                                color:
+                                    _isComposing
+                                        ? theme.colorScheme.onPrimary
+                                        : theme.disabledColor,
+                                size: 24,
                               ),
-                            );
-                          }
-                          _controller.clear();
-                          setState(() => _isComposing = false);
-                        }
-                      }
-                          : null,
+                      onPressed:
+                          _isComposing && !isLoading
+                              ? () {
+                                final message = _controller.text.trim();
+                                if (message.isNotEmpty) {
+                                  final currentState =
+                                      context.read<ChatBloc>().state;
+                                  if (currentState is ChatLoaded) {
+                                    _pendingMessage = message;
+                                    context.read<ChatBloc>().add(
+                                      SendMessage(
+                                        message: message,
+                                        chatWindow: currentState.chatWindow,
+                                      ),
+                                    );
+                                  }
+                                  _controller.clear();
+                                  setState(() => _isComposing = false);
+                                }
+                              }
+                              : null,
                     ),
                   );
                 },
@@ -853,11 +895,12 @@ class TypewriterText extends StatefulWidget {
   final TextStyle style;
   final Duration duration;
 
-  const TypewriterText(
-      {super.key,
-        required this.text,
-        required this.style,
-        this.duration = const Duration(milliseconds: 50)});
+  const TypewriterText({
+    super.key,
+    required this.text,
+    required this.style,
+    this.duration = const Duration(milliseconds: 50),
+  });
 
   @override
   State<TypewriterText> createState() => _TypewriterTextState();

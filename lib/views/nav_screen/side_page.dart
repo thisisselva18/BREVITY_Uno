@@ -1,13 +1,13 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
 import 'package:brevity/controller/cubit/theme/theme_state.dart';
 import 'package:brevity/controller/services/news_services.dart';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/models/news_category.dart';
 import 'package:brevity/views/common_widgets/common_appbar.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class SidePage extends StatefulWidget {
   const SidePage({super.key});
@@ -93,7 +93,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
           },
           behavior: HitTestBehavior.opaque,
           child: Scaffold(
-            backgroundColor: theme.colorScheme.background,
+            backgroundColor: theme.colorScheme.surface,
             body: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
@@ -116,10 +116,11 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                               children: [
                                 CircleAvatar(
                                   backgroundColor:
-                                  theme.colorScheme.secondaryContainer,
+                                      theme.colorScheme.secondaryContainer,
                                   radius: 24,
                                   child: IconButton(
-                                    color: theme.colorScheme.onSecondaryContainer,
+                                    color:
+                                        theme.colorScheme.onSecondaryContainer,
                                     icon: const Icon(Icons.person, size: 28),
                                     onPressed: () {
                                       context.push("/sidepage/profile");
@@ -133,7 +134,8 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                       'home',
                                       pathParameters: {
                                         'category':
-                                        NewsCategory.general.index.toString(),
+                                            NewsCategory.general.index
+                                                .toString(),
                                       },
                                     );
                                   },
@@ -160,11 +162,13 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                 isDense: true,
                                 hintText: 'Search news topics...',
                                 hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                  color: theme.colorScheme.onSurface
+                                      .withOpacity(0.6),
                                 ),
                                 suffixIcon: IconButton(
                                   icon: const Icon(Icons.search),
-                                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                  color: theme.colorScheme.onSurface
+                                      .withOpacity(0.7),
                                   onPressed: _handleSearch,
                                 ),
                                 border: OutlineInputBorder(
@@ -172,7 +176,10 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                   borderSide: BorderSide.none,
                                 ),
                                 filled: true,
-                                fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.7),
+                                fillColor: theme
+                                    .colorScheme
+                                    .surfaceContainerHighest
+                                    .withOpacity(0.7),
                               ),
                               onSubmitted: (_) => _handleSearch(),
                             ),
@@ -210,6 +217,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                 height: 100,
                                 child: ListView(
                                   scrollDirection: Axis.horizontal,
+                                  physics: const BouncingScrollPhysics(),
                                   shrinkWrap: true,
                                   children: [
                                     _buildMenuButton(
@@ -219,7 +227,6 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                       NewsCategory.general,
                                       currentTheme.primaryColor,
                                     ),
-                                    // ADDED: "Top Stories" button is now back
                                     _buildMenuButton(
                                       'Top Stories',
                                       Icons.trending_up,
@@ -261,13 +268,16 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                     return Column(
                                       children: List.generate(
                                         3,
-                                            (index) => _buildNewsItem(context, null),
+                                        (index) =>
+                                            _buildNewsItem(context, null),
                                       ),
                                     );
                                   }
                                   if (snapshot.hasError) {
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
                                       child: Text(
                                         'Failed to load top news',
                                         style: TextStyle(
@@ -278,10 +288,15 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                     );
                                   }
                                   return Column(
-                                    children: snapshot.data!
-                                        .map((article) =>
-                                        _buildNewsItem(context, article))
-                                        .toList(),
+                                    children:
+                                        snapshot.data!
+                                            .map(
+                                              (article) => _buildNewsItem(
+                                                context,
+                                                article,
+                                              ),
+                                            )
+                                            .toList(),
                                   );
                                 },
                               ),
@@ -358,12 +373,12 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
   }
 
   Widget _buildMenuButton(
-      String text,
-      IconData icon,
-      BuildContext context,
-      NewsCategory? category,
-      Color themeColor,
-      ) {
+    String text,
+    IconData icon,
+    BuildContext context,
+    NewsCategory? category,
+    Color themeColor,
+  ) {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -384,11 +399,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 36,
-              color: themeColor,
-            ),
+            Icon(icon, size: 45, color: themeColor),
             const SizedBox(height: 8),
             Text(
               text,
@@ -412,12 +423,14 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant,
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
               image: DecorationImage(
-                image: article?.urlToImage != null
-                    ? CachedNetworkImageProvider(article!.urlToImage)
-                    : const AssetImage('assets/placeholder.png') as ImageProvider,
+                image:
+                    article?.urlToImage != null
+                        ? CachedNetworkImageProvider(article!.urlToImage)
+                        : const AssetImage('assets/placeholder.png')
+                            as ImageProvider,
                 fit: BoxFit.cover,
                 onError: (exception, stackTrace) {},
               ),
@@ -430,13 +443,16 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
               children: [
                 Text(
                   article?.title ?? 'Loading News!!',
-                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  article?.description ?? 'News description text will come here...',
+                  article?.description ??
+                      'News description text will come here...',
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -452,11 +468,11 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
   }
 
   Widget _buildImageContainer(
-      String text,
-      String imageUrl,
-      BuildContext context,
-      NewsCategory category,
-      ) {
+    String text,
+    String imageUrl,
+    BuildContext context,
+    NewsCategory category,
+  ) {
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: () {
