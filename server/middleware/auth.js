@@ -22,10 +22,10 @@ const authMiddleware = async (req, res, next) => {
             });
         }
 
-        if (!user.isActive) {
+        if (!user.emailVerified) {
             return res.status(401).json({
                 success: false,
-                message: 'Account is deactivated'
+                message: 'Email not verified, please verify your email to access this resource'
             });
         }
 

@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 // Import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const bookmarkRoutes = require('./routes/bookmark');
 
 // Import controllers
 const { verifyEmail } = require('./controllers/auth');
@@ -52,6 +53,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/bookmarks', bookmarkRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
