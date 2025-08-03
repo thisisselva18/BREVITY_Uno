@@ -13,7 +13,8 @@ class AuthService {
   factory AuthService() => _instance;
   AuthService._internal();
 
-  final String _baseUrl = 'https://brevitybackend.onrender.com/api/auth';
+  final String _baseUrl = 'http://localhost:3000/api/auth';
+  // final String _baseUrl= 'https://brevitybackend.onrender.com/api/auth';
   String? _accessToken;
   UserModel? _currentUser;
 
@@ -86,12 +87,14 @@ class AuthService {
           displayName: userData['displayName'] ?? '',
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
-          createdAt: userData['createdAt'] != null
-              ? DateTime.parse(userData['createdAt'])
-              : null,
-          updatedAt: userData['updatedAt'] != null
-              ? DateTime.parse(userData['updatedAt'])
-              : null,
+          createdAt:
+              userData['createdAt'] != null
+                  ? DateTime.parse(userData['createdAt'])
+                  : null,
+          updatedAt:
+              userData['updatedAt'] != null
+                  ? DateTime.parse(userData['updatedAt'])
+                  : null,
         );
 
         if (context != null && context.mounted) {
@@ -107,11 +110,84 @@ class AuthService {
         throw Exception(errorData['message'] ?? 'Failed to create account');
       }
     } catch (e) {
+      Log.e('Sign up error: $e'); // For debugging
       if (context != null && context.mounted) {
         _showErrorSnackBar(context, e.toString());
       }
       rethrow;
     }
+  }
+
+  Future<void> forgotPassword({
+    required String email,
+    BuildContext? context,
+  }) async {
+    try {
+      if (context != null) {
+        _showLoadingSnackBar(context, 'Sending reset OTP...');
+      }
+
+      final response = await http.post(
+        Uri.parse('$_baseUrl/forgot-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email.trim()}),
+      );
+
+      if (response.statusCode == 200) {
+        if (context != null && context.mounted) {
+          _showSuccessSnackBar(context, 'Reset OTP sent to your email');
+        }
+      } else {
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['message'] ?? 'Failed to send reset OTP');
+      }
+    } catch (e) {
+      Log.e('Forgot password error: $e'); // For debugging
+      if (context != null && context.mounted) {
+        _showErrorSnackBar(context, e.toString());
+      }
+      rethrow;
+    }
+  }
+
+  Future<bool> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+    BuildContext? context,
+  }) async {
+    try {
+      if (context != null) {
+        _showLoadingSnackBar(context, 'Resetting your password...');
+      }
+
+      final response = await http.post(
+        Uri.parse('$_baseUrl/reset-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': email.trim(),
+          'token': otp.trim(),
+          'newPassword': newPassword.trim(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        if (context != null && context.mounted) {
+          _showSuccessSnackBar(context, 'Password reset successfully');
+          return true;
+        }
+      } else {
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['message'] ?? 'Failed to reset password');
+      }
+    } catch (e) {
+      Log.e('Reset password error: $e'); // For debugging
+      if (context != null && context.mounted) {
+        _showErrorSnackBar(context, e.toString());
+      }
+      rethrow;
+    }
+    return false; // Return false if reset failed
   }
 
   Future<UserModel?> loginWithEmail({
@@ -127,10 +203,7 @@ class AuthService {
       final response = await http.post(
         Uri.parse('$_baseUrl/login'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'email': email.trim(),
-          'password': password.trim(),
-        }),
+        body: json.encode({'email': email.trim(), 'password': password.trim()}),
       );
 
       if (response.statusCode == 200) {
@@ -148,12 +221,14 @@ class AuthService {
           displayName: userData['displayName'] ?? '',
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
-          createdAt: userData['createdAt'] != null
-              ? DateTime.parse(userData['createdAt'])
-              : null,
-          updatedAt: userData['updatedAt'] != null
-              ? DateTime.parse(userData['updatedAt'])
-              : null,
+          createdAt:
+              userData['createdAt'] != null
+                  ? DateTime.parse(userData['createdAt'])
+                  : null,
+          updatedAt:
+              userData['updatedAt'] != null
+                  ? DateTime.parse(userData['updatedAt'])
+                  : null,
         );
 
         if (context != null && context.mounted) {
@@ -169,6 +244,7 @@ class AuthService {
         throw Exception(errorData['message'] ?? 'Login failed');
       }
     } catch (e) {
+      Log.e('Login error: $e'); // For debugging
       if (context != null && context.mounted) {
         _showErrorSnackBar(context, e.toString());
       }
@@ -205,6 +281,7 @@ class AuthService {
         context.go('/login'); // Redirect to login page
       }
     } catch (e) {
+      Log.e('Logout error: $e'); // For debugging
       // Even if logout fails on server, clear local state
       _accessToken = null;
       _currentUser = null;
@@ -215,8 +292,11 @@ class AuthService {
       await prefs.remove('accessToken');
 
       if (context != null) {
-        if(!context.mounted) return;
-        _showErrorSnackBar(context, 'Error signing out, but you have been logged out locally');
+        if (!context.mounted) return;
+        _showErrorSnackBar(
+          context,
+          'Error signing out, but you have been logged out locally',
+        );
         context.go('/login');
       }
     }
@@ -247,12 +327,14 @@ class AuthService {
           displayName: userData['displayName'] ?? '',
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
-          createdAt: userData['createdAt'] != null
-              ? DateTime.parse(userData['createdAt'])
-              : null,
-          updatedAt: userData['updatedAt'] != null
-              ? DateTime.parse(userData['updatedAt'])
-              : null,
+          createdAt:
+              userData['createdAt'] != null
+                  ? DateTime.parse(userData['createdAt'])
+                  : null,
+          updatedAt:
+              userData['updatedAt'] != null
+                  ? DateTime.parse(userData['updatedAt'])
+                  : null,
         );
 
         _authStateController.add(_currentUser);
@@ -276,7 +358,7 @@ class AuthService {
   void _showErrorSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(message.split('Exception: ').last),
         backgroundColor: Colors.red,
         duration: Duration(seconds: 3),
       ),
