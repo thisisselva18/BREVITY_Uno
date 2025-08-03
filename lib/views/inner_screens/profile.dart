@@ -71,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       builder: (context, state) {
         if (state.status == UserProfileStatus.loading) {
           return Scaffold(
-            backgroundColor: theme.colorScheme.background,
+            backgroundColor: theme.colorScheme.surface,
             body: Center(
               child: CircularProgressIndicator(
                 color: currentTheme.primaryColor,
@@ -82,19 +82,19 @@ class _ProfileScreenState extends State<ProfileScreen>
 
         if (state.status == UserProfileStatus.error) {
           return Scaffold(
-            backgroundColor: theme.colorScheme.background,
+            backgroundColor: theme.colorScheme.surface,
             body: Center(child: Text('Error: ${state.errorMessage}')),
           );
         }
 
         final user = state.user;
         return Scaffold(
-          backgroundColor: theme.colorScheme.background,
+          backgroundColor: theme.colorScheme.surface,
           body: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
               SliverAppBar(
-                backgroundColor: theme.colorScheme.surface.withOpacity(0.85),
+                backgroundColor: theme.colorScheme.surface.withAlpha((0.85 * 255).toInt()),
                 expandedHeight: 90,
                 pinned: true,
                 elevation: 0,
@@ -107,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ),
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
@@ -123,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                             CircleAvatar(
                               radius: 50,
                               backgroundColor:
-                              currentTheme.primaryColor.withOpacity(0.2),
+                              currentTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
                               child: Text(
                                 user?.displayName.isNotEmpty == true
                                     ? user!.displayName[0].toUpperCase()
@@ -140,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                               decoration: BoxDecoration(
                                   color: currentTheme.primaryColor,
                                   borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: theme.colorScheme.background, width: 2)
+                                  border: Border.all(color: theme.colorScheme.surface, width: 2)
                               ),
                               child: Icon(
                                 Icons.edit,
@@ -248,7 +248,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: currentTheme.primaryColor),
           labelText: label,
-          labelStyle: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7)),
+          labelStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt())),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(16),
         ),
@@ -273,7 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       child: ListTile(
         leading: Icon(icon, color: currentTheme.primaryColor),
         title: Text(title, style: theme.textTheme.titleMedium),
-        subtitle: Text(subtitle, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.7))),
+        subtitle: Text(subtitle, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()))),
         trailing: Icon(
           Icons.arrow_forward_ios,
           size: 16,

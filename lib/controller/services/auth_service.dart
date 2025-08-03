@@ -1,3 +1,4 @@
+import 'package:brevity/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
@@ -45,7 +46,7 @@ class AuthService {
     } catch (e) {
       // Handle any errors during initialization, e.g., SharedPreferences error
       _authStateController.add(null);
-      print('Error initializing auth: $e'); // For debugging
+      Log.e('Error initializing auth: $e'); // For debugging
     }
   }
 
@@ -262,7 +263,7 @@ class AuthService {
     } catch (e) {
       // If refresh fails due to network or other error, sign out locally
       await signOut();
-      print('Error refreshing user: $e'); // For debugging
+      Log.e('Error refreshing user: $e'); // For debugging
     }
   }
 
@@ -309,15 +310,6 @@ class AuthService {
             Text(message),
           ],
         ),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-  void _showInfoSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.blue,
         duration: Duration(seconds: 2),
       ),
     );

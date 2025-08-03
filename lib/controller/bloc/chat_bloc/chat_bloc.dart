@@ -1,3 +1,4 @@
+import 'package:brevity/utils/logger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brevity/models/conversation_model.dart';
 import 'package:brevity/models/chat_window_model.dart';
@@ -30,7 +31,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   Future<void> _onSendMessage(SendMessage event, Emitter<ChatState> emit) async {
     if (state is! ChatLoaded) {
-      print('Cannot send message: Chat is not in ChatLoaded state. Current state: $state');
+      Log.d('Cannot send message: Chat is not in ChatLoaded state. Current state: $state');
       return;
     }
 
