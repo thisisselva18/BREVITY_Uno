@@ -13,8 +13,9 @@ class AuthService {
   factory AuthService() => _instance;
   AuthService._internal();
 
-  final String _baseUrl = 'http://localhost:3000/api/auth';
-  // final String _baseUrl= 'https://brevitybackend.onrender.com/api/auth';
+  // final String _baseUrl = 'http://localhost:3000/api/auth';
+  final String _baseUrl= 'https://brevitybackend.onrender.com/api/auth';
+  
   String? _accessToken;
   UserModel? _currentUser;
 
