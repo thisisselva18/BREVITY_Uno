@@ -1,3 +1,4 @@
+import 'package:brevity/views/auth/forgot_password.dart';
 import 'package:flutter/material.dart';
 import 'package:brevity/views/auth/signup.dart';
 import 'package:brevity/views/auth/login.dart';
@@ -33,8 +34,12 @@ class AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     _backgroundController.repeat();
 
     _pages = [
-      LoginScreen(goToSignupPage: goToSignupPage),
+      LoginScreen(
+        goToSignupPage: goToSignupPage,
+        goToForgotPasswordPage: goToForgotPasswordPage,
+      ),
       SignupScreen(goToLoginPage: goToLoginPage),
+      ForgotPasswordScreen(goToLoginPage: goToLoginPage),
     ];
   }
 
@@ -56,6 +61,14 @@ class AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   void goToSignupPage() {
     _pageController.animateToPage(
       1,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
+  void goToForgotPasswordPage() {
+    _pageController.animateToPage(
+      2,
       duration: const Duration(milliseconds: 600),
       curve: Curves.easeInOutCubic,
     );

@@ -69,12 +69,12 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            backgroundColor: theme.colorScheme.surface.withOpacity(0.85),
+            backgroundColor: theme.colorScheme.surface.withAlpha((0.85 * 255).toInt()),
             expandedHeight: 70,
             pinned: true,
             elevation: 0,
@@ -88,7 +88,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
             centerTitle: true,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
+              color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ),
@@ -143,7 +143,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 borderRadius: BorderRadius.circular(100),
                 boxShadow: [
                   BoxShadow(
-                    color: currentTheme.primaryColor.withOpacity(0.15),
+                    color: currentTheme.primaryColor.withAlpha((0.15 * 255).toInt()),
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),
@@ -168,7 +168,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
               'Articles you save will appear here',
               textAlign: TextAlign.center,
               style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                 height: 1.5,
               ),
             ),
@@ -185,7 +185,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 4,
-                shadowColor: currentTheme.primaryColor.withOpacity(0.5),
+                shadowColor: currentTheme.primaryColor.withAlpha((0.5 * 255).toInt()),
               ),
               onPressed: () => Navigator.of(context).pop(),
               child: const Row(

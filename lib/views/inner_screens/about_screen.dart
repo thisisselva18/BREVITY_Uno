@@ -56,15 +56,15 @@ class _AboutUsScreenState extends State<AboutUsScreen>
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: theme.cardColor.withOpacity(isDarkMode ? 0.5 : 0.8),
+        color: theme.cardColor.withAlpha(((isDarkMode ? 0.5 : 0.8) * 255).toInt()),
         borderRadius: borderRadius ?? BorderRadius.circular(16),
         border: Border.all(
-          color: baseColor.withOpacity(0.12),
+          color: baseColor.withAlpha((0.12 * 255).toInt()),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withAlpha((0.08 * 255).toInt()),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -94,16 +94,16 @@ class _AboutUsScreenState extends State<AboutUsScreen>
     final appTheme = themeCubit.currentTheme;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              appTheme.primaryColor.withOpacity(0.2),
-              theme.colorScheme.background,
-              theme.colorScheme.background,
+              appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
+              theme.colorScheme.surface,
+              theme.colorScheme.surface,
             ],
           ),
         ),
@@ -173,7 +173,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: appTheme.primaryColor.withOpacity(0.2),
+                    color: appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -202,7 +202,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
             Text(
               'Stay informed with curated news from reliable sources. Our intelligent chatbot helps you understand and discuss articles in real-time.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                 height: 1.4,
               ),
             ),
@@ -244,7 +244,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: appTheme.primaryColor.withOpacity(0.2),
+                    color: appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -277,10 +277,10 @@ class _AboutUsScreenState extends State<AboutUsScreen>
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withOpacity(0.5),
+        color: theme.colorScheme.surface.withAlpha((0.5 * 255).toInt()),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: baseColor.withOpacity(0.08),
+          color: baseColor.withAlpha((0.08 * 255).toInt()),
           width: 1,
         ),
       ),
@@ -289,7 +289,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: appTheme.primaryColor.withOpacity(0.2),
+              color: appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(feature['icon'], color: appTheme.primaryColor, size: 16),
@@ -307,7 +307,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                 Text(
                   feature['description'],
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                   ),
                 ),
               ],
@@ -332,7 +332,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: appTheme.primaryColor.withOpacity(0.2),
+                    color: appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(Icons.code, color: appTheme.primaryColor, size: 20),
@@ -348,7 +348,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
             Text(
               'Meet the talented developers behind Unity News.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                 height: 1.4,
               ),
             ),
@@ -388,10 +388,10 @@ class _AboutUsScreenState extends State<AboutUsScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: uiTheme.colorScheme.surface.withOpacity(0.5),
+        color: uiTheme.colorScheme.surface.withAlpha((0.5 * 255).toInt()),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: baseColor.withOpacity(0.08),
+          color: baseColor.withAlpha((0.08 * 255).toInt()),
           width: 1,
         ),
       ),
@@ -402,7 +402,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: theme.primaryColor.withOpacity(0.2),
+                backgroundColor: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
                 child: Text(
                   name.split(' ').map((n) => n[0]).take(2).join(),
                   style: TextStyle(
@@ -424,7 +424,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                     Text(
                       role,
                       style: TextStyle(
-                        color: theme.primaryColor.withOpacity(0.8),
+                        color: theme.primaryColor.withAlpha((0.8 * 255).toInt()),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -444,10 +444,10 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: theme.primaryColor.withOpacity(0.1),
+                      color: theme.primaryColor.withAlpha((0.1 * 255).toInt()),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: theme.primaryColor.withOpacity(0.3),
+                        color: theme.primaryColor.withAlpha((0.3 * 255).toInt()),
                         width: 1,
                       ),
                     ),
@@ -477,10 +477,10 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: baseColor.withOpacity(0.04),
+                      color: baseColor.withAlpha((0.04 * 255).toInt()),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: baseColor.withOpacity(0.12),
+                        color: baseColor.withAlpha((0.12 * 255).toInt()),
                         width: 1,
                       ),
                     ),
@@ -489,14 +489,14 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                       children: [
                         Icon(
                           Icons.business,
-                          color: baseColor.withOpacity(0.8),
+                          color: baseColor.withAlpha((0.8 * 255).toInt()),
                           size: 16,
                         ),
                         const Gap(6),
                         Text(
                           'LinkedIn',
                           style: TextStyle(
-                            color: baseColor.withOpacity(0.8),
+                            color: baseColor.withAlpha((0.8 * 255).toInt()),
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),
@@ -524,7 +524,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
           children: [
             Icon(
               Icons.info_outline,
-              color: appTheme.primaryColor.withOpacity(0.7),
+              color: appTheme.primaryColor.withAlpha((0.7 * 255).toInt()),
               size: 16,
             ),
             const Gap(8),
@@ -535,7 +535,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                   Text(
                     'Version 1.0.0 • Built with Flutter',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                      color: Theme.of(context).colorScheme.onSurface.withAlpha((0.08 * 255).toInt()),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -543,7 +543,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                   Text(
                     'Unity is created for news consumption and educational purposes.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withAlpha((0.6 * 255).toInt()),
                     ),
                   ),
                 ],

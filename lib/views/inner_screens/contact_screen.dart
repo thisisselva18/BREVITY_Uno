@@ -56,12 +56,12 @@ class _ContactUsScreenState extends State<ContactUsScreen>
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: theme.cardColor.withOpacity(isDarkMode ? 0.5 : 0.8),
+        color: theme.cardColor.withAlpha(((isDarkMode ? 0.5 : 0.8) * 255).toInt()),
         borderRadius: borderRadius ?? BorderRadius.circular(16),
-        border: Border.all(color: baseColor.withOpacity(0.12), width: 1),
+        border: Border.all(color: baseColor.withAlpha((0.12 * 255).toInt()), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withAlpha((0.08 * 255).toInt()),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -83,7 +83,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
       SnackBar(
         content: Text('$type copied to clipboard'),
         duration: const Duration(seconds: 2),
-        backgroundColor: Colors.green.withOpacity(0.8),
+        backgroundColor: Colors.green.withAlpha((0.8 * 255).toInt()),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -97,16 +97,16 @@ class _ContactUsScreenState extends State<ContactUsScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              appTheme.primaryColor.withOpacity(0.2),
-              theme.colorScheme.background,
-              theme.colorScheme.background,
+              appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
+              theme.colorScheme.surface,
+              theme.colorScheme.surface,
             ],
           ),
         ),
@@ -172,7 +172,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: appTheme.primaryColor.withOpacity(0.2),
+                    color: appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -192,7 +192,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
             Text(
               'For support, feedback, or questions about the app, reach out to our development team.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                 height: 1.4,
               ),
             ),
@@ -232,9 +232,9 @@ class _ContactUsScreenState extends State<ContactUsScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: uiTheme.colorScheme.surface.withOpacity(0.5),
+        color: uiTheme.colorScheme.surface.withAlpha((0.5 * 255).toInt()),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: baseColor.withOpacity(0.08), width: 1),
+        border: Border.all(color: baseColor.withAlpha((0.08 * 255).toInt()), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,7 +243,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: theme.primaryColor.withOpacity(0.2),
+                backgroundColor: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
                 child: Text(
                   name.split(' ').map((n) => n[0]).take(2).join(),
                   style: TextStyle(
@@ -265,7 +265,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
                     Text(
                       role,
                       style: TextStyle(
-                        color: theme.primaryColor.withOpacity(0.8),
+                        color: theme.primaryColor.withAlpha((0.8 * 255).toInt()),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -311,12 +311,12 @@ class _ContactUsScreenState extends State<ContactUsScreen>
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         child: Row(
           children: [
-            Icon(icon, color: theme.primaryColor.withOpacity(0.7), size: 16),
+            Icon(icon, color: theme.primaryColor.withAlpha((0.7 * 255).toInt()), size: 16),
             const Gap(8),
             Text(
               label,
               style: uiTheme.textTheme.bodyMedium?.copyWith(
-                color: uiTheme.colorScheme.onSurface.withOpacity(0.7),
+                color: uiTheme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -329,7 +329,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
             ),
             Icon(
               Icons.copy,
-              color: theme.primaryColor.withOpacity(0.5),
+              color: theme.primaryColor.withAlpha((0.5 * 255).toInt()),
               size: 14,
             ),
           ],
@@ -349,7 +349,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
           children: [
             Icon(
               Icons.schedule_outlined,
-              color: appTheme.primaryColor.withOpacity(0.7),
+              color: appTheme.primaryColor.withAlpha((0.7 * 255).toInt()),
               size: 16,
             ),
             const Gap(8),
@@ -357,7 +357,7 @@ class _ContactUsScreenState extends State<ContactUsScreen>
               child: Text(
                 'We typically respond within 1-2 business days',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                 ),
               ),
             ),

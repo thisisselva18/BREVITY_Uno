@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:brevity/controller/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.goToSignupPage});
+  const LoginScreen({
+    super.key,
+    required this.goToSignupPage,
+    required this.goToForgotPasswordPage,
+  });
   final void Function() goToSignupPage;
+  final void Function() goToForgotPasswordPage;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -300,7 +305,10 @@ class _LoginScreenState extends State<LoginScreen>
                         duration: const Duration(milliseconds: 200),
                         child: TextButton(
                           onPressed: () {
-                            // Handle forgot password
+                            FocusScope.of(context).unfocus();
+                            Future.delayed(Duration.zero, () {
+                              widget.goToForgotPasswordPage();
+                            });
                           },
                           child: const Text(
                             'Forgot Password?',
@@ -695,8 +703,6 @@ class _AnimatedGoogleButtonState extends State<AnimatedGoogleButton>
     );
   }
 }
-
-
 
 // // ==================== UPDATED LOGIN SCREEN ====================
 // import 'package:flutter/material.dart';
