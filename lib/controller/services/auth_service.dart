@@ -13,8 +13,11 @@ class AuthService {
   factory AuthService() => _instance;
   AuthService._internal();
 
-  // final String _baseUrl = 'http://localhost:3000/api/auth';
+  // final String _baseUrl = 'https://gf8tgrvw-5001.inc1.devtunnels.ms/api/auth';
   final String _baseUrl= 'https://brevitybackend.onrender.com/api/auth';
+  
+  // HTTP timeout duration
+  static const Duration _httpTimeout = Duration(seconds: 30);
   
   String? _accessToken;
   UserModel? _currentUser;
@@ -39,8 +42,8 @@ class AuthService {
         if (_currentUser != null) {
           _authStateController.add(_currentUser);
         } else {
-          // If refresh fails (e.g., token expired), clear token and notify logged out
-          await signOut();
+          // If refresh fails (e.g., token expired), clear local state without calling logout API
+          await _clearLocalAuthState();
         }
       } else {
         _authStateController.add(null);
@@ -59,10 +62,6 @@ class AuthService {
     BuildContext? context,
   }) async {
     try {
-      if (context != null) {
-        _showLoadingSnackBar(context, 'Creating your account...');
-      }
-
       final response = await http.post(
         Uri.parse('$_baseUrl/register'),
         headers: {'Content-Type': 'application/json'},
@@ -99,8 +98,8 @@ class AuthService {
         );
 
         if (context != null && context.mounted) {
-          _showSuccessSnackBar(context, 'Account created successfully!');
-          context.go('/intro');
+          // Redirect to email verification - no success snackbar as user needs to verify email
+          context.go('/email-verification?email=${Uri.encodeComponent(email)}&isFromLogin=false');
         }
 
         // Notify listeners of auth state change
@@ -112,9 +111,7 @@ class AuthService {
       }
     } catch (e) {
       Log.e('Sign up error: $e'); // For debugging
-      if (context != null && context.mounted) {
-        _showErrorSnackBar(context, e.toString());
-      }
+      // Let the calling screen handle error display for better UX control
       rethrow;
     }
   }
@@ -124,10 +121,6 @@ class AuthService {
     BuildContext? context,
   }) async {
     try {
-      if (context != null) {
-        _showLoadingSnackBar(context, 'Sending reset OTP...');
-      }
-
       final response = await http.post(
         Uri.parse('$_baseUrl/forgot-password'),
         headers: {'Content-Type': 'application/json'},
@@ -144,9 +137,7 @@ class AuthService {
       }
     } catch (e) {
       Log.e('Forgot password error: $e'); // For debugging
-      if (context != null && context.mounted) {
-        _showErrorSnackBar(context, e.toString());
-      }
+      // Let the calling screen handle error display for better UX control
       rethrow;
     }
   }
@@ -158,10 +149,6 @@ class AuthService {
     BuildContext? context,
   }) async {
     try {
-      if (context != null) {
-        _showLoadingSnackBar(context, 'Resetting your password...');
-      }
-
       final response = await http.post(
         Uri.parse('$_baseUrl/reset-password'),
         headers: {'Content-Type': 'application/json'},
@@ -183,9 +170,7 @@ class AuthService {
       }
     } catch (e) {
       Log.e('Reset password error: $e'); // For debugging
-      if (context != null && context.mounted) {
-        _showErrorSnackBar(context, e.toString());
-      }
+      // Let the calling screen handle error display for better UX control
       rethrow;
     }
     return false; // Return false if reset failed
@@ -197,15 +182,11 @@ class AuthService {
     BuildContext? context,
   }) async {
     try {
-      if (context != null) {
-        _showLoadingSnackBar(context, 'Signing you in...');
-      }
-
       final response = await http.post(
         Uri.parse('$_baseUrl/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': email.trim(), 'password': password.trim()}),
-      );
+      ).timeout(_httpTimeout);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -233,22 +214,39 @@ class AuthService {
         );
 
         if (context != null && context.mounted) {
-          _showSuccessSnackBar(context, 'Welcome back!');
-          context.go('/home/0');
+          // Check if email is verified before redirecting
+          if (_currentUser!.emailVerified) {
+            _showSuccessSnackBar(context, 'Welcome back!');
+            context.go('/home/0');
+          } else {
+            // Don't show success snackbar when redirecting to email verification
+            context.go('/email-verification?email=${Uri.encodeComponent(email)}&isFromLogin=true');
+          }
         }
 
         // Notify listeners of auth state change
         _authStateController.add(_currentUser);
         return _currentUser;
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        // Email not verified or access denied - check if it's email verification issue
+        final errorData = json.decode(response.body);
+        if (errorData['message']?.contains('verify your email') == true || 
+            errorData['message']?.contains('Email not verified') == true) {
+          if (context != null && context.mounted) {
+            context.go('/email-verification?email=${Uri.encodeComponent(email)}&isFromLogin=true');
+          }
+          // Don't show snackbar here as we're redirecting to verification screen
+          throw Exception('Please verify your email to continue');
+        } else {
+          throw Exception(errorData['message'] ?? 'Login failed');
+        }
       } else {
         final errorData = json.decode(response.body);
         throw Exception(errorData['message'] ?? 'Login failed');
       }
     } catch (e) {
       Log.e('Login error: $e'); // For debugging
-      if (context != null && context.mounted) {
-        _showErrorSnackBar(context, e.toString());
-      }
+      // Let the calling screen handle error display for better UX control
       rethrow;
     }
   }
@@ -294,12 +292,9 @@ class AuthService {
 
       if (context != null) {
         if (!context.mounted) return;
-        _showErrorSnackBar(
-          context,
-          'Error signing out, but you have been logged out locally',
-        );
         context.go('/login');
       }
+      throw Exception('Error signing out: ${e.toString()}');
     }
   }
 
@@ -308,16 +303,18 @@ class AuthService {
 
   // Refresh user data
   Future<void> refreshUser() async {
-    if (_accessToken == null) return;
+    if (_accessToken == null) {
+      throw Exception('No access token available');
+    }
 
     try {
       final response = await http.get(
-        Uri.parse('https://brevitybackend.onrender.com/api/auth/me'),
+        Uri.parse('$_baseUrl/me'),
         headers: {
           'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',
         },
-      );
+      ).timeout(_httpTimeout);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -339,31 +336,92 @@ class AuthService {
         );
 
         _authStateController.add(_currentUser);
+      } else if (response.statusCode == 401) {
+        // Token expired or invalid
+        await _clearLocalAuthState();
+        throw Exception('Token expired');
       } else {
-        // If refresh fails (e.g., token expired on server), sign out locally
-        await signOut();
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['message'] ?? 'Failed to refresh user data');
       }
+    } on TimeoutException {
+      throw Exception('Network timeout. Please check your connection.');
     } catch (e) {
-      // If refresh fails due to network or other error, sign out locally
-      await signOut();
-      Log.e('Error refreshing user: $e'); // For debugging
+      // Only clear state if it's an auth error, not network error
+      if (e.toString().contains('Token expired') || e.toString().contains('401')) {
+        await _clearLocalAuthState();
+      }
+      Log.e('Error refreshing user: $e');
+      rethrow; // Re-throw to let caller handle the error
     }
   }
+
+  // Clear local auth state without calling logout API
+  Future<void> _clearLocalAuthState() async {
+    _accessToken = null;
+    _currentUser = null;
+    
+    // Clear token from local storage
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('accessToken');
+    
+    // Notify listeners of auth state change
+    _authStateController.add(null);
+  }
+
+  // Email verification methods
+  Future<void> resendVerificationEmail(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/resend-verification'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email.trim()}),
+      ).timeout(_httpTimeout);
+
+      if (response.statusCode == 200) {
+        // Success - verification email sent
+        return;
+      } else if (response.statusCode == 400) {
+        final errorData = json.decode(response.body);
+        if (errorData['message']?.contains('already verified') == true) {
+          throw Exception('Email is already verified');
+        } else {
+          throw Exception(errorData['message'] ?? 'Failed to resend verification email');
+        }
+      } else if (response.statusCode == 404) {
+        throw Exception('User not found with this email');
+      } else if (response.statusCode >= 500) {
+        throw Exception('Server error. Please try again later.');
+      } else {
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['message'] ?? 'Failed to resend verification email');
+      }
+    } on TimeoutException {
+      throw Exception('Network timeout. Please check your connection and try again.');
+    } catch (e) {
+      if (e is Exception) {
+        rethrow; // Re-throw our custom exceptions
+      }
+      // Handle network errors
+      throw Exception('Network error. Please check your connection and try again.');
+    }
+  }
+
+  // Check if current user's email is verified
+  bool get isEmailVerified => _currentUser?.emailVerified ?? false;
+
+  // Debug method to get current auth state
+  Map<String, dynamic> get debugAuthState => {
+    'hasToken': _accessToken != null,
+    'hasUser': _currentUser != null,
+    'userEmail': _currentUser?.email,
+    'emailVerified': _currentUser?.emailVerified,
+    'isAuthenticated': isAuthenticated,
+  };
 
   // Dispose of resources
   void dispose() {
     _authStateController.close();
-  }
-
-  // Snackbar helpers
-  void _showErrorSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message.split('Exception: ').last),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      ),
-    );
   }
 
   void _showSuccessSnackBar(BuildContext context, String message) {
@@ -371,28 +429,6 @@ class AuthService {
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _showLoadingSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-            SizedBox(width: 16),
-            Text(message),
-          ],
-        ),
         duration: Duration(seconds: 2),
       ),
     );
