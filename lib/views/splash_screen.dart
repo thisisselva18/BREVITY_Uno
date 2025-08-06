@@ -46,10 +46,21 @@ class SplashScreenState extends State<SplashScreen>
 
   void navigateBasedOnAuthStatus() {
     // Use your AuthService to check authentication status
-    final isSignedIn = AuthService().isAuthenticated;
+    final authService = AuthService();
+    final isSignedIn = authService.isAuthenticated;
 
     if (isSignedIn) {
-      context.go('/home/0');
+      // Check if email is verified
+      if (authService.isEmailVerified) {
+        context.go('/home/0');
+      } else {
+        final user = authService.currentUser;
+        if (user != null) {
+          context.go('/email-verification?email=${Uri.encodeComponent(user.email)}&isFromLogin=true');
+        } else {
+          context.go('/auth');
+        }
+      }
     } else {
       context.go('/auth');
     }

@@ -6,6 +6,7 @@ import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/models/news_category.dart';
 import 'package:brevity/views/auth/auth.dart';
+import 'package:brevity/views/auth/email_verification.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:brevity/firebase_options.dart';
 import 'package:brevity/views/inner_screens/chat_screen.dart';
@@ -46,6 +47,18 @@ final _routes = GoRouter(
       name: 'auth',
       builder: (context, state) {
         return const AuthScreen();
+      },
+    ),
+    GoRoute(
+      path: '/email-verification',
+      name: 'email-verification',
+      builder: (context, state) {
+        final email = state.uri.queryParameters['email'] ?? '';
+        final isFromLogin = state.uri.queryParameters['isFromLogin'] == 'true';
+        return EmailVerificationScreen(
+          email: email,
+          isFromLogin: isFromLogin,
+        );
       },
     ),
     GoRoute(
@@ -290,12 +303,23 @@ final _routes = GoRouter(
     if (state.matchedLocation == '/splash') return null;
 
     // Check for routes that should be accessible without authentication
-    final allowedPaths = ['/auth', '/intro'];
+    final allowedPaths = ['/auth', '/intro', '/email-verification'];
     if (allowedPaths.contains(state.matchedLocation)) return null;
 
-    // If user is not signed in, redirect to auth using your AuthService
-    if (!AuthService().isAuthenticated) {
+    // Get the AuthService instance
+    final authService = AuthService();
+    
+    // If user is not signed in, redirect to auth
+    if (!authService.isAuthenticated) {
       return '/auth';
+    }
+    
+    // If user is authenticated but email is not verified, redirect to email verification
+    if (authService.isAuthenticated && !authService.isEmailVerified) {
+      final currentUser = authService.currentUser;
+      if (currentUser != null) {
+        return '/email-verification?email=${Uri.encodeComponent(currentUser.email)}&isFromLogin=true';
+      }
     }
 
     // Allow access to authenticated routes

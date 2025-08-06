@@ -117,18 +117,23 @@ class _LoginScreenState extends State<LoginScreen>
         context: context,
       );
     } catch (e) {
-      // Handle error
+      // Handle error - but don't show snackbar for email verification redirects
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Login failed: ${e.toString()}'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+      String errorMessage = e.toString();
+      if (errorMessage.contains('Exception: ')) {
+        errorMessage = errorMessage.split('Exception: ').last;
+      }
+      
+      // Don't show snackbar for email verification related errors as user is already redirected
+      if (!errorMessage.contains('verify your email') && 
+          !errorMessage.contains('Email not verified')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
           ),
-        ),
-      );
+        );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
