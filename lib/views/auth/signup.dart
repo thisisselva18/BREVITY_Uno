@@ -349,8 +349,8 @@ class _SignupScreenState extends State<SignupScreen>
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscurePassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Colors.white54,
                           ),
                           onPressed: () {

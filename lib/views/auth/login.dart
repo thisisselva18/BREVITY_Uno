@@ -272,9 +272,10 @@ class _LoginScreenState extends State<LoginScreen>
                         delay: 400,
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                            // FLIP THE LOGIC HERE:
+                            _obscurePassword // If _obscurePassword is true (password is hidden)
+                                ? Icons.visibility_off // Show a CLOSED eye (meaning "click to reveal")
+                                : Icons.visibility, // Else (password is visible), show an OPEN eye (meaning "click to hide")
                             color: Colors.white54,
                           ),
                           onPressed: () {
