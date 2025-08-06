@@ -1,10 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:brevity/models/user_model.dart';
 import 'package:brevity/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:brevity/models/user_model.dart';
-import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 
 class AuthService {
@@ -13,12 +14,11 @@ class AuthService {
   factory AuthService() => _instance;
   AuthService._internal();
 
-  // final String _baseUrl = 'https://gf8tgrvw-5001.inc1.devtunnels.ms/api/auth';
-  final String _baseUrl= 'https://brevitybackend.onrender.com/api/auth';
-  
+  final String _baseUrl = 'https://brevitybackend.onrender.com/api/auth';
+
   // HTTP timeout duration
   static const Duration _httpTimeout = Duration(seconds: 30);
-  
+
   String? _accessToken;
   UserModel? _currentUser;
 
@@ -99,7 +99,9 @@ class AuthService {
 
         if (context != null && context.mounted) {
           // Redirect to email verification - no success snackbar as user needs to verify email
-          context.go('/email-verification?email=${Uri.encodeComponent(email)}&isFromLogin=false');
+          context.go(
+            '/email-verification?email=${Uri.encodeComponent(email)}&isFromLogin=false',
+          );
         }
 
         // Notify listeners of auth state change
@@ -182,11 +184,16 @@ class AuthService {
     BuildContext? context,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': email.trim(), 'password': password.trim()}),
-      ).timeout(_httpTimeout);
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/login'),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode({
+              'email': email.trim(),
+              'password': password.trim(),
+            }),
+          )
+          .timeout(_httpTimeout);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -220,7 +227,9 @@ class AuthService {
             context.go('/home/0');
           } else {
             // Don't show success snackbar when redirecting to email verification
-            context.go('/email-verification?email=${Uri.encodeComponent(email)}&isFromLogin=true');
+            context.go(
+              '/email-verification?email=${Uri.encodeComponent(email)}&isFromLogin=true',
+            );
           }
         }
 
@@ -230,10 +239,12 @@ class AuthService {
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         // Email not verified or access denied - check if it's email verification issue
         final errorData = json.decode(response.body);
-        if (errorData['message']?.contains('verify your email') == true || 
+        if (errorData['message']?.contains('verify your email') == true ||
             errorData['message']?.contains('Email not verified') == true) {
           if (context != null && context.mounted) {
-            context.go('/email-verification?email=${Uri.encodeComponent(email)}&isFromLogin=true');
+            context.go(
+              '/email-verification?email=${Uri.encodeComponent(email)}&isFromLogin=true',
+            );
           }
           // Don't show snackbar here as we're redirecting to verification screen
           throw Exception('Please verify your email to continue');
@@ -308,13 +319,15 @@ class AuthService {
     }
 
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/me'),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(_httpTimeout);
+      final response = await http
+          .get(
+            Uri.parse('$_baseUrl/me'),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(_httpTimeout);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -348,7 +361,8 @@ class AuthService {
       throw Exception('Network timeout. Please check your connection.');
     } catch (e) {
       // Only clear state if it's an auth error, not network error
-      if (e.toString().contains('Token expired') || e.toString().contains('401')) {
+      if (e.toString().contains('Token expired') ||
+          e.toString().contains('401')) {
         await _clearLocalAuthState();
       }
       Log.e('Error refreshing user: $e');
@@ -360,11 +374,11 @@ class AuthService {
   Future<void> _clearLocalAuthState() async {
     _accessToken = null;
     _currentUser = null;
-    
+
     // Clear token from local storage
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('accessToken');
-    
+
     // Notify listeners of auth state change
     _authStateController.add(null);
   }
@@ -372,11 +386,13 @@ class AuthService {
   // Email verification methods
   Future<void> resendVerificationEmail(String email) async {
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/resend-verification'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': email.trim()}),
-      ).timeout(_httpTimeout);
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/resend-verification'),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode({'email': email.trim()}),
+          )
+          .timeout(_httpTimeout);
 
       if (response.statusCode == 200) {
         // Success - verification email sent
@@ -386,7 +402,9 @@ class AuthService {
         if (errorData['message']?.contains('already verified') == true) {
           throw Exception('Email is already verified');
         } else {
-          throw Exception(errorData['message'] ?? 'Failed to resend verification email');
+          throw Exception(
+            errorData['message'] ?? 'Failed to resend verification email',
+          );
         }
       } else if (response.statusCode == 404) {
         throw Exception('User not found with this email');
@@ -394,16 +412,22 @@ class AuthService {
         throw Exception('Server error. Please try again later.');
       } else {
         final errorData = json.decode(response.body);
-        throw Exception(errorData['message'] ?? 'Failed to resend verification email');
+        throw Exception(
+          errorData['message'] ?? 'Failed to resend verification email',
+        );
       }
     } on TimeoutException {
-      throw Exception('Network timeout. Please check your connection and try again.');
+      throw Exception(
+        'Network timeout. Please check your connection and try again.',
+      );
     } catch (e) {
       if (e is Exception) {
         rethrow; // Re-throw our custom exceptions
       }
       // Handle network errors
-      throw Exception('Network error. Please check your connection and try again.');
+      throw Exception(
+        'Network error. Please check your connection and try again.',
+      );
     }
   }
 

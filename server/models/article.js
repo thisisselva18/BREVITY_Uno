@@ -54,7 +54,7 @@ const articleSchema = new mongoose.Schema({
 
 articleSchema.index({ userId: 1, url: 1 }, { unique: true });
 
-articleSchema.virtual('timeAgo').get(function () {
+articleSchema.virtual("timeAgo").get(function () {
     const now = new Date();
     const diffInSeconds = Math.floor((now - this.publishedAt) / 1000);
     if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
@@ -67,11 +67,11 @@ articleSchema.virtual('timeAgo').get(function () {
     return `${Math.floor(diffInDays / 7)} weeks ago`;
 });
 
-articleSchema.pre('save', function (next) {
+articleSchema.pre("save", function (next) {
     if (this.isNew) {
         this.publishedAt = new Date(this.publishedAt);
     }
     next();
 });
 
-export default mongoose.model('Article', articleSchema);
+module.exports = mongoose.model("Article", articleSchema);
