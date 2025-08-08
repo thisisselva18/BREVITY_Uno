@@ -133,6 +133,18 @@ CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 BCRYPT_ROUNDS=12
 MAX_LOGIN_ATTEMPTS=5
 LOCK_TIME=30
+
+# Email Configuration
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+
+# Deployment
+
+DEPLOYMENT_URL=https://your-deployment-url.com/
+
 ```
 
 > ⚠️ **Important:** Never commit your `.env` file — it contains sensitive credentials.
