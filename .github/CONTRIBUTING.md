@@ -17,8 +17,6 @@ Thank you for your interest in contributing to **Brevity**! We welcome all kinds
   - [4. Run the Server](#4-run-the-server)
   - [Notes for Backend Contributors](#notes-for-backend-contributors)
 - [📍 Backend Route Overview](#backend-route-overview)
-- [🔁 Keeping Your Fork Up-to-Date](#keeping-your-fork-up-to-date)
-- [🛠️ Making Contributions](#making-contributions)
 - [🧩 Working on Issues](#working-on-issues)
 - [💬 Community & Support](#community--support)
 - [🙌 Thank You!](#thank-you)
@@ -178,50 +176,6 @@ You can view or download a detailed document outlining all backend routes and th
 
 ---
 
-## 🔁 Keeping Your Fork Up-to-Date <a id="keeping-your-fork-up-to-date"></a>
-
-Before starting new work:
-
-```bash
-git fetch upstream
-git checkout main
-git merge upstream/main
-```
-
-*Or use rebase for a cleaner commit history:*
-
-```bash
-git rebase upstream/main
-```
-
-## 🛠️ Making Contributions <a id="making-contributions"></a>
-
-1. **Create a new branch**
-
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-2. **Make your changes and commit them**
-
-   ```bash
-   git add .
-   git commit -m "feat: add [your-feature-name]"
-   ```
-
-3. **Push your branch**
-
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-4. **Create a Pull Request**
-
-   * Go to your fork on GitHub
-   * Open a **Pull Request** targeting the `main` branch
-
----
-
 ## 🧩 Working on Issues <a id="working-on-issues"></a>
 
 * 💬 **Comment first**: Claim an issue by leaving a comment.
@@ -237,7 +191,7 @@ git rebase upstream/main
 Need help? Want to discuss features?
 
 Join our **Discord community**:
-[https://discord.gg/ueAnrmWr](https://discord.gg/fS6AbcUW)
+[Click Here](https://discord.gg/fS6AbcUW)
 
 ## 🙌 Thank You! <a id="thank-you"></a>
 
