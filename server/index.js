@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 // Import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const bookmarkRoutes = require('./routes/bookmark');
 
 // Import controllers
 const { verifyEmail } = require('./controllers/auth');
@@ -22,6 +23,8 @@ app.use(helmet());
 app.use(compression());
 
 // Rate limiting
+app.set('trust proxy', 1);
+
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // limit each IP to 100 requests per windowMs
@@ -52,6 +55,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/bookmarks', bookmarkRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

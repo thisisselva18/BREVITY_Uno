@@ -17,6 +17,7 @@ class _IntroductionScreenState extends State<IntroductionScreen>
   late Animation<double> _scaleAnimation;
   late Animation<double> _slideAnimation;
   late Animation<double> _opacityAnimation;
+  bool _didPrecache = false;
 
   final List<IntroductionPage> _pages = [
     IntroductionPage(
@@ -74,9 +75,16 @@ class _IntroductionScreenState extends State<IntroductionScreen>
     );
 
     _controller.forward();
+  }
 
-    // Pre-cache images - optional but can help with performance
-    _precacheImages();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_didPrecache) {
+      _precacheImages();
+      _didPrecache = true;
+    }
   }
 
   Future<void> _precacheImages() async {

@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui';
 import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
+import 'package:brevity/models/theme_model.dart';
 
 class AboutUsScreen extends StatefulWidget {
   const AboutUsScreen({super.key});
@@ -22,7 +23,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
     super.initState();
     _fadeController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
     );
 
     _fadeAnimation = CurvedAnimation(
@@ -40,28 +41,32 @@ class _AboutUsScreenState extends State<AboutUsScreen>
   }
 
   Widget _buildGlassContainer({
+    required BuildContext context,
     required Widget child,
-    required Color primaryColor,
     double? opacity,
     EdgeInsets? margin,
     EdgeInsets? padding,
     BorderRadius? borderRadius,
   }) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final baseColor = isDarkMode ? Colors.white : Colors.black;
+
     return Container(
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(((opacity ?? 0.08) * 255).toInt()),
+        color: theme.cardColor.withAlpha(((isDarkMode ? 0.5 : 0.8) * 255).toInt()),
         borderRadius: borderRadius ?? BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withAlpha(((0.12) * 255).toInt()),
+          color: baseColor.withAlpha((0.12 * 255).toInt()),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(((0.08) * 255).toInt()),
+            color: Colors.black.withAlpha((0.08 * 255).toInt()),
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -84,36 +89,39 @@ class _AboutUsScreenState extends State<AboutUsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.read<ThemeCubit>().currentTheme;
+    final themeCubit = context.read<ThemeCubit>();
+    final theme = Theme.of(context);
+    final appTheme = themeCubit.currentTheme;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: theme.colorScheme.surface,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              theme.primaryColor.withAlpha((0.08 * 255).toInt()),
-              Colors.black,
-              Colors.black.withAlpha((0.95 * 255).toInt()),
+              appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
+              theme.colorScheme.surface,
+              theme.colorScheme.surface,
             ],
           ),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
+            physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
-                _buildAppBar(theme),
-                Gap(24),
-                _buildAppInfoSection(theme),
-                Gap(20),
-                _buildFeaturesSection(theme),
-                Gap(20),
-                _buildDeveloperSection(theme),
-                Gap(20),
-                _buildVersionSection(theme),
+                _buildAppBar(appTheme),
+                const Gap(24),
+                _buildAppInfoSection(appTheme),
+                const Gap(20),
+                _buildFeaturesSection(appTheme),
+                const Gap(20),
+                _buildDeveloperSection(appTheme),
+                const Gap(20),
+                _buildVersionSection(appTheme),
               ],
             ),
           ),
@@ -122,32 +130,28 @@ class _AboutUsScreenState extends State<AboutUsScreen>
     );
   }
 
-  Widget _buildAppBar(theme) {
+  Widget _buildAppBar(AppTheme appTheme) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: _buildGlassContainer(
-        primaryColor: theme.primaryColor,
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        context: context,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
             IconButton(
               onPressed: () => Navigator.pop(context),
               icon: Icon(
                 Icons.arrow_back_ios_new,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 20,
               ),
               padding: EdgeInsets.zero,
-              constraints: BoxConstraints(minWidth: 32, minHeight: 32),
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             ),
-            Gap(8),
+            const Gap(8),
             Text(
               'About Unity',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ],
         ),
@@ -155,55 +159,50 @@ class _AboutUsScreenState extends State<AboutUsScreen>
     );
   }
 
-  Widget _buildAppInfoSection(theme) {
+  Widget _buildAppInfoSection(AppTheme appTheme) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: _buildGlassContainer(
-        primaryColor: theme.primaryColor,
-        padding: EdgeInsets.all(20),
+        context: context,
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
+                    color: appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     Icons.newspaper_rounded,
-                    color: theme.primaryColor,
+                    color: appTheme.primaryColor,
                     size: 20,
                   ),
                 ),
-                Gap(12),
+                const Gap(12),
                 Text(
                   'Unity News',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            Gap(16),
+            const Gap(16),
             Text(
               'AI-Powered News Platform',
               style: TextStyle(
-                color: theme.primaryColor,
+                color: appTheme.primaryColor,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            Gap(12),
+            const Gap(12),
             Text(
               'Stay informed with curated news from reliable sources. Our intelligent chatbot helps you understand and discuss articles in real-time.',
-              style: TextStyle(
-                color: Colors.white.withAlpha((0.7 * 255).toInt()),
-                fontSize: 14,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                 height: 1.4,
               ),
             ),
@@ -213,7 +212,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
     );
   }
 
-  Widget _buildFeaturesSection(theme) {
+  Widget _buildFeaturesSection(AppTheme appTheme) {
     final features = [
       {
         'icon': Icons.auto_awesome,
@@ -235,85 +234,80 @@ class _AboutUsScreenState extends State<AboutUsScreen>
     return FadeTransition(
       opacity: _fadeAnimation,
       child: _buildGlassContainer(
-        primaryColor: theme.primaryColor,
-        padding: EdgeInsets.all(20),
+        context: context,
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
+                    color: appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     Icons.star_rounded,
-                    color: theme.primaryColor,
+                    color: appTheme.primaryColor,
                     size: 20,
                   ),
                 ),
-                Gap(12),
+                const Gap(12),
                 Text(
                   'Features',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            Gap(16),
-            ...features.map((feature) => _buildFeatureItem(theme, feature)),
+            const Gap(16),
+            ...features.map((feature) => _buildFeatureItem(appTheme, feature)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFeatureItem(theme, Map<String, dynamic> feature) {
+  Widget _buildFeatureItem(AppTheme appTheme, Map<String, dynamic> feature) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final baseColor = isDarkMode ? Colors.white : Colors.black;
+
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha((0.04 * 255).toInt()),
+        color: theme.colorScheme.surface.withAlpha((0.5 * 255).toInt()),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.white.withAlpha((0.08 * 255).toInt()),
+          color: baseColor.withAlpha((0.08 * 255).toInt()),
           width: 1,
         ),
       ),
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
+              color: appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(feature['icon'], color: theme.primaryColor, size: 16),
+            child: Icon(feature['icon'], color: appTheme.primaryColor, size: 16),
           ),
-          Gap(12),
+          const Gap(12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   feature['title'],
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
                 ),
-                Gap(2),
+                const Gap(2),
                 Text(
                   feature['description'],
-                  style: TextStyle(
-                    color: Colors.white.withAlpha((0.7 * 255).toInt()),
-                    fontSize: 12,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                   ),
                 ),
               ],
@@ -324,60 +318,55 @@ class _AboutUsScreenState extends State<AboutUsScreen>
     );
   }
 
-  Widget _buildDeveloperSection(theme) {
+  Widget _buildDeveloperSection(AppTheme appTheme) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: _buildGlassContainer(
-        primaryColor: theme.primaryColor,
-        padding: EdgeInsets.all(20),
+        context: context,
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: theme.primaryColor.withAlpha((0.2 * 255).toInt()),
+                    color: appTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(Icons.code, color: theme.primaryColor, size: 20),
+                  child: Icon(Icons.code, color: appTheme.primaryColor, size: 20),
                 ),
-                Gap(12),
+                const Gap(12),
                 Text(
                   'Developers',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            Gap(16),
+            const Gap(16),
             Text(
               'Meet the talented developers behind Unity News.',
-              style: TextStyle(
-                color: Colors.white.withAlpha((0.7 * 255).toInt()),
-                fontSize: 14,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                 height: 1.4,
               ),
             ),
-            Gap(24),
+            const Gap(24),
             _buildDeveloperCard(
               name: 'Samarth Sharma',
               role: 'Co-Developer',
               portfolioUrl: 'https://saysamarth.netlify.app/',
               linkedinUrl: 'https://www.linkedin.com/in/saysamarth/',
-              theme: theme,
+              theme: appTheme,
             ),
-            Gap(16),
+            const Gap(16),
             _buildDeveloperCard(
               name: 'Yash',
               role: 'Co-Developer',
               portfolioUrl: 'https://portfolio-yash-914981.netlify.app/',
               linkedinUrl: 'https://www.linkedin.com/in/yash-kumar101/',
-              theme: theme,
+              theme: appTheme,
             ),
           ],
         ),
@@ -390,15 +379,19 @@ class _AboutUsScreenState extends State<AboutUsScreen>
     required String role,
     required String portfolioUrl,
     required String linkedinUrl,
-    required theme,
+    required AppTheme theme,
   }) {
+    final uiTheme = Theme.of(context);
+    final isDarkMode = uiTheme.brightness == Brightness.dark;
+    final baseColor = isDarkMode ? Colors.white : Colors.black;
+
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha((0.04 * 255).toInt()),
+        color: uiTheme.colorScheme.surface.withAlpha((0.5 * 255).toInt()),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.white.withAlpha((0.08 * 255).toInt()),
+          color: baseColor.withAlpha((0.08 * 255).toInt()),
           width: 1,
         ),
       ),
@@ -419,18 +412,14 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                   ),
                 ),
               ),
-              Gap(12),
+              const Gap(12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       name,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: uiTheme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
                     ),
                     Text(
                       role,
@@ -445,7 +434,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
               ),
             ],
           ),
-          Gap(16),
+          const Gap(16),
           Row(
             children: [
               Expanded(
@@ -453,7 +442,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                   onTap: () => _launchUrl(portfolioUrl),
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                     decoration: BoxDecoration(
                       color: theme.primaryColor.withAlpha((0.1 * 255).toInt()),
                       borderRadius: BorderRadius.circular(8),
@@ -466,7 +455,7 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.web, color: theme.primaryColor, size: 16),
-                        Gap(6),
+                        const Gap(6),
                         Text(
                           'Portfolio',
                           style: TextStyle(
@@ -480,18 +469,18 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                   ),
                 ),
               ),
-              Gap(8),
+              const Gap(8),
               Expanded(
                 child: InkWell(
                   onTap: () => _launchUrl(linkedinUrl),
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(((0.04) * 255).toInt()),
+                      color: baseColor.withAlpha((0.04 * 255).toInt()),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: Colors.white.withAlpha(((0.12) * 255).toInt()),
+                        color: baseColor.withAlpha((0.12 * 255).toInt()),
                         width: 1,
                       ),
                     ),
@@ -500,16 +489,14 @@ class _AboutUsScreenState extends State<AboutUsScreen>
                       children: [
                         Icon(
                           Icons.business,
-                          color: Colors.white.withAlpha(((0.8) * 255).toInt()),
+                          color: baseColor.withAlpha((0.8 * 255).toInt()),
                           size: 16,
                         ),
-                        Gap(6),
+                        const Gap(6),
                         Text(
                           'LinkedIn',
                           style: TextStyle(
-                            color: Colors.white.withAlpha(
-                              ((0.8) * 255).toInt(),
-                            ),
+                            color: baseColor.withAlpha((0.8 * 255).toInt()),
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),
@@ -526,39 +513,37 @@ class _AboutUsScreenState extends State<AboutUsScreen>
     );
   }
 
-  Widget _buildVersionSection(theme) {
+  Widget _buildVersionSection(AppTheme appTheme) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: _buildGlassContainer(
-        primaryColor: theme.primaryColor,
-        padding: EdgeInsets.all(16),
+        context: context,
+        padding: const EdgeInsets.all(16),
         opacity: 0.04,
         child: Row(
           children: [
             Icon(
               Icons.info_outline,
-              color: theme.primaryColor.withAlpha((0.7 * 255).toInt()),
+              color: appTheme.primaryColor.withAlpha((0.7 * 255).toInt()),
               size: 16,
             ),
-            Gap(8),
+            const Gap(8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Version 1.0.0 • Built with Flutter',
-                    style: TextStyle(
-                      color: Colors.white.withAlpha(((0.8) * 255).toInt()),
-                      fontSize: 12,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withAlpha((0.08 * 255).toInt()),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Gap(2),
+                  const Gap(2),
                   Text(
                     'Unity is created for news consumption and educational purposes.',
-                    style: TextStyle(
-                      color: Colors.white.withAlpha(((0.6) * 255).toInt()),
-                      fontSize: 11,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withAlpha((0.6 * 255).toInt()),
                     ),
                   ),
                 ],

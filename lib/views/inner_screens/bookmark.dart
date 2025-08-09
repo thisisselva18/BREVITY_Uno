@@ -8,6 +8,7 @@ import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_state.dart';
 import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/views/common_widgets/common_appbar.dart';
+import 'package:brevity/models/theme_model.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});
@@ -64,22 +65,22 @@ class _BookmarkScreenState extends State<BookmarkScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Access current theme from ThemeCubit for dynamic theming
-    final currentTheme = context.read<ThemeCubit>().currentTheme;
+    final currentTheme = context.watch<ThemeCubit>().currentTheme;
+    final theme = Theme.of(context);
 
-    return AppScaffold(
+    return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            backgroundColor: const Color.fromARGB(210, 0, 0, 0),
+            backgroundColor: theme.colorScheme.surface.withAlpha((0.85 * 255).toInt()),
             expandedHeight: 70,
             pinned: true,
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
               background: ParticlesHeader(
                 title: "Bookmarks",
-                // Apply theme's primary color to particle header
                 themeColor: currentTheme.primaryColor,
                 particleAnimation: _particleAnimationController,
               ),
@@ -87,46 +88,48 @@ class _BookmarkScreenState extends State<BookmarkScreen>
             centerTitle: true,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-              color: Colors.white70,
+              color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              FadeTransition(
-                opacity: _animation,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 0.1),
-                    end: Offset.zero,
-                  ).animate(_animation),
-                  child: BlocBuilder<BookmarkBloc, BookmarkState>(
-                    builder: (context, state) {
-                      if (state is BookmarksLoaded) {
-                        return state.bookmarks.isEmpty
-                            ? _buildEmptyState(currentTheme)
-                            : _buildBookmarksList(state.bookmarks);
-                      }
-                      return Center(
-                        child: CircularProgressIndicator(
-                          // Use theme's primary color for loading indicator
-                          color: currentTheme.primaryColor,
-                          strokeWidth: 3,
-                        ),
-                      );
-                    },
+          SliverPadding(
+            padding: const EdgeInsets.only(top: 20),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                FadeTransition(
+                  opacity: _animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.1),
+                      end: Offset.zero,
+                    ).animate(_animation),
+                    child: BlocBuilder<BookmarkBloc, BookmarkState>(
+                      builder: (context, state) {
+                        if (state is BookmarksLoaded) {
+                          return state.bookmarks.isEmpty
+                              ? _buildEmptyState(currentTheme)
+                              : _buildBookmarksList(state.bookmarks);
+                        }
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: currentTheme.primaryColor,
+                            strokeWidth: 3,
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ]),
+              ]),
+            ),
           ),
         ],
       ),
     );
   }
 
-  // Updated empty state with theme parameter for dynamic styling
-  Widget _buildEmptyState(currentTheme) {
+  Widget _buildEmptyState(AppTheme currentTheme) {
+    final theme = Theme.of(context);
     return Center(
       child: Container(
         padding: const EdgeInsets.all(30),
@@ -136,11 +139,10 @@ class _BookmarkScreenState extends State<BookmarkScreen>
             Container(
               padding: const EdgeInsets.all(25),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E222A),
+                color: theme.cardColor,
                 borderRadius: BorderRadius.circular(100),
                 boxShadow: [
                   BoxShadow(
-                    // Apply theme color to shadow with opacity
                     color: currentTheme.primaryColor.withAlpha((0.15 * 255).toInt()),
                     blurRadius: 20,
                     spreadRadius: 5,
@@ -150,36 +152,31 @@ class _BookmarkScreenState extends State<BookmarkScreen>
               child: Icon(
                 Icons.bookmark_border_rounded,
                 size: 70,
-                // Use theme's primary color for bookmark icon
                 color: currentTheme.primaryColor,
               ),
             ),
             const SizedBox(height: 32),
-            const Text(
+            Text(
               'No Bookmarks Yet',
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.white,
+              style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'Articles you save will appear here',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Color(0xFFABB0B8),
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 32),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                // Apply theme's primary color to button background
                 backgroundColor: currentTheme.primaryColor,
-                foregroundColor: Colors.white,
+                foregroundColor: theme.colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,
@@ -188,7 +185,6 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 4,
-                // Apply theme color to button shadow
                 shadowColor: currentTheme.primaryColor.withAlpha((0.5 * 255).toInt()),
               ),
               onPressed: () => Navigator.of(context).pop(),
@@ -226,10 +222,9 @@ class _BookmarkScreenState extends State<BookmarkScreen>
           child: ArticleListItem(
             showRemove: true,
             article: article,
-            onSide:
-                () => context.read<BookmarkBloc>().add(
-                  ToggleBookmarkEvent(article),
-                ),
+            onSide: () => context.read<BookmarkBloc>().add(
+              ToggleBookmarkEvent(article),
+            ),
             onTap: () => _launchUrl(article.url),
           ),
         );

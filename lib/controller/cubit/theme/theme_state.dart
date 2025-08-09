@@ -14,34 +14,13 @@ class ThemeState extends Equatable {
     this.errorMessage,
   });
 
-  // Initial state
   factory ThemeState.initial() {
-    return const ThemeState(
-      currentTheme: AppThemes.defaultTheme,
+    return ThemeState(
+      currentTheme: AppTheme.defaultTheme,
       status: ThemeStatus.initial,
     );
   }
 
-  // Loading state
-  ThemeState loading() {
-    return copyWith(status: ThemeStatus.loading);
-  }
-
-  // Loaded state
-  ThemeState loaded(AppTheme theme) {
-    return copyWith(
-      currentTheme: theme,
-      status: ThemeStatus.loaded,
-      errorMessage: null,
-    );
-  }
-
-  // Error state
-  ThemeState error(String message) {
-    return copyWith(status: ThemeStatus.error, errorMessage: message);
-  }
-
-  // Copy with method
   ThemeState copyWith({
     AppTheme? currentTheme,
     ThemeStatus? status,
@@ -56,9 +35,4 @@ class ThemeState extends Equatable {
 
   @override
   List<Object?> get props => [currentTheme, status, errorMessage];
-
-  @override
-  String toString() {
-    return 'ThemeState(currentTheme: ${currentTheme.name}, status: $status, errorMessage: $errorMessage)';
-  }
 }

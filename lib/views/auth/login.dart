@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:brevity/controller/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.goToSignupPage});
+  const LoginScreen({
+    super.key,
+    required this.goToSignupPage,
+    required this.goToForgotPasswordPage,
+  });
   final void Function() goToSignupPage;
+  final void Function() goToForgotPasswordPage;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -112,18 +117,23 @@ class _LoginScreenState extends State<LoginScreen>
         context: context,
       );
     } catch (e) {
-      // Handle error
+      // Handle error - but don't show snackbar for email verification redirects
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Login failed: ${e.toString()}'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+      String errorMessage = e.toString();
+      if (errorMessage.contains('Exception: ')) {
+        errorMessage = errorMessage.split('Exception: ').last;
+      }
+      
+      // Don't show snackbar for email verification related errors as user is already redirected
+      if (!errorMessage.contains('verify your email') && 
+          !errorMessage.contains('Email not verified')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
           ),
-        ),
-      );
+        );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -267,9 +277,10 @@ class _LoginScreenState extends State<LoginScreen>
                         delay: 400,
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                            // FLIP THE LOGIC HERE:
+                            _obscurePassword // If _obscurePassword is true (password is hidden)
+                                ? Icons.visibility_off // Show a CLOSED eye (meaning "click to reveal")
+                                : Icons.visibility, // Else (password is visible), show an OPEN eye (meaning "click to hide")
                             color: Colors.white54,
                           ),
                           onPressed: () {
@@ -300,7 +311,10 @@ class _LoginScreenState extends State<LoginScreen>
                         duration: const Duration(milliseconds: 200),
                         child: TextButton(
                           onPressed: () {
-                            // Handle forgot password
+                            FocusScope.of(context).unfocus();
+                            Future.delayed(Duration.zero, () {
+                              widget.goToForgotPasswordPage();
+                            });
                           },
                           child: const Text(
                             'Forgot Password?',
@@ -695,8 +709,6 @@ class _AnimatedGoogleButtonState extends State<AnimatedGoogleButton>
     );
   }
 }
-
-
 
 // // ==================== UPDATED LOGIN SCREEN ====================
 // import 'package:flutter/material.dart';

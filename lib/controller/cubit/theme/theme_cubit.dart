@@ -8,8 +8,8 @@ class ThemeCubit extends Cubit<ThemeState> {
   final ThemeService _themeService;
 
   ThemeCubit({ThemeService? themeService})
-    : _themeService = themeService ?? ThemeService.instance,
-      super(ThemeState.initial());
+      : _themeService = themeService ?? ThemeService.instance,
+        super(ThemeState.initial());
 
   // Initialize theme from storage or use default
   Future<void> initializeTheme() async {
@@ -19,22 +19,22 @@ class ThemeCubit extends Cubit<ThemeState> {
     try {
       // Ensure ThemeService is initialized first
       await _themeService.init();
-      
+
       // Load the saved theme
       final savedTheme = await _themeService.loadTheme();
       Log.i("Theme initialized with: ${savedTheme.name}");
 
       emit(
         state.copyWith(
-          currentTheme: savedTheme, 
-          status: ThemeStatus.loaded
+            currentTheme: savedTheme,
+            status: ThemeStatus.loaded
         ),
       );
     } catch (e) {
       Log.e("Error initializing theme: $e");
       emit(
         state.copyWith(
-          currentTheme: AppThemes.defaultTheme,
+          currentTheme: AppTheme.defaultTheme,
           status: ThemeStatus.error,
           errorMessage: 'Failed to load theme: $e',
         ),
@@ -57,9 +57,9 @@ class ThemeCubit extends Cubit<ThemeState> {
         Log.i("Theme saved successfully: ${newTheme.name}");
         emit(
           state.copyWith(
-            currentTheme: newTheme, 
-            status: ThemeStatus.loaded,
-            errorMessage: null
+              currentTheme: newTheme,
+              status: ThemeStatus.loaded,
+              errorMessage: null
           ),
         );
       } else {
@@ -82,6 +82,45 @@ class ThemeCubit extends Cubit<ThemeState> {
     }
   }
 
+  // Toggle dark mode
+  Future<void> toggleDarkMode(bool isDarkMode) async {
+    Log.d("Toggling dark mode to: $isDarkMode");
+    emit(state.copyWith(status: ThemeStatus.loading));
+
+    try {
+      // Create a new theme with updated dark mode setting
+      final newTheme = state.currentTheme.copyWith(isDarkMode: isDarkMode);
+      final success = await _themeService.saveTheme(newTheme);
+
+      if (success) {
+        Log.i("Dark mode toggled successfully");
+        emit(
+          state.copyWith(
+              currentTheme: newTheme,
+              status: ThemeStatus.loaded,
+              errorMessage: null
+          ),
+        );
+      } else {
+        Log.w("Failed to toggle dark mode");
+        emit(
+          state.copyWith(
+            status: ThemeStatus.error,
+            errorMessage: 'Failed to toggle dark mode',
+          ),
+        );
+      }
+    } catch (e) {
+      Log.e("Error toggling dark mode: $e");
+      emit(
+        state.copyWith(
+          status: ThemeStatus.error,
+          errorMessage: 'Error toggling dark mode: $e',
+        ),
+      );
+    }
+  }
+
   // Reset theme to default
   Future<void> resetTheme() async {
     Log.d("Resetting theme to default");
@@ -90,12 +129,12 @@ class ThemeCubit extends Cubit<ThemeState> {
     try {
       // Clear saved theme and reset to default
       await _themeService.clearTheme();
-      
+
       emit(
         state.copyWith(
-          currentTheme: AppThemes.defaultTheme,
-          status: ThemeStatus.loaded,
-          errorMessage: null
+            currentTheme: AppTheme.defaultTheme,
+            status: ThemeStatus.loaded,
+            errorMessage: null
         ),
       );
 
@@ -115,10 +154,10 @@ class ThemeCubit extends Cubit<ThemeState> {
   AppTheme get currentTheme => state.currentTheme;
 
   // Check if current theme is the default theme
-  bool get isDefaultTheme => state.currentTheme == AppThemes.defaultTheme;
+  bool get isDefaultTheme => state.currentTheme == AppTheme.defaultTheme;
 
   // Get all available themes
-  List<AppTheme> get availableThemes => AppThemes.availableThemes;
+  List<AppTheme> get availableThemes => AppTheme.availableThemes;
 
   // Check if a specific theme is currently selected
   bool isThemeSelected(AppTheme theme) => state.currentTheme == theme;

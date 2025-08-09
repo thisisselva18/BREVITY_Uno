@@ -91,13 +91,19 @@ class _SignupScreenState extends State<SignupScreen>
 
   void _startAnimations() async {
     await Future.delayed(const Duration(milliseconds: 100));
+    if (!mounted) return;
     _logoController.forward();
+
     await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
     _fadeController.forward();
+
     await Future.delayed(const Duration(milliseconds: 200));
+    if (!mounted) return;
     _slideController.forward();
 
     // Start floating animation and repeat
+    if (!mounted) return;
     _floatingController.repeat(reverse: true);
   }
 
@@ -343,8 +349,8 @@ class _SignupScreenState extends State<SignupScreen>
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscurePassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Colors.white54,
                           ),
                           onPressed: () {
