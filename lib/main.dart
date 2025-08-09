@@ -92,7 +92,7 @@ final _routes = GoRouter(
       ),
       routes: [
         GoRoute(
-          path: 'bookmark',
+          path: '/bookmark',
           name: 'bookmark',
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,

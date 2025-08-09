@@ -322,7 +322,7 @@ class _LoginScreenState extends State<LoginScreen>
                     child: SlideTransition(
                       position: _slideAnimation,
                       child: AnimatedButton(
-                        onPressed: _isLoading ? null : _handleLogin,
+                        onPressed: _handleLogin,
                         isLoading: _isLoading,
                         text: 'LOGIN',
                         delay: 600,
