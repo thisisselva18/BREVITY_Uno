@@ -80,6 +80,8 @@ NEWS_API_KEY=your_news_api_key_here
 
 ## 🧱 Backend Setup Guide (Node.js) <a id="backend-setup-guide-nodejs"></a>
 
+Required only for backend development. Not needed for frontend work since the backend is already deployed.
+
 ### 1. Navigate to the Server Directory <a id="1-navigate-to-the-server-directory"></a>
 
 If you haven't already cloned the repo:
@@ -235,7 +237,7 @@ git rebase upstream/main
 Need help? Want to discuss features?
 
 Join our **Discord community**:
-[https://discord.gg/ueAnrmWr](https://discord.gg/ueAnrmWr)
+[https://discord.gg/ueAnrmWr](https://discord.gg/fS6AbcUW)
 
 ## 🙌 Thank You! <a id="thank-you"></a>
 
