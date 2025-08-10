@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/applogo.png" width="140"/>
+  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/brevity_logo.png" width="200"/>
   <h1>🚀 Brevity - Short, Smart, Straight to the point</h1>
   <p>
     <b>Stay informed effortlessly with real-time news, seamless navigation, and a personalized reading experience.</b>
