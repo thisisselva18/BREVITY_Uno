@@ -530,19 +530,6 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ),
                       ),
-                  // Animated Login Button
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: AnimatedButton(
-                        onPressed: _handleLogin,
-                        isLoading: _isLoading,
-                        text: 'LOGIN',
-                        delay: 600,
-                      ),
-                    ),
-                  ),
 
                       const SizedBox(height: 20),
 
