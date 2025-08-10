@@ -1,9 +1,32 @@
-import 'package:flutter/material.dart';
+import 'dart:math' as math;
+
 import 'package:brevity/controller/services/auth_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../common_widgets/auth_header.dart';
+
+// Enhanced Palette (same as login)
+const Color bgStart = Color(0xFF070B14);
+const Color bgEnd = Color(0xFF0E1624);
+
+const Color primaryA = Color(0xFF3D4DFF);
+const Color primaryB = Color(0xFF29C0FF);
+
+const Color panelTop = Color(0xFF0F1724);
+const Color panelBottom = Color(0xFF111827);
+const Color mutedText = Color(0xFF9AA8BF);
+const Color successColor = Color(0xFF10B981);
+const Color warningColor = Color(0xFFF59E0B);
+const Color errorColor = Color(0xFFEF4444);
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key, required this.goToLoginPage});
-  final void Function() goToLoginPage;
+  const SignupScreen({
+    super.key,
+    required this.goToLoginPage,
+  });
+
+  final VoidCallback goToLoginPage;
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -11,143 +34,180 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen>
     with TickerProviderStateMixin {
+  // Form state
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+
+  // Validation states
+  bool _nameValid = false;
+  bool _emailValid = false;
+  bool _passwordValid = false;
+  String? _nameError;
+  String? _emailError;
+  String? _passwordError;
   PasswordStrength _passwordStrength = PasswordStrength.weak;
 
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
-  late AnimationController _logoController;
-  late AnimationController _strengthController;
-  late AnimationController _floatingController;
+  // Animations
+  late final AnimationController _fadeController;
+  late final AnimationController _slideController;
+  late final AnimationController _floatController;
+  late final AnimationController _pulseController;
+  late final AnimationController _shakeController;
 
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _logoAnimation;
-  late Animation<double> _strengthAnimation;
-  late Animation<double> _floatingAnimation;
+  late final Animation<double> _fadeAnim;
+  late final Animation<Offset> _slideAnim;
+  late final Animation<double> _floatAnim;
+  late final Animation<double> _pulseAnim;
+  late final Animation<double> _shakeAnim;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize animation controllers
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
       vsync: this,
+      duration: const Duration(milliseconds: 850),
     );
-
     _slideController = AnimationController(
-      duration: const Duration(milliseconds: 800),
       vsync: this,
+      duration: const Duration(milliseconds: 650),
     );
-
-    _logoController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+    _floatController = AnimationController(
       vsync: this,
+      duration: const Duration(milliseconds: 4200),
     );
-
-    _strengthController = AnimationController(
-      duration: const Duration(milliseconds: 500),
+    _pulseController = AnimationController(
       vsync: this,
+      duration: const Duration(milliseconds: 2200),
     );
-
-    _floatingController = AnimationController(
-      duration: const Duration(milliseconds: 3000),
+    _shakeController = AnimationController(
       vsync: this,
+      duration: const Duration(milliseconds: 600),
     );
 
-    // Initialize animations
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    _fadeAnim = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeInOut,
     );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.5),
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.2),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
+    ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut));
+    _floatAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
+    );
+    _pulseAnim = Tween<double>(begin: 1.0, end: 1.04).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+    _shakeAnim = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _shakeController, curve: Curves.elasticOut),
     );
 
-    _logoAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.elasticOut),
+    _floatController.repeat(reverse: true);
+    _pulseController.repeat(reverse: true);
+
+    // Start entrance animations
+    Future.delayed(
+      const Duration(milliseconds: 160),
+      () => _fadeController.forward(),
+    );
+    Future.delayed(
+      const Duration(milliseconds: 300),
+      () => _slideController.forward(),
     );
 
-    _strengthAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _strengthController, curve: Curves.easeInOut),
-    );
-
-    _floatingAnimation = Tween<double>(begin: -10.0, end: 10.0).animate(
-      CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut),
-    );
-
-    // Start animations
-    _startAnimations();
-  }
-
-  void _startAnimations() async {
-    await Future.delayed(const Duration(milliseconds: 100));
-    if (!mounted) return;
-    _logoController.forward();
-
-    await Future.delayed(const Duration(milliseconds: 300));
-    if (!mounted) return;
-    _fadeController.forward();
-
-    await Future.delayed(const Duration(milliseconds: 200));
-    if (!mounted) return;
-    _slideController.forward();
-
-    // Start floating animation and repeat
-    if (!mounted) return;
-    _floatingController.repeat(reverse: true);
+    // Add listeners for real-time validation
+    _nameController.addListener(_validateName);
+    _emailController.addListener(_validateEmail);
+    _passwordController.addListener(_validatePassword);
   }
 
   @override
   void dispose() {
     _fadeController.dispose();
     _slideController.dispose();
-    _logoController.dispose();
-    _strengthController.dispose();
-    _floatingController.dispose();
+    _floatController.dispose();
+    _pulseController.dispose();
+    _shakeController.dispose();
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  // Password strength checker with animation
-  void _checkPasswordStrength(String value) {
-    PasswordStrength newStrength;
-
-    if (value.length < 6) {
-      newStrength = PasswordStrength.weak;
-    } else if (value.length < 8) {
-      newStrength = PasswordStrength.medium;
-    } else {
-      bool hasUppercase = value.contains(RegExp(r'[A-Z]'));
-      bool hasDigits = value.contains(RegExp(r'[0-9]'));
-      bool hasSpecial = value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-
-      newStrength =
-          (hasUppercase && hasDigits && hasSpecial)
-              ? PasswordStrength.strong
-              : PasswordStrength.medium;
-    }
-
-    if (newStrength != _passwordStrength) {
-      setState(() => _passwordStrength = newStrength);
-      _strengthController.reset();
-      _strengthController.forward();
+  void _validateName() {
+    final name = _nameController.text;
+    final isValid = name.isNotEmpty && name.length >= 2;
+    if (_nameValid != isValid) {
+      setState(() {
+        _nameValid = isValid;
+        _nameError = name.isEmpty
+            ? null
+            : (isValid ? null : 'Name must be at least 2 characters');
+      });
     }
   }
 
+  void _validateEmail() {
+    final email = _emailController.text;
+    final isValid = email.isNotEmpty &&
+        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+    if (_emailValid != isValid) {
+      setState(() {
+        _emailValid = isValid;
+        _emailError = email.isEmpty
+            ? null
+            : (isValid ? null : 'Please enter a valid email');
+      });
+    }
+  }
+
+  void _validatePassword() {
+    final password = _passwordController.text;
+    final isValid = password.length >= 8;
+    
+    // Password strength check
+    PasswordStrength newStrength;
+    if (password.length < 6) {
+      newStrength = PasswordStrength.weak;
+    } else if (password.length < 8) {
+      newStrength = PasswordStrength.medium;
+    } else {
+      bool hasUppercase = password.contains(RegExp(r'[A-Z]'));
+      bool hasDigits = password.contains(RegExp(r'[0-9]'));
+      bool hasSpecial = password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+
+      newStrength = (hasUppercase && hasDigits && hasSpecial)
+          ? PasswordStrength.strong
+          : PasswordStrength.medium;
+    }
+
+    if (_passwordValid != isValid || _passwordStrength != newStrength) {
+      setState(() {
+        _passwordValid = isValid;
+        _passwordStrength = newStrength;
+        _passwordError = password.isEmpty
+            ? null
+            : (isValid ? null : 'Password must be at least 8 characters');
+      });
+    }
+  }
+
+  bool get _canSignup => _nameValid && _emailValid && _passwordValid && !_isLoading;
+
+  // Signup handler
   Future<void> _handleSignup() async {
-    if (!_formKey.currentState!.validate()) return;
+    HapticFeedback.lightImpact();
+
+    if (!_formKey.currentState!.validate()) {
+      _shakeController.forward().then((_) => _shakeController.reset());
+      HapticFeedback.heavyImpact();
+      return;
+    }
 
     setState(() => _isLoading = true);
     FocusScope.of(context).unfocus();
@@ -159,24 +219,51 @@ class _SignupScreenState extends State<SignupScreen>
         userName: _nameController.text,
         context: context,
       );
-    } catch (e) {
-      // Handle error with animated snackbar
+
       if (!mounted) return;
+      HapticFeedback.mediumImpact();
+
+      // Show success state
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
             children: [
-              const Icon(Icons.error_outline, color: Colors.white),
+              Icon(Icons.check_circle_rounded, color: successColor, size: 20),
               const SizedBox(width: 8),
-              Expanded(child: Text('Signup failed: ${e.toString()}')),
+              const Text('Account created! Check your email to verify.'),
             ],
           ),
-          backgroundColor: Colors.red.shade600,
+          backgroundColor: const Color(0xFF1F2937),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
           ),
-          margin: const EdgeInsets.all(16),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      HapticFeedback.heavyImpact();
+      _shakeController.forward().then((_) => _shakeController.reset());
+
+      String errorMessage = e.toString();
+      if (errorMessage.contains('Exception: ')) {
+        errorMessage = errorMessage.split('Exception: ').last;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.error_rounded, color: errorColor, size: 20),
+              const SizedBox(width: 8),
+              Expanded(child: Text('Signup failed: $errorMessage')),
+            ],
+          ),
+          backgroundColor: const Color(0xFF1F2937),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
     } finally {
@@ -186,285 +273,408 @@ class _SignupScreenState extends State<SignupScreen>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return Scaffold(
+      backgroundColor: bgStart,
+      body: Stack(
+        children: [
+          Positioned.fill(child: _buildBackground(size)),
+          SafeArea(child: _buildPortraitLayout(size)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPortraitLayout(Size size) {
+    return Column(
+      children: [
+        AnimatedHeader(
+          title: 'Create Account',
+          subtitle: 'Join the Brevity community',
+          logoAssetPath: 'assets/logos/Brevity_white.png',
+          screenSize: size,
+          isLandscape: false,
+        ),
+        _buildFormPanel(),
+      ],
+    );
+  }
+
+  Widget _buildBackground(Size size) {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color.fromARGB(255, 4, 16, 54),
-            Color.fromARGB(255, 20, 25, 78),
-            Color.fromARGB(255, 27, 52, 105),
-          ],
-          stops: [0.0, 0.5, 1.0],
+          colors: [bgStart, bgEnd],
         ),
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  const SizedBox(height: 60),
+      child: Stack(
+        children: [
+          AnimatedBuilder(
+            animation: _floatAnim,
+            builder: (context, _) {
+              final t = _floatAnim.value;
+              final yOsc = math.sin(t * 2 * math.pi) * 20;
+              final xOsc = math.cos(t * 2 * math.pi) * 12;
+              return Positioned(
+                left: -40 + xOsc,
+                top: 80 + yOsc,
+                child: Transform.rotate(
+                  angle: 0.15 * math.sin(t * 2 * math.pi),
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      gradient: RadialGradient(
+                        center: const Alignment(-0.3, -0.4),
+                        radius: 1.2,
+                        colors: [
+                          primaryA.withOpacity(0.08),
+                          primaryB.withOpacity(0.02),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          AnimatedBuilder(
+            animation: Listenable.merge([_floatAnim, _pulseAnim]),
+            builder: (context, _) {
+              final f = _floatAnim.value;
+              final p = _pulseAnim.value;
+              final y = math.cos(f * 2 * math.pi + math.pi / 3) * 15;
+              final x = math.sin(f * 2 * math.pi + math.pi / 3) * 10;
+              return Positioned(
+                right: -20 + x,
+                top: 140 + y,
+                child: Transform.scale(
+                  scale: p,
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(80),
+                      gradient: RadialGradient(
+                        center: const Alignment(0.4, -0.2),
+                        radius: 1.0,
+                        colors: [
+                          primaryB.withOpacity(0.06),
+                          primaryA.withOpacity(0.01),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.6, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          ...List.generate(6, (i) {
+            return AnimatedBuilder(
+              animation: _floatAnim,
+              builder: (context, _) {
+                final offset = (i * math.pi / 3);
+                final x = 50 + math.cos(_floatAnim.value * 2 * math.pi + offset) * 30;
+                final y = 200 + math.sin(_floatAnim.value * 2 * math.pi + offset) * 20;
+                final opacity = (math.sin(_floatAnim.value * 2 * math.pi + offset) + 1) * 0.02;
 
-                  // Animated Logo with floating effect
-                  AnimatedBuilder(
-                    animation: _logoAnimation,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        scale: _logoAnimation.value,
-                        child: AnimatedBuilder(
-                          animation: _floatingAnimation,
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: Offset(0, _floatingAnimation.value),
-                              child: Container(
-                                width: 140,
-                                height: 140,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color.fromARGB(
-                                        255,
-                                        26,
-                                        175,
-                                        255,
-                                      ).withAlpha((0.4 * 255).toInt()),
-                                      blurRadius: 25,
-                                      spreadRadius: 5,
-                                    ),
+                return Positioned(
+                  left: x,
+                  top: y,
+                  child: Container(
+                    width: 4,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: primaryB.withOpacity(opacity),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                );
+              },
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormPanel() {
+    return Expanded(
+      child: AnimatedBuilder(
+        animation: _shakeAnim,
+        builder: (context, child) {
+          final shakeOffset = math.sin(_shakeAnim.value * math.pi * 8) * 2;
+          return Transform.translate(
+            offset: Offset(shakeOffset, 0),
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [panelTop, panelBottom],
+                ),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 24,
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Progress indicator
+                      LinearProgressIndicator(
+                        value: (_nameValid && _emailValid && _passwordValid)
+                            ? 1.0
+                            : ((_nameValid ? 1 : 0) + 
+                               (_emailValid ? 1 : 0) + 
+                               (_passwordValid ? 1 : 0)) / 3,
+                        backgroundColor: Colors.white.withOpacity(0.1),
+                        valueColor: AlwaysStoppedAnimation(primaryB),
+                        minHeight: 2,
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      EnhancedTextField(
+                        controller: _nameController,
+                        label: 'Full Name',
+                        hintText: 'Enter your full name',
+                        icon: Icons.person_outline_rounded,
+                        keyboardType: TextInputType.name,
+                        isValid: _nameValid,
+                        errorText: _nameError,
+                        validator: (v) {
+                          if (v == null || v.isEmpty) return 'Name is required';
+                          if (v.length < 2) return 'Name must be at least 2 characters';
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      EnhancedTextField(
+                        controller: _emailController,
+                        label: 'Email Address',
+                        hintText: 'Enter your email',
+                        icon: Icons.mail_outline_rounded,
+                        keyboardType: TextInputType.emailAddress,
+                        isValid: _emailValid,
+                        errorText: _emailError,
+                        validator: (v) {
+                          if (v == null || v.isEmpty) return 'Email is required';
+                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v)) {
+                            return 'Please enter a valid email address';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      EnhancedTextField(
+                        controller: _passwordController,
+                        label: 'Password',
+                        hintText: 'Create a strong password',
+                        icon: Icons.lock_outline_rounded,
+                        obscureText: _obscurePassword,
+                        isValid: _passwordValid,
+                        errorText: _passwordError,
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            setState(() => _obscurePassword = !_obscurePassword);
+                          },
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            child: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off_rounded
+                                  : Icons.visibility_rounded,
+                              key: ValueKey(_obscurePassword),
+                              color: _passwordValid ? successColor : primaryA,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        validator: (v) {
+                          if (v == null || v.isEmpty) return 'Password is required';
+                          if (v.length < 8) return 'Password must be at least 8 characters';
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // Password strength indicator
+                      PasswordStrengthIndicator(strength: _passwordStrength),
+
+                      const SizedBox(height: 24),
+
+                      // Enhanced signup button
+                      Center(
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: EnhancedButton(
+                            onPressed: _canSignup ? _handleSignup : null,
+                            isLoading: _isLoading,
+                            text: 'CREATE ACCOUNT',
+                            enabled: _canSignup,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Divider
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    Colors.white.withOpacity(0.1),
+                                    Colors.transparent,
                                   ],
                                 ),
-                                child: CircleAvatar(
-                                  radius: 70,
-                                  backgroundColor: Colors.transparent,
-                                  child: Image.asset('assets/logos/logo.png'),
-                                ),
                               ),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Animated Title
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: ShaderMask(
-                        shaderCallback:
-                            (bounds) => const LinearGradient(
-                              colors: [
-                                Color.fromARGB(255, 26, 167, 255),
-                                Colors.white,
-                              ],
-                            ).createShader(bounds),
-                        child: const Text(
-                          'Create Account',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins',
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  // Animated Name Field
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: AnimatedTextFormField(
-                        controller: _nameController,
-                        hintText: 'Full Name',
-                        icon: Icons.person,
-                        delay: 200,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your full name';
-                          }
-                          if (value.length < 2) {
-                            return 'Name must be at least 2 characters';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Animated Email Field
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: AnimatedTextFormField(
-                        controller: _emailController,
-                        hintText: 'Email Address',
-                        icon: Icons.email,
-                        delay: 400,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!RegExp(
-                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}',
-                          ).hasMatch(value)) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Animated Password Field
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: AnimatedTextFormField(
-                        controller: _passwordController,
-                        hintText: 'Password',
-                        icon: Icons.lock,
-                        obscureText: _obscurePassword,
-                        delay: 600,
-                        onChanged: _checkPasswordStrength,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.white54,
-                          ),
-                          onPressed: () {
-                            setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            );
-                          },
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a password';
-                          }
-                          if (value.length < 8) {
-                            return 'Password must be at least 8 characters';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // Animated Password Strength Indicator
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: AnimatedPasswordStrengthIndicator(
-                      strength: _passwordStrength,
-                      animation: _strengthAnimation,
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Animated Sign Up Button
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: AnimatedButton(
-                        onPressed: _isLoading ? null : _handleSignup,
-                        isLoading: _isLoading,
-                        text: 'SIGN UP',
-                        delay: 800,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Animated Google Button
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: AnimatedGoogleButton(
-                        onPressed: () {},
-                        delay: 1000,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Animated Login Link
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: AnimatedScale(
-                      scale: 1.0,
-                      duration: const Duration(milliseconds: 200),
-                      child: TextButton(
-                        onPressed: widget.goToLoginPage,
-                        child: const Text.rich(
-                          TextSpan(
-                            text: 'Already have an account? ',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontFamily: 'Poppins',
                             ),
-                            children: [
-                              TextSpan(
-                                text: 'Login',
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 26, 167, 255),
-                                  fontWeight: FontWeight.bold,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              'or continue with',
+                              style: TextStyle(
+                                color: mutedText,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    Colors.white.withOpacity(0.1),
+                                    Colors.transparent,
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Social login buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: EnhancedSocialButton(
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                // Google signup logic
+                              },
+                              icon: Icons.g_mobiledata_rounded,
+                              text: 'Google',
+                              iconColor: const Color(0xFFDB4437),
+                              imagePath: 'assets/logos/google.png',
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: EnhancedSocialButton(
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                // Apple signup logic
+                              },
+                              icon: Icons.apple_rounded,
+                              text: 'Apple',
+                              iconColor: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Login link
+                      Center(
+                        child: TextButton(
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            widget.goToLoginPage();
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                          ),
+                          child: Text.rich(
+                            TextSpan(
+                              text: "Already have an account? ",
+                              style: TextStyle(
+                                color: mutedText,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: 'Login',
+                                  style: TextStyle(
+                                    color: primaryB,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
+
+                      const SizedBox(height: 24),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 }
 
+// -------------------- Enhanced Components --------------------
+
 enum PasswordStrength { weak, medium, strong }
 
-// Enhanced animated password strength indicator
-class AnimatedPasswordStrengthIndicator extends StatelessWidget {
+class PasswordStrengthIndicator extends StatelessWidget {
   final PasswordStrength strength;
-  final Animation<double> animation;
 
-  const AnimatedPasswordStrengthIndicator({
+  const PasswordStrengthIndicator({
     super.key,
     required this.strength,
-    required this.animation,
   });
 
   @override
@@ -477,425 +687,547 @@ class AnimatedPasswordStrengthIndicator extends StatelessWidget {
     switch (strength) {
       case PasswordStrength.weak:
         strengthText = 'Weak';
-        textColor = Colors.red;
-        barColor = Colors.red;
+        textColor = errorColor;
+        barColor = errorColor;
         strengthLevel = 0.33;
         break;
       case PasswordStrength.medium:
         strengthText = 'Medium';
-        textColor = Colors.orange;
-        barColor = Colors.orange;
+        textColor = warningColor;
+        barColor = warningColor;
         strengthLevel = 0.66;
         break;
       case PasswordStrength.strong:
         strengthText = 'Strong';
-        textColor = const Color(0xFF00F5D4);
-        barColor = const Color(0xFF00F5D4);
+        textColor = successColor;
+        barColor = successColor;
         strengthLevel = 1.0;
         break;
     }
 
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Text indicator
-            Transform.scale(
-              scale: 1.0 + (animation.value * 0.1),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  const Text(
-                    'Strength: ',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                  Text(
-                    strengthText,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Poppins',
-                    ),
+            Text(
+              'Password Strength:',
+              style: TextStyle(
+                color: mutedText,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              strengthText,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Container(
+          width: double.infinity,
+          height: 4,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(2),
+            color: Colors.white.withOpacity(0.1),
+          ),
+          child: FractionallySizedBox(
+            alignment: Alignment.centerLeft,
+            widthFactor: strengthLevel,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(2),
+                color: barColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: barColor.withOpacity(0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-
-            // Animated progress bar
-            Container(
-              width: 150,
-              height: 4,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(2),
-                color: Colors.white24,
-              ),
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: strengthLevel * animation.value,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(2),
-                    color: barColor,
-                    boxShadow: [
-                      BoxShadow(
-                        color: barColor.withAlpha((0.5 * 255).toInt()),
-                        blurRadius: 4,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+          ),
+        ),
+      ],
     );
   }
 }
 
-// Reuse the same AnimatedTextFormField, AnimatedButton, and AnimatedGoogleButton
-// from the login screen (they're identical)
-
-// Custom animated text form field widget
-class AnimatedTextFormField extends StatefulWidget {
+// Enhanced TextField (same as login)
+class EnhancedTextField extends StatefulWidget {
   final TextEditingController controller;
+  final String label;
   final String hintText;
   final IconData icon;
   final bool obscureText;
   final Widget? suffixIcon;
-  final int delay;
   final String? Function(String?)? validator;
-  final Function(String)? onChanged;
+  final TextInputType? keyboardType;
+  final bool isValid;
+  final String? errorText;
 
-  const AnimatedTextFormField({
+  const EnhancedTextField({
     super.key,
     required this.controller,
+    required this.label,
     required this.hintText,
     required this.icon,
     this.obscureText = false,
     this.suffixIcon,
-    required this.delay,
     this.validator,
-    this.onChanged,
+    this.keyboardType,
+    this.isValid = false,
+    this.errorText,
   });
 
   @override
-  State<AnimatedTextFormField> createState() => _AnimatedTextFormFieldState();
+  State<EnhancedTextField> createState() => _EnhancedTextFieldState();
 }
 
-class _AnimatedTextFormFieldState extends State<AnimatedTextFormField>
+class _EnhancedTextFieldState extends State<EnhancedTextField>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  bool _isFocused = false;
+  bool _focused = false;
+  bool _hasContent = false;
+  late AnimationController _animController;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
+    _animation = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeInOut,
+    );
+    widget.controller.addListener(_onTextChanged);
+  }
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.95,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-
-    // Delayed animation start
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) _controller.forward();
-    });
+  void _onTextChanged() {
+    final hasContent = widget.controller.text.isNotEmpty;
+    if (hasContent != _hasContent) {
+      setState(() => _hasContent = hasContent);
+      if (hasContent) {
+        _animController.forward();
+      } else {
+        _animController.reverse();
+      }
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _animController.dispose();
+    widget.controller.removeListener(_onTextChanged);
     super.dispose();
+  }
+
+  Color get _getBorderColor {
+    if (widget.errorText != null && _hasContent) return errorColor;
+    if (widget.isValid && _hasContent) return successColor;
+    if (_focused) return primaryA;
+    if (_hasContent) return const Color(0xFF374151);
+    return const Color(0xFF1F2937);
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _scaleAnimation,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Focus(
+          onFocusChange: (focused) {
+            setState(() => _focused = focused);
+            if (focused) {
+              HapticFeedback.selectionClick();
+            }
+          },
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              boxShadow:
-                  _isFocused
-                      ? [
-                        BoxShadow(
-                          color: const Color.fromARGB(
-                            255,
-                            26,
-                            175,
-                            255,
-                          ).withAlpha((0.3 * 255).toInt()),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ]
-                      : [],
+              color: const Color(0xFF0B131A),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _getBorderColor,
+                width: _focused ? 2 : 1,
+              ),
+              boxShadow: _focused
+                  ? [
+                      BoxShadow(
+                        color: primaryA.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
             ),
-            child: Focus(
-              onFocusChange: (focused) {
-                setState(() => _isFocused = focused);
-              },
-              child: TextFormField(
-                controller: widget.controller,
-                obscureText: widget.obscureText,
-                onChanged: widget.onChanged,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Poppins',
+            child: TextFormField(
+              controller: widget.controller,
+              obscureText: widget.obscureText,
+              validator: widget.validator,
+              keyboardType: widget.keyboardType,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+              decoration: InputDecoration(
+                hintText: widget.hintText,
+                hintStyle: TextStyle(
+                  color: Colors.white.withOpacity(0.4),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
                 ),
-                decoration: InputDecoration(
-                  hintText: widget.hintText,
-                  hintStyle: const TextStyle(
-                    color: Colors.white54,
-                    fontFamily: 'Poppins',
-                  ),
-                  prefixIcon: Icon(widget.icon, color: Colors.white54),
-                  suffixIcon: widget.suffixIcon,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.white54),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.white54),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                      color: Color.fromARGB(255, 26, 175, 255),
-                      width: 2,
-                    ),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.red, width: 2),
-                  ),
+                prefixIcon: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return Icon(
+                      widget.icon,
+                      color: Color.lerp(
+                        _focused ? primaryA : Colors.white54,
+                        widget.isValid && _hasContent
+                            ? successColor
+                            : (_focused ? primaryA : Colors.white54),
+                        _animation.value,
+                      ),
+                      size: 20,
+                    );
+                  },
                 ),
-                validator: widget.validator,
+                suffixIcon: widget.suffixIcon ??
+                    (_hasContent && widget.isValid
+                        ? Icon(
+                            Icons.check_circle_rounded,
+                            color: successColor,
+                            size: 20,
+                          )
+                        : null),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
               ),
             ),
           ),
-        );
-      },
+        ),
+        if (widget.errorText != null && _hasContent)
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 4),
+            child: Text(
+              widget.errorText!,
+              style: TextStyle(
+                color: errorColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
 
-// Custom animated button widget
-class AnimatedButton extends StatefulWidget {
+// Enhanced Button (same as login)
+class EnhancedButton extends StatefulWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
   final String text;
-  final int delay;
+  final bool enabled;
 
-  const AnimatedButton({
+  const EnhancedButton({
     super.key,
     required this.onPressed,
     required this.isLoading,
     required this.text,
-    required this.delay,
+    this.enabled = true,
   });
 
   @override
-  State<AnimatedButton> createState() => _AnimatedButtonState();
+  State<EnhancedButton> createState() => _EnhancedButtonState();
 }
 
-class _AnimatedButtonState extends State<AnimatedButton>
+class _EnhancedButtonState extends State<EnhancedButton>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+  late AnimationController _animController;
+  late Animation<double> _scaleAnim;
+  late Animation<double> _glowAnim;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
+    _scaleAnim = Tween<double>(
+      begin: 1.0,
+      end: 0.98,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
+    _glowAnim = Tween<double>(
+      begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
-
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) _controller.forward();
-    });
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _animController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _scaleAnimation,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              gradient: const LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 9, 121, 232),
-                  Color.fromARGB(255, 26, 175, 255),
-                ],
+    return GestureDetector(
+      onTapDown: widget.enabled && !widget.isLoading
+          ? (_) => _animController.forward()
+          : null,
+      onTapUp: widget.enabled && !widget.isLoading
+          ? (_) => _animController.reverse()
+          : null,
+      onTapCancel: widget.enabled && !widget.isLoading
+          ? () => _animController.reverse()
+          : null,
+      child: AnimatedBuilder(
+        animation: _animController,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnim.value,
+            child: Container(
+              height: 52,
+              decoration: BoxDecoration(
+                gradient: widget.enabled && !widget.isLoading
+                    ? const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [primaryA, primaryB],
+                      )
+                    : LinearGradient(
+                        colors: [
+                          Colors.grey.withOpacity(0.3),
+                          Colors.grey.withOpacity(0.2),
+                        ],
+                      ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: widget.enabled && !widget.isLoading
+                    ? [
+                        BoxShadow(
+                          color: primaryA.withOpacity(
+                            0.3 + (_glowAnim.value * 0.2),
+                          ),
+                          blurRadius: 12 + (_glowAnim.value * 8),
+                          offset: const Offset(0, 6),
+                        ),
+                      ]
+                    : null,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color.fromARGB(
-                    255,
-                    26,
-                    175,
-                    255,
-                  ).withAlpha((0.3 * 255).toInt()),
-                  blurRadius: 15,
-                  spreadRadius: 2,
+              child: ElevatedButton(
+                onPressed: widget.enabled && !widget.isLoading
+                    ? widget.onPressed
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
-              ],
-            ),
-            child: ElevatedButton(
-              onPressed: widget.onPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              child:
-                  widget.isLoading
-                      ? Row(
+                child: widget.isLoading
+                    ? Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const SizedBox(
-                            width: 20,
-                            height: 20,
+                            width: 24,
+                            height: 24,
                             child: CircularProgressIndicator(
                               color: Colors.white,
                               strokeWidth: 2,
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Text(
+                          const Text(
                             'Creating Account...',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 14,
-                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              letterSpacing: -0.2,
                             ),
                           ),
                         ],
                       )
-                      : Text(
+                    : Text(
                         widget.text,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: widget.enabled ? Colors.white : Colors.white54,
+                          fontWeight: FontWeight.w700,
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins',
+                          letterSpacing: -0.2,
                         ),
                       ),
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
 
-// Custom animated Google button
-class AnimatedGoogleButton extends StatefulWidget {
+// Enhanced Social Button (same as login)
+class EnhancedSocialButton extends StatefulWidget {
   final VoidCallback onPressed;
-  final int delay;
+  final IconData icon;
+  final String text;
+  final Color iconColor;
+  final String? imagePath;
 
-  const AnimatedGoogleButton({
+  const EnhancedSocialButton({
     super.key,
     required this.onPressed,
-    required this.delay,
+    required this.icon,
+    required this.text,
+    required this.iconColor,
+    this.imagePath,
   });
 
   @override
-  State<AnimatedGoogleButton> createState() => _AnimatedGoogleButtonState();
+  State<EnhancedSocialButton> createState() => _EnhancedSocialButtonState();
 }
 
-class _AnimatedGoogleButtonState extends State<AnimatedGoogleButton>
+class _EnhancedSocialButtonState extends State<EnhancedSocialButton>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+  late AnimationController _hoverController;
+  late Animation<double> _hoverAnim;
+  bool _isHovered = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+    _hoverController = AnimationController(
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
-
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) _controller.forward();
-    });
+    _hoverAnim = CurvedAnimation(
+      parent: _hoverController,
+      curve: Curves.easeOut,
+    );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _hoverController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _scaleAnimation,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: OutlinedButton.icon(
-            icon: Image.asset('assets/logos/google.png', width: 24),
-            label: const Text(
-              'Continue with Google',
-              style: TextStyle(color: Colors.white, fontFamily: 'Poppins'),
-            ),
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Color.fromARGB(255, 26, 175, 255)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              minimumSize: const Size(double.infinity, 50),
-            ),
-            onPressed: widget.onPressed,
-          ),
-        );
+    return GestureDetector(
+      onTapDown: (_) {
+        setState(() => _isHovered = true);
+        _hoverController.forward();
       },
+      onTapUp: (_) {
+        setState(() => _isHovered = false);
+        _hoverController.reverse();
+      },
+      onTapCancel: () {
+        setState(() => _isHovered = false);
+        _hoverController.reverse();
+      },
+      child: AnimatedBuilder(
+        animation: _hoverAnim,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: 1.0 - (_hoverAnim.value * 0.02),
+            child: Container(
+              height: 48,
+              decoration: BoxDecoration(
+                color: Color.lerp(
+                  const Color(0xFF0D1117),
+                  const Color(0xFF161B22),
+                  _hoverAnim.value,
+                ),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Color.lerp(
+                    Colors.white.withOpacity(0.08),
+                    Colors.white.withOpacity(0.15),
+                    _hoverAnim.value,
+                  )!,
+                  width: 1,
+                ),
+                boxShadow: _isHovered
+                    ? [
+                        BoxShadow(
+                          color: widget.iconColor.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: ElevatedButton(
+                onPressed: widget.onPressed,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    widget.imagePath != null
+                        ? Image.asset(
+                            widget.imagePath!,
+                            fit: BoxFit.contain,
+                            width: 24,
+                            height: 24,
+                            errorBuilder: (_, __, ___) {
+                              return Icon(
+                                widget.icon,
+                                color: widget.iconColor,
+                                size: 24,
+                              );
+                            },
+                          )
+                        : Icon(widget.icon, color: widget.iconColor, size: 24),
+                    const SizedBox(width: 12),
+                    Text(
+                      widget.text,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
