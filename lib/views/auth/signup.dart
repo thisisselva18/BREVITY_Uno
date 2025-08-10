@@ -21,10 +21,7 @@ const Color warningColor = Color(0xFFF59E0B);
 const Color errorColor = Color(0xFFEF4444);
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({
-    super.key,
-    required this.goToLoginPage,
-  });
+  const SignupScreen({super.key, required this.goToLoginPage});
 
   final VoidCallback goToLoginPage;
 
@@ -145,23 +142,26 @@ class _SignupScreenState extends State<SignupScreen>
     if (_nameValid != isValid) {
       setState(() {
         _nameValid = isValid;
-        _nameError = name.isEmpty
-            ? null
-            : (isValid ? null : 'Name must be at least 2 characters');
+        _nameError =
+            name.isEmpty
+                ? null
+                : (isValid ? null : 'Name must be at least 2 characters');
       });
     }
   }
 
   void _validateEmail() {
     final email = _emailController.text;
-    final isValid = email.isNotEmpty &&
+    final isValid =
+        email.isNotEmpty &&
         RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
     if (_emailValid != isValid) {
       setState(() {
         _emailValid = isValid;
-        _emailError = email.isEmpty
-            ? null
-            : (isValid ? null : 'Please enter a valid email');
+        _emailError =
+            email.isEmpty
+                ? null
+                : (isValid ? null : 'Please enter a valid email');
       });
     }
   }
@@ -169,7 +169,7 @@ class _SignupScreenState extends State<SignupScreen>
   void _validatePassword() {
     final password = _passwordController.text;
     final isValid = password.length >= 8;
-    
+
     // Password strength check
     PasswordStrength newStrength;
     if (password.length < 6) {
@@ -181,23 +181,26 @@ class _SignupScreenState extends State<SignupScreen>
       bool hasDigits = password.contains(RegExp(r'[0-9]'));
       bool hasSpecial = password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
 
-      newStrength = (hasUppercase && hasDigits && hasSpecial)
-          ? PasswordStrength.strong
-          : PasswordStrength.medium;
+      newStrength =
+          (hasUppercase && hasDigits && hasSpecial)
+              ? PasswordStrength.strong
+              : PasswordStrength.medium;
     }
 
     if (_passwordValid != isValid || _passwordStrength != newStrength) {
       setState(() {
         _passwordValid = isValid;
         _passwordStrength = newStrength;
-        _passwordError = password.isEmpty
-            ? null
-            : (isValid ? null : 'Password must be at least 8 characters');
+        _passwordError =
+            password.isEmpty
+                ? null
+                : (isValid ? null : 'Password must be at least 8 characters');
       });
     }
   }
 
-  bool get _canSignup => _nameValid && _emailValid && _passwordValid && !_isLoading;
+  bool get _canSignup =>
+      _nameValid && _emailValid && _passwordValid && !_isLoading;
 
   // Signup handler
   Future<void> _handleSignup() async {
@@ -381,9 +384,14 @@ class _SignupScreenState extends State<SignupScreen>
               animation: _floatAnim,
               builder: (context, _) {
                 final offset = (i * math.pi / 3);
-                final x = 50 + math.cos(_floatAnim.value * 2 * math.pi + offset) * 30;
-                final y = 200 + math.sin(_floatAnim.value * 2 * math.pi + offset) * 20;
-                final opacity = (math.sin(_floatAnim.value * 2 * math.pi + offset) + 1) * 0.02;
+                final x =
+                    50 + math.cos(_floatAnim.value * 2 * math.pi + offset) * 30;
+                final y =
+                    200 +
+                    math.sin(_floatAnim.value * 2 * math.pi + offset) * 20;
+                final opacity =
+                    (math.sin(_floatAnim.value * 2 * math.pi + offset) + 1) *
+                    0.02;
 
                 return Positioned(
                   left: x,
@@ -428,8 +436,8 @@ class _SignupScreenState extends State<SignupScreen>
               ),
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 24,
+                  horizontal: 20, // was 24
+                  vertical: 20, // was 24
                 ),
                 child: Form(
                   key: _formKey,
@@ -438,17 +446,19 @@ class _SignupScreenState extends State<SignupScreen>
                     children: [
                       // Progress indicator
                       LinearProgressIndicator(
-                        value: (_nameValid && _emailValid && _passwordValid)
-                            ? 1.0
-                            : ((_nameValid ? 1 : 0) + 
-                               (_emailValid ? 1 : 0) + 
-                               (_passwordValid ? 1 : 0)) / 3,
+                        value:
+                            (_nameValid && _emailValid && _passwordValid)
+                                ? 1.0
+                                : ((_nameValid ? 1 : 0) +
+                                        (_emailValid ? 1 : 0) +
+                                        (_passwordValid ? 1 : 0)) /
+                                    3,
                         backgroundColor: Colors.white.withOpacity(0.1),
                         valueColor: AlwaysStoppedAnimation(primaryB),
                         minHeight: 2,
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20), // was 24
 
                       EnhancedTextField(
                         controller: _nameController,
@@ -460,12 +470,14 @@ class _SignupScreenState extends State<SignupScreen>
                         errorText: _nameError,
                         validator: (v) {
                           if (v == null || v.isEmpty) return 'Name is required';
-                          if (v.length < 2) return 'Name must be at least 2 characters';
+                          if (v.length < 2) {
+                            return 'Name must be at least 2 characters';
+                          }
                           return null;
                         },
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14), // was 16
 
                       EnhancedTextField(
                         controller: _emailController,
@@ -476,15 +488,18 @@ class _SignupScreenState extends State<SignupScreen>
                         isValid: _emailValid,
                         errorText: _emailError,
                         validator: (v) {
-                          if (v == null || v.isEmpty) return 'Email is required';
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v)) {
+                          if (v == null || v.isEmpty)
+                            return 'Email is required';
+                          if (!RegExp(
+                            r'^[\w\-.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          ).hasMatch(v)) {
                             return 'Please enter a valid email address';
                           }
                           return null;
                         },
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14), // was 16
 
                       EnhancedTextField(
                         controller: _passwordController,
@@ -497,7 +512,9 @@ class _SignupScreenState extends State<SignupScreen>
                         suffixIcon: GestureDetector(
                           onTap: () {
                             HapticFeedback.selectionClick();
-                            setState(() => _obscurePassword = !_obscurePassword);
+                            setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            );
                           },
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 200),
@@ -512,23 +529,26 @@ class _SignupScreenState extends State<SignupScreen>
                           ),
                         ),
                         validator: (v) {
-                          if (v == null || v.isEmpty) return 'Password is required';
-                          if (v.length < 8) return 'Password must be at least 8 characters';
+                          if (v == null || v.isEmpty) {
+                            return 'Password is required';
+                          }
+                          if (v.length < 8) {
+                            return 'Password must be at least 8 characters';
+                          }
                           return null;
                         },
                       ),
 
-                      const SizedBox(height: 12),
-
+                      const SizedBox(height: 12), // was 12
                       // Password strength indicator
                       PasswordStrengthIndicator(strength: _passwordStrength),
 
-                      const SizedBox(height: 24),
-
-                      // Enhanced signup button
+                      const SizedBox(height: 24), // was 24
+                      // Signup button
                       Center(
                         child: SizedBox(
                           width: double.infinity,
+                          height: 50,
                           child: EnhancedButton(
                             onPressed: _canSignup ? _handleSignup : null,
                             isLoading: _isLoading,
@@ -538,8 +558,7 @@ class _SignupScreenState extends State<SignupScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 20),
-
+                      const SizedBox(height: 16), // was 20
                       // Divider
                       Row(
                         children: [
@@ -558,7 +577,9 @@ class _SignupScreenState extends State<SignupScreen>
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                            ), // was 16
                             child: Text(
                               'or continue with',
                               style: TextStyle(
@@ -585,8 +606,7 @@ class _SignupScreenState extends State<SignupScreen>
                         ],
                       ),
 
-                      const SizedBox(height: 16),
-
+                      const SizedBox(height: 14), // was 16
                       // Social login buttons
                       Row(
                         children: [
@@ -602,7 +622,7 @@ class _SignupScreenState extends State<SignupScreen>
                               imagePath: 'assets/logos/google.png',
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 10), // was 12
                           Expanded(
                             child: EnhancedSocialButton(
                               onPressed: () {
@@ -617,8 +637,7 @@ class _SignupScreenState extends State<SignupScreen>
                         ],
                       ),
 
-                      const SizedBox(height: 24),
-
+                      const SizedBox(height: 20), // was 24
                       // Login link
                       Center(
                         child: TextButton(
@@ -627,7 +646,10 @@ class _SignupScreenState extends State<SignupScreen>
                             widget.goToLoginPage();
                           },
                           style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 14,
+                            ), // reduced
                           ),
                           child: Text.rich(
                             TextSpan(
@@ -652,7 +674,7 @@ class _SignupScreenState extends State<SignupScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20), // was 24
                     ],
                   ),
                 ),
@@ -672,10 +694,7 @@ enum PasswordStrength { weak, medium, strong }
 class PasswordStrengthIndicator extends StatelessWidget {
   final PasswordStrength strength;
 
-  const PasswordStrengthIndicator({
-    super.key,
-    required this.strength,
-  });
+  const PasswordStrengthIndicator({super.key, required this.strength});
 
   @override
   Widget build(BuildContext context) {
@@ -869,15 +888,16 @@ class _EnhancedTextFieldState extends State<EnhancedTextField>
                 color: _getBorderColor,
                 width: _focused ? 2 : 1,
               ),
-              boxShadow: _focused
-                  ? [
-                      BoxShadow(
-                        color: primaryA.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ]
-                  : null,
+              boxShadow:
+                  _focused
+                      ? [
+                        BoxShadow(
+                          color: primaryA.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                      : null,
             ),
             child: TextFormField(
               controller: widget.controller,
@@ -912,13 +932,14 @@ class _EnhancedTextFieldState extends State<EnhancedTextField>
                     );
                   },
                 ),
-                suffixIcon: widget.suffixIcon ??
+                suffixIcon:
+                    widget.suffixIcon ??
                     (_hasContent && widget.isValid
                         ? Icon(
-                            Icons.check_circle_rounded,
-                            color: successColor,
-                            size: 20,
-                          )
+                          Icons.check_circle_rounded,
+                          color: successColor,
+                          size: 20,
+                        )
                         : null),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
@@ -997,15 +1018,18 @@ class _EnhancedButtonState extends State<EnhancedButton>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: widget.enabled && !widget.isLoading
-          ? (_) => _animController.forward()
-          : null,
-      onTapUp: widget.enabled && !widget.isLoading
-          ? (_) => _animController.reverse()
-          : null,
-      onTapCancel: widget.enabled && !widget.isLoading
-          ? () => _animController.reverse()
-          : null,
+      onTapDown:
+          widget.enabled && !widget.isLoading
+              ? (_) => _animController.forward()
+              : null,
+      onTapUp:
+          widget.enabled && !widget.isLoading
+              ? (_) => _animController.reverse()
+              : null,
+      onTapCancel:
+          widget.enabled && !widget.isLoading
+              ? () => _animController.reverse()
+              : null,
       child: AnimatedBuilder(
         animation: _animController,
         builder: (context, child) {
@@ -1014,35 +1038,38 @@ class _EnhancedButtonState extends State<EnhancedButton>
             child: Container(
               height: 52,
               decoration: BoxDecoration(
-                gradient: widget.enabled && !widget.isLoading
-                    ? const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [primaryA, primaryB],
-                      )
-                    : LinearGradient(
-                        colors: [
-                          Colors.grey.withOpacity(0.3),
-                          Colors.grey.withOpacity(0.2),
-                        ],
-                      ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: widget.enabled && !widget.isLoading
-                    ? [
-                        BoxShadow(
-                          color: primaryA.withOpacity(
-                            0.3 + (_glowAnim.value * 0.2),
-                          ),
-                          blurRadius: 12 + (_glowAnim.value * 8),
-                          offset: const Offset(0, 6),
+                gradient:
+                    widget.enabled && !widget.isLoading
+                        ? const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [primaryA, primaryB],
+                        )
+                        : LinearGradient(
+                          colors: [
+                            Colors.grey.withOpacity(0.3),
+                            Colors.grey.withOpacity(0.2),
+                          ],
                         ),
-                      ]
-                    : null,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow:
+                    widget.enabled && !widget.isLoading
+                        ? [
+                          BoxShadow(
+                            color: primaryA.withOpacity(
+                              0.3 + (_glowAnim.value * 0.2),
+                            ),
+                            blurRadius: 12 + (_glowAnim.value * 8),
+                            offset: const Offset(0, 6),
+                          ),
+                        ]
+                        : null,
               ),
               child: ElevatedButton(
-                onPressed: widget.enabled && !widget.isLoading
-                    ? widget.onPressed
-                    : null,
+                onPressed:
+                    widget.enabled && !widget.isLoading
+                        ? widget.onPressed
+                        : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
@@ -1050,39 +1077,41 @@ class _EnhancedButtonState extends State<EnhancedButton>
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: widget.isLoading
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
+                child:
+                    widget.isLoading
+                        ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Text(
-                            'Creating Account...',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                              letterSpacing: -0.2,
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Creating Account...',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                                letterSpacing: -0.2,
+                              ),
                             ),
+                          ],
+                        )
+                        : Text(
+                          widget.text,
+                          style: TextStyle(
+                            color:
+                                widget.enabled ? Colors.white : Colors.white54,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            letterSpacing: -0.2,
                           ),
-                        ],
-                      )
-                    : Text(
-                        widget.text,
-                        style: TextStyle(
-                          color: widget.enabled ? Colors.white : Colors.white54,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                          letterSpacing: -0.2,
                         ),
-                      ),
               ),
             ),
           );
@@ -1168,22 +1197,24 @@ class _EnhancedSocialButtonState extends State<EnhancedSocialButton>
                 ),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Color.lerp(
-                    Colors.white.withOpacity(0.08),
-                    Colors.white.withOpacity(0.15),
-                    _hoverAnim.value,
-                  )!,
+                  color:
+                      Color.lerp(
+                        Colors.white.withOpacity(0.08),
+                        Colors.white.withOpacity(0.15),
+                        _hoverAnim.value,
+                      )!,
                   width: 1,
                 ),
-                boxShadow: _isHovered
-                    ? [
-                        BoxShadow(
-                          color: widget.iconColor.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ]
-                    : null,
+                boxShadow:
+                    _isHovered
+                        ? [
+                          BoxShadow(
+                            color: widget.iconColor.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                        : null,
               ),
               child: ElevatedButton(
                 onPressed: widget.onPressed,
@@ -1199,18 +1230,18 @@ class _EnhancedSocialButtonState extends State<EnhancedSocialButton>
                   children: [
                     widget.imagePath != null
                         ? Image.asset(
-                            widget.imagePath!,
-                            fit: BoxFit.contain,
-                            width: 24,
-                            height: 24,
-                            errorBuilder: (_, __, ___) {
-                              return Icon(
-                                widget.icon,
-                                color: widget.iconColor,
-                                size: 24,
-                              );
-                            },
-                          )
+                          widget.imagePath!,
+                          fit: BoxFit.contain,
+                          width: 24,
+                          height: 24,
+                          errorBuilder: (_, __, ___) {
+                            return Icon(
+                              widget.icon,
+                              color: widget.iconColor,
+                              size: 24,
+                            );
+                          },
+                        )
                         : Icon(widget.icon, color: widget.iconColor, size: 24),
                     const SizedBox(width: 12),
                     Text(

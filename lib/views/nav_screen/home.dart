@@ -43,7 +43,8 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     final currentState = newsBloc.state;
 
     int initialPage = 0;
-    if (currentState is NewsLoaded && currentState.category == widget.category) {
+    if (currentState is NewsLoaded &&
+        currentState.category == widget.category) {
       initialPage = currentState.currentIndex;
     } else {
       newsBloc.add(FetchInitialNews(category: widget.category));
@@ -96,8 +97,11 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     final articles = state.articles;
     if (articles.isEmpty) {
       return const Center(
-          child: Text("No articles found.",
-              style: TextStyle(color: Colors.white)));
+        child: Text(
+          "No articles found.",
+          style: TextStyle(color: Colors.white),
+        ),
+      );
     }
 
     return GestureDetector(
@@ -113,14 +117,14 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
             controller: _pageController,
             scrollDirection: Axis.vertical,
             itemCount:
-            state.hasReachedMax ? articles.length : articles.length + 1,
+                state.hasReachedMax ? articles.length : articles.length + 1,
             onPageChanged: (index) {
               context.read<NewsBloc>().add(UpdateNewsIndex(index));
 
               if (!state.hasReachedMax && index >= articles.length - 3) {
-                context
-                    .read<NewsBloc>()
-                    .add(FetchNextPage(index, widget.category));
+                context.read<NewsBloc>().add(
+                  FetchNextPage(index, widget.category),
+                );
               }
             },
             itemBuilder: (context, index) {
@@ -188,9 +192,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
 class _NewsCard extends StatelessWidget {
   final Article article;
 
-  const _NewsCard({
-    required this.article,
-  });
+  const _NewsCard({required this.article});
 
   @override
   Widget build(BuildContext context) {
@@ -252,13 +254,19 @@ class _NewsCard extends StatelessWidget {
                       ),
                     ),
                     const Gap(12),
-                    Text(
-                      DateFormat('MMM dd, y • h:mm a')
-                          .format(article.publishedAt),
-                      // UPDATED: Reverted to static white color
-                      style: TextStyle(
-                        color: Colors.white.withAlpha(229),
-                        fontSize: 14,
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          DateFormat(
+                            'MMM dd, y • h:mm a',
+                          ).format(article.publishedAt),
+                          style: TextStyle(
+                            color: Colors.white.withAlpha(229),
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -300,7 +308,6 @@ class _NewsCard extends StatelessWidget {
                     const Gap(8),
                     Text(
                       'Swipe to continue',
-                      // UPDATED: Reverted to static white color
                       style: TextStyle(
                         color: Colors.white.withAlpha(204),
                         fontSize: 16,
@@ -308,7 +315,6 @@ class _NewsCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     IconButton(
-                      // UPDATED: Reverted to static white color
                       icon: const Icon(
                         Icons.open_in_new_rounded,
                         color: Colors.white,
@@ -317,10 +323,8 @@ class _NewsCard extends StatelessWidget {
                       onPressed: () => _launchUrl(article.url),
                     ),
                     IconButton(
-                      onPressed: () => context.pushNamed(
-                        'chat',
-                        extra: article,
-                      ),
+                      onPressed:
+                          () => context.pushNamed('chat', extra: article),
                       icon: Image.asset(
                         'assets/logos/ai.gif',
                         width: 90,
@@ -349,13 +353,15 @@ class _TappableHeadline extends StatelessWidget {
     final currentTheme = context.read<ThemeCubit>().currentTheme;
     return BlocBuilder<BookmarkBloc, BookmarkState>(
       builder: (context, state) {
-        final isBookmarked = state is BookmarksLoaded
-            ? state.bookmarks.any((a) => a.url == article.url)
-            : false;
+        final isBookmarked =
+            state is BookmarksLoaded
+                ? state.bookmarks.any((a) => a.url == article.url)
+                : false;
         return GestureDetector(
-          onTap: () => context.read<BookmarkBloc>().add(
-            ToggleBookmarkEvent(article),
-          ),
+          onTap:
+              () => context.read<BookmarkBloc>().add(
+                ToggleBookmarkEvent(article),
+              ),
           child: Text(
             title,
             maxLines: 3,
