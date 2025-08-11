@@ -297,8 +297,8 @@ class SplashScreenState extends State<SplashScreen>
                           center: const Alignment(-0.3, -0.4),
                           radius: 1.2,
                           colors: [
-                            primaryA.withOpacity(element.opacity),
-                            primaryB.withOpacity(element.opacity / 2),
+                            primaryA.withAlpha((element.opacity * 255).toInt()),
+                            primaryB.withAlpha((element.opacity / 2 * 255).toInt()),
                             Colors.transparent,
                           ],
                           stops: const [0.0, 0.5, 1.0],
@@ -410,7 +410,7 @@ class SplashScreenState extends State<SplashScreen>
               height: 4,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(2),
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withAlpha((0.1 * 255).toInt()),
               ),
               child: Stack(
                 children: [
@@ -422,7 +422,7 @@ class SplashScreenState extends State<SplashScreen>
                       gradient: LinearGradient(colors: [primaryA, primaryB]),
                       boxShadow: [
                         BoxShadow(
-                          color: primaryB.withOpacity(0.5),
+                          color: primaryB.withAlpha((0.5 * 255).toInt()),
                           blurRadius: 8,
                           offset: const Offset(0, 0),
                         ),
@@ -440,7 +440,7 @@ class SplashScreenState extends State<SplashScreen>
         Text(
           'Loading your experience...',
           style: TextStyle(
-            color: mutedText.withOpacity(0.8),
+            color: mutedText.withAlpha((0.8 * 255).toInt()),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -502,8 +502,8 @@ class EnhancedParticlePainter extends CustomPainter {
     for (var particle in particles) {
       final paint =
           Paint()
-            ..color = particle.color.withOpacity(
-              particle.opacity * (1.0 - progress * 0.5),
+            ..color = particle.color.withAlpha(
+              (particle.opacity * (1.0 - progress * 0.5) * 255).toInt(),
             )
             ..style = PaintingStyle.fill;
 
@@ -530,7 +530,7 @@ class EnhancedParticlePainter extends CustomPainter {
       // Draw particle with glow effect
       final glowPaint =
           Paint()
-            ..color = particle.color.withOpacity(particle.opacity * 0.3)
+            ..color = particle.color.withAlpha((particle.opacity * 0.3 * 255).toInt())
             ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
 
       canvas.drawCircle(Offset(finalX, finalY), particle.radius * 2, glowPaint);
