@@ -1,199 +1,536 @@
 # 🌟 Contributing to Brevity
 
-Thank you for your interest in contributing to **Brevity**! We welcome all kinds of contributions — whether it’s fixing bugs, improving documentation, or building new features.
+Thank you for your interest in contributing to **Brevity**! We welcome all kinds of contributions — whether it's fixing bugs, improving documentation, adding new features, or helping with translations.
 
-## 📚 Index
+## 📚 Table of Contents
 
+- [🤝 Ways to Contribute](#ways-to-contribute)
 - [⭐ Show Your Support](#show-your-support)
-- [🚀 Frontend Setup Guide](#frontend-setup-guide)
-  - [1. Fork the Repository](#1-fork-the-repository)
-  - [2. Clone Your Fork](#2-clone-your-fork)
-  - [3. Set Up Upstream](#3-set-up-upstream)
-  - [4. Configure API Keys (.env)](#4-configure-api-keys-env)
-- [🧱 Backend Setup Guide (Node.js)](#backend-setup-guide-nodejs)
-  - [1. Navigate to the Server Directory](#1-navigate-to-the-server-directory)
-  - [2. Install Dependencies](#2-install-dependencies)
-  - [3. Configure Environment Variables](#3-configure-environment-variables)
-  - [4. Run the Server](#4-run-the-server)
-  - [Notes for Backend Contributors](#notes-for-backend-contributors)
-- [📍 Backend Route Overview](#backend-route-overview)
-- [🧩 Working on Issues](#working-on-issues)
+- [🔧 Development Setup](#development-setup)
+  - [📋 Prerequisites](#prerequisites)
+  - [🚀 Frontend Setup (Flutter)](#frontend-setup-flutter)
+  - [🧱 Backend Setup (Node.js)](#backend-setup-nodejs)
+- [📍 Project Structure](#project-structure)
+- [🔄 Contribution Workflow](#contribution-workflow)
+- [🎯 Issue Guidelines](#issue-guidelines)
+- [📍 Backend API Documentation](#backend-api-documentation)
 - [💬 Community & Support](#community--support)
 - [🙌 Thank You!](#thank-you)
 
----
+
+
+## 🤝 Ways to Contribute <a id="ways-to-contribute"></a>
+
+- 🐛 **Bug fixes** - Help us squash those pesky bugs
+- ✨ **New features** - Implement exciting new functionality
+- 📚 **Documentation** - Improve or write new documentation
+- 🎨 **UI/UX improvements** - Make the app more beautiful and user-friendly
+- 🧪 **Testing** - Write tests to improve code quality
+- 🔧 **Performance optimizations** - Make the app faster and more efficient
+- 🛡️ **Security improvements** - Help keep user data safe
+
+
 
 ## ⭐ Show Your Support <a id="show-your-support"></a>
 
-If you like the project, **give it a star**!  
+If you like the project, **give it a star**! ⭐  
 👉 [Star Brevity on GitHub](https://github.com/Yash159357/BREVITY)
 
----
 
-## 🚀 Frontend Setup Guide <a id="frontend-setup-guide"></a>
 
-### 1. Fork the Repository <a id="1-fork-the-repository"></a>
+## 🔧 Development Setup <a id="development-setup"></a>
 
-Click the **Fork** button at the top right of [this repo](https://github.com/Yash159357/BREVITY).
+### 📋 Prerequisites <a id="prerequisites"></a>
 
-### 2. Clone Your Fork <a id="2-clone-your-fork"></a>
+Before you begin, ensure you have the following installed on your system:
 
+**For Flutter Development:**
+- [Flutter SDK](https://flutter.dev/docs/get-started/install) (3.7.0 or higher)
+- [Dart SDK](https://dart.dev/get-dart) (comes with Flutter)
+- [Android Studio](https://developer.android.com/studio) or [VS Code](https://code.visualstudio.com/)
+- [Git](https://git-scm.com/downloads)
+
+**For Backend Development:**
+- [Node.js](https://nodejs.org/) (18.x or higher recommended)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- [MongoDB](https://www.mongodb.com/try/download/community) (local or cloud)
+- [Git](https://git-scm.com/downloads)
+
+**Additional Tools (Optional but Recommended):**
+- [MongoDB Compass](https://www.mongodb.com/products/compass) - GUI for MongoDB
+- [Postman](https://www.postman.com/) - API testing
+
+### 🚀 Frontend Setup (Flutter) <a id="frontend-setup-flutter"></a>
+
+#### 1. Fork and Clone the Repository
+
+1. **Fork** the repository by clicking the "Fork" button at the top right of [this repo](https://github.com/Yash159357/BREVITY)
+
+2. **Clone** your fork:
 ```bash
-git clone https://github.com/your-username/BREVITY.git
-cd BREVTY
-````
+git clone https://github.com/YOUR-USERNAME/brevity.git
+cd brevity
+```
 
-### 3. Set Up Upstream <a id="3-set-up-upstream"></a>
-
+3. **Set up upstream** to keep your fork synchronized:
 ```bash
 git remote add upstream https://github.com/Yash159357/BREVITY.git
 git remote -v
 ```
 
 You should see:
-
 ```bash
-origin    https://github.com/your-username/BREVITY.git (fetch)
+origin    https://github.com/YOUR-USERNAME/brevity.git (fetch)
+origin    https://github.com/YOUR-USERNAME/brevity.git (push)
 upstream  https://github.com/Yash159357/BREVITY.git (fetch)
+upstream  https://github.com/Yash159357/BREVITY.git (push)
 ```
 
-### 4. Configure API Keys (.env) <a id="4-configure-api-keys-env"></a>
+#### 2. Configure Environment Variables
 
 Create a `.env` file at the root of the Flutter project:
 
 ```bash
+# For Windows
+type nul > .env
+
+# For macOS/Linux
 touch .env
 ```
 
-Add the following:
+Add the following to your `.env` file:
 
 ```env
+# API Keys
 GEMINI_API_KEY=your_gemini_api_key_here
 NEWS_API_KEY=your_news_api_key_here
+
+# Optional: Add more configuration as needed
 ```
 
-> 🔒 **Never commit this file** — it contains sensitive credentials.
+> 🔒 **Important**: Never commit the `.env` file to version control. It's already included in `.gitignore`.
 
----
+#### 3. Get API Keys
 
-## 🧱 Backend Setup Guide (Node.js) <a id="backend-setup-guide-nodejs"></a>
+**Gemini API Key:**
+1. Visit [Google AI Studio](https://aistudio.google.com/apikey)
+2. Create a new API key
+3. Copy and paste it into your `.env` file
 
-Required only for backend development. Not needed for frontend work since the backend is already deployed.
+**News API Key:**
+1. Visit [NewsAPI.org](https://newsapi.org/register)
+2. Sign up for a free account
+3. Copy your API key to the `.env` file
 
-### 1. Navigate to the Server Directory <a id="1-navigate-to-the-server-directory"></a>
+#### 4. Configure Android Signing (Required for Building)
 
-If you haven't already cloned the repo:
+The project includes an Android signing configuration that needs to be set up for building APKs.
+
+**Configure `key.properties` file:**
+
+1. Navigate to the `android` directory - there's already a `key.properties` file
+2. Update the existing `android/key.properties` file with appropriate values:
+
+**For Development/Debug Builds:**
+```properties
+storeFile=debug.keystore
+storePassword=android
+keyAlias=androiddebugkey
+keyPassword=android
+```
+
+**For Production Builds:**
+```properties
+storeFile=your-release-keystore.jks
+storePassword=your_store_password
+keyAlias=your_key_alias
+keyPassword=your_key_password
+```
+
+**Create Debug Keystore (if needed):**
+
+If you don't have a debug keystore, create one:
+```bash
+# Navigate to android directory
+cd android
+
+# Create debug keystore
+keytool -genkeypair -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+```
+
+**For Production Release:**
+
+1. Generate a release keystore:
+```bash
+keytool -genkey -v -keystore your-release-keystore.jks -alias your_key_alias -keyalg RSA -keysize 2048 -validity 10000
+```
+
+2. Update `key.properties` with your actual keystore details
+
+> 🔒 **Important**: 
+> - Never commit keystore files or real passwords to version control
+> - The `key.properties` file is already gitignored for security
+> - Keep your release keystore and passwords secure
+
+#### 5. Install Dependencies and Run
 
 ```bash
-git clone https://github.com/Yash159357/BREVITY.git
+# Install Flutter dependencies
+flutter pub get
+
+# Run the app (make sure you have an emulator running or device connected)
+flutter run
 ```
 
-Then:
+#### 6. Verify Setup
+
+- The app should launch successfully
+- Check that API calls are working (news feed loads, AI features respond)
+- No errors in the debug console
+
+**Common Issues & Troubleshooting:**
+
+🔧 **Build Issues:**
+- If you get signing errors, ensure `key.properties` is configured correctly
+- For "Keystore not found" errors, check the `storeFile` path in `key.properties`
+- Ensure you have the correct Android SDK and build tools installed
+
+🔧 **API Issues:**
+- If news feed doesn't load, verify your `NEWS_API_KEY` in `.env`
+- If AI features don't work, check your `GEMINI_API_KEY` in `.env`
+- Ensure `.env` file is in the root directory, not in subdirectories
+
+🔧 **Emulator Issues:**
+- Make sure you have at least one Android emulator created in Android Studio
+- Or connect a physical device with USB debugging enabled
+- Check that your device/emulator is detected with `flutter devices`
+
+### 🧱 Backend Setup (Node.js) <a id="backend-setup-nodejs"></a>
+
+> **Note**: Backend setup is only required if you're working on server-side features. The backend is already deployed and accessible for frontend development.
+
+#### 1. Navigate to Server Directory
 
 ```bash
-cd BREVTY/server
+cd server
 ```
 
-### 2. Install Dependencies <a id="2-install-dependencies"></a>
+#### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Configure Environment Variables <a id="3-configure-environment-variables"></a>
+#### 3. Configure Environment Variables
 
-Create a `.env` file inside the `server` directory:
-
-```bash
-touch .env
-```
-
-Add the following configuration:
-
-```env
-# Server
-PORT=5001
-NODE_ENV=development
-
-# Database
-MONGODB_URI=your_mongo_db_connection_string
-
-# JWT Configuration
-JWT_SECRET=your_jwt_secret
-JWT_REFRESH_SECRET=your_jwt_refresh_secret
-JWT_EXPIRE=7d
-JWT_REFRESH_EXPIRE=30d
-
-# Cloudinary (Media Uploads)
-CLOUDINARY_CLOUD_NAME=your_cloudinary_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-
-# Security
-BCRYPT_ROUNDS=12
-MAX_LOGIN_ATTEMPTS=5
-LOCK_TIME=30
-
-# Email Configuration
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_SECURE=false
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
-
-# Deployment
-
-DEPLOYMENT_URL=https://your-deployment-url.com/
-
-```
-
-> ⚠️ **Important:** Never commit your `.env` file — it contains sensitive credentials.
-
-### 4. Run the Server <a id="4-run-the-server"></a>
+The server directory should have a `.env.example` file. Copy it to create your own `.env`:
 
 ```bash
+# For Windows
+copy .env.example .env
+
+# For macOS/Linux
+cp .env.example .env
+```
+
+Then update the values in `.env` with your actual credentials (see `.env.example` for all required variables).
+
+#### 4. Set Up Database
+
+**Option A: Local MongoDB**
+1. Install and start MongoDB locally
+2. Use the default connection string in `.env`
+
+**Option B: MongoDB Atlas (Cloud)**
+1. Create a free account at [MongoDB Atlas](https://www.mongodb.com/atlas)
+2. Create a new cluster
+3. Get your connection string and update `MONGODB_URI` in `.env`
+
+#### 5. Run the Server
+
+```bash
+# Development mode (with auto-restart)
 npm run dev
+
+# Production mode
+npm start
 ```
 
-Your backend will be running at:
-[http://localhost:5001](http://localhost:5001)
+Your backend will be running at: [http://localhost:5001](http://localhost:5001)
 
-### Notes for Backend Contributors <a id="notes-for-backend-contributors"></a>
+#### 6. Verify Backend Setup
 
-* ✅ Ensure MongoDB is running and accessible.
-* 🔐 Authentication uses **JWT** (access and refresh tokens).
-* ☁️ Images and media uploads use **Cloudinary**.
-* 🧪 Test APIs with tools like **Postman** or **Thunder Client**.
-* 🗂️ Keep code modular: organize logic in `/routes`, `/controllers`, `/middlewares`, etc.
+Test the server with a simple GET request:
+```bash
+curl http://localhost:5001/api/health
+```
 
----
+Or visit [http://localhost:5001/api/health](http://localhost:5001/api/health) in your browser.
 
-## 📍 Backend Route Overview <a id="backend-route-overview"></a>
 
-You can view or download a detailed document outlining all backend routes and their usage.
+## 📍 Project Structure <a id="project-structure"></a>
 
-[📄 Download Backend Route Overview](.github/assets/backend_route_overview.docx)
+```
+brevity/
+├── 📱 lib/                     # Flutter app source code
+│   ├── controller/            # State management & business logic
+│   ├── models/               # Data models
+│   ├── utils/                # Utility functions
+│   └── views/                # UI screens and widgets
+├── 🖥️ server/                 # Node.js backend
+│   ├── controllers/          # Route handlers
+│   ├── middleware/           # Custom middleware
+│   ├── models/              # Database models
+│   ├── routes/              # API routes
+│   └── services/            # Business logic
+├── 🏗️ android/               # Android-specific code
+├── 🍎 ios/                   # iOS-specific code
+├── 🌐 web/                   # Web-specific assets
+├── 🧪 test/                  # Test files
+├── 📄 .env                   # Environment variables (create this)
+├── 📦 pubspec.yaml          # Flutter dependencies
+└── 📖 README.md             # Project documentation
+```
 
----
 
-## 🧩 Working on Issues <a id="working-on-issues"></a>
+## 🔄 Contribution Workflow <a id="contribution-workflow"></a>
 
-* 💬 **Comment first**: Claim an issue by leaving a comment.
-* ⏳ **7-day inactivity rule**: Issues can be unassigned if there's no activity for 7+ days.
-* 🥇 **First come, first serve**: Contributors are assigned based on who claims first.
+### Step 1: Choose an Issue
+1. Browse [open issues](https://github.com/Yash159357/BREVITY/issues)
+2. Comment on the issue to get it assigned to you
 
-👉 [Browse Open Issues](https://github.com/Yash159357/BREVITY/issues)
+### Step 2: Create a Branch
+```bash
+# Sync with upstream
+git checkout main
+git pull upstream main
 
----
+# Create a new branch for your feature
+git checkout -b feature/your-feature-name
+
+# Or for bug fixes
+git checkout -b fix/bug-description
+```
+
+### Step 3: Make Your Changes
+- Write clean, readable code
+- Follow the existing code style
+- Add comments where necessary
+- Test your changes thoroughly
+
+### Step 4: Commit Your Changes
+```bash
+# Stage your changes
+git add .
+
+# Commit with a descriptive message
+git commit -m "feat: add new feature description"
+
+# Or for bug fixes
+git commit -m "fix: resolve issue with specific component"
+```
+
+**Commit Message Convention:**
+- `feat:` for new features
+- `fix:` for bug fixes
+- `docs:` for documentation changes
+- `style:` for formatting changes
+- `refactor:` for code refactoring
+- `test:` for adding or updating tests
+- `chore:` for maintenance tasks
+
+### Step 5: Push and Create Pull Request
+```bash
+# Push to your fork
+git push origin your-branch-name
+```
+
+Then create a pull request through GitHub's interface.
+
+
+## 🎯 Issue Guidelines <a id="issue-guidelines"></a>
+
+### Claiming Issues
+- 💬 **Comment first**: Claim an issue by leaving a comment
+- ⏳ **7-day rule**: Issues will be unassigned if inactive for 7+ days
+- 🥇 **First come, first serve**: Issues are assigned based on who claims first
+- 🚫 **One at a time**: Work on one issue at a time until completion
+
+## 📍 Backend API Documentation <a id="backend-api-documentation"></a>
+
+Our Node.js/Express backend provides comprehensive REST API endpoints for user authentication, content management, bookmarks, and more.
+
+### 🔗 Base URLs
+- **Development**: `http://localhost:5001`
+- **Production**: `https://your-production-url.com`
+
+### 🔐 Authentication
+Most endpoints require authentication via JWT Bearer tokens:
+```http
+Authorization: Bearer <your-jwt-token>
+```
+
+### 📊 API Response Format
+All API responses follow this standard format:
+```json
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": { ... },
+  "timestamp": "2025-08-12T10:30:00.000Z"
+}
+```
+
+### 🛣️ Endpoints
+
+#### 🔑 Authentication (`/api/auth`)
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `POST` | `/register` | User registration with profile image | ❌ |
+| `POST` | `/resend-verification` | Resend email verification | ❌ |
+| `GET` | `/verify-email` | Verify user email address | ❌ |
+| `POST` | `/login` | User login | ❌ |
+| `POST` | `/forgot-password` | Send password reset email | ❌ |
+| `POST` | `/reset-password` | Reset password with token | ❌ |
+| `POST` | `/logout` | User logout | ✅ |
+| `GET` | `/me` | Get current user profile | ✅ |
+
+#### 👤 User Management (`/api/users`)
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `PUT` | `/profile` | Update user profile with image | ✅ |
+| `DELETE` | `/profile/image` | Delete profile image | ✅ |
+
+#### 🔖 Bookmarks (`/api/bookmarks`)
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/` | Get user's bookmarks | ✅ |
+| `POST` | `/` | Toggle bookmark (add/remove) | ✅ |
+
+#### ⚕️ System
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/health` | Health check endpoint | ❌ |
+| `GET` | `/auth/verify-email` | Email verification redirect | ❌ |
+
+### 📋 Request Examples
+
+#### User Registration
+```bash
+curl -X POST http://localhost:5001/api/auth/register \
+  -F "email=user@example.com" \
+  -F "password=securePassword123" \
+  -F "name=John Doe" \
+  -F "profileImage=@/path/to/image.jpg"
+```
+
+#### User Login
+```bash
+curl -X POST http://localhost:5001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"securePassword123"}'
+```
+
+#### Get Bookmarks
+```bash
+curl -X GET http://localhost:5001/api/bookmarks \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### 🔄 Error Handling
+The API uses standard HTTP status codes:
+- `200` - Success
+- `201` - Created
+- `400` - Bad Request
+- `401` - Unauthorized
+- `403` - Forbidden
+- `404` - Not Found
+- `429` - Too Many Requests
+- `500` - Internal Server Error
+
+Error responses include detailed messages:
+```json
+{
+  "success": false,
+  "message": "Validation error",
+  "errors": [
+    {
+      "field": "email",
+      "message": "Please provide a valid email address"
+    }
+  ]
+}
+```
+
+### 📄 Complete API Documentation
+
+For detailed information about all endpoints, request/response schemas, and advanced features, download our comprehensive API documentation:
+
+📥 **[Download Complete API Documentation](.github/assets/backend_route_overview.docx)**
+
+This document includes:
+- 📝 Detailed endpoint descriptions
+- 🔍 Request/response examples
+- 🛡️ Authentication requirements
+- 📊 Data validation rules
+- 🚨 Error scenarios and handling
+- 🔄 Rate limiting information
+- 🧪 Testing guidelines
+
+### 🧪 Testing the API
+
+You can test the API using various tools:
+
+#### Recommended Tools
+- **[Postman](https://postman.com)** - Full-featured API client
+- **cURL** - Command line tool
+
+#### Quick Health Check
+```bash
+curl http://localhost:5001/api/health
+```
+
+Expected response:
+```json
+{
+  "success": true,
+  "status": "OK",
+  "message": "NewsAI Backend is running",
+  "timestamp": "2025-08-12T10:30:00.000Z"
+}
+```
+
+### 📈 Rate Limiting
+- **Limit**: 100 requests per 15-minute window per IP
+- **Headers**: Check `X-RateLimit-*` headers in responses
+- **Exceeded**: Returns `429 Too Many Requests`
+
 
 ## 💬 Community & Support <a id="community--support"></a>
 
-Need help? Want to discuss features?
+### Getting Help
+- 💬 **Discord**: Join our [Discord community](https://discord.gg/fS6AbcUW)
+- 🐛 **Issues**: Create a [GitHub issue](https://github.com/Yash159357/BREVITY/issues/new)
 
-Join our **Discord community**:
-[Click Here](https://discord.gg/fS6AbcUW)
+### Community Guidelines
+- Be respectful and inclusive
+- Help others when you can
+- Stay on topic in discussions
+- Follow our [Code of Conduct](CODE_OF_CONDUCT.md)
+
+### Recognition
+Contributors are recognized in our:
+- 📜 Hall of Fame in the README
+- 🏆 Monthly contributor highlights
+- 🎉 Special mentions in release notes
 
 ## 🙌 Thank You! <a id="thank-you"></a>
 
-Whether you're fixing a typo or shipping a huge feature, every contribution matters.
-**We appreciate your support and input.** 🎉
+Every contribution matters, whether you're:
+- 🐛 Fixing a small typo
+- ✨ Implementing a major feature  
+- 📚 Improving documentation
+- 🧪 Writing tests
+- 🎨 Designing UI improvements
+
+**Your efforts help make Brevity better for everyone!** 🎉
