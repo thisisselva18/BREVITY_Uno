@@ -341,10 +341,10 @@ class _NewsCardState extends State<_NewsCard> {
                   maxLines: 7,
                   overflow: TextOverflow.ellipsis,
                 ),
-                if (widget.article.author.trim().isNotEmpty) ...[
-                  const Gap(12),
-                  Row(
-                    children: [
+                const Gap(12),
+                Row(
+                  children: [
+                    if (widget.article.author.trim().isNotEmpty) ...[
                       Text(
                         'By ${widget.article.author}',
                         style: TextStyle(
@@ -354,37 +354,37 @@ class _NewsCardState extends State<_NewsCard> {
                         ),
                       ),
                       const Gap(8),
-                      GestureDetector(
-                        onTap: _speak,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(26),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.white.withAlpha(51),
-                              width: 1,
-                            ),
-                          ),
-                          child: isLoading
-                              ? SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white.withAlpha(204),
-                            ),
-                          )
-                              : Icon(
-                            isPlaying ? Icons.stop : Icons.volume_up_rounded,
-                            color: Colors.white.withAlpha(204),
-                            size: 16,
+                    ],
+                    GestureDetector(
+                      onTap: _speak,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withAlpha(26),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.white.withAlpha(51),
+                            width: 1,
                           ),
                         ),
+                        child: isLoading
+                            ? SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white.withAlpha(204),
+                          ),
+                        )
+                            : Icon(
+                          isPlaying ? Icons.stop : Icons.volume_up_rounded,
+                          color: Colors.white.withAlpha(204),
+                          size: 16,
+                        ),
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
                 const Gap(24),
                 Row(
                   children: [
