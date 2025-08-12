@@ -51,17 +51,13 @@ class ReactionBar extends StatefulWidget {
   State<ReactionBar> createState() => _ReactionBarState();
 }
 
-class _ReactionBarState extends State<ReactionBar>
-    with TickerProviderStateMixin {
+class _ReactionBarState extends State<ReactionBar> {
   late Map<ReactionType, ReactionData> _reactions;
-  late Map<ReactionType, AnimationController> _animationControllers;
-  late Map<ReactionType, Animation<double>> _scaleAnimations;
 
   @override
   void initState() {
     super.initState();
     _initializeReactions();
-    _initializeAnimations();
   }
 
   void _initializeReactions() {
@@ -82,36 +78,6 @@ class _ReactionBarState extends State<ReactionBar>
         isSelected: false,
       );
     }
-  }
-
-  void _initializeAnimations() {
-    _animationControllers = {};
-    _scaleAnimations = {};
-
-    for (final type in ReactionType.values) {
-      final controller = AnimationController(
-        duration: const Duration(milliseconds: 150),
-        vsync: this,
-      );
-
-      _animationControllers[type] = controller;
-
-      _scaleAnimations[type] = Tween<double>(
-        begin: 1.0,
-        end: 1.2,
-      ).animate(CurvedAnimation(
-        parent: controller,
-        curve: Curves.elasticOut,
-      ));
-    }
-  }
-
-  @override
-  void dispose() {
-    for (final controller in _animationControllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
   }
 
   void _handleReactionTap(ReactionType type) {
@@ -155,18 +121,6 @@ class _ReactionBarState extends State<ReactionBar>
         widget.onReactionTap?.call(type, true);
       }
     });
-
-    // Trigger animation
-    _triggerReactionAnimation(type);
-  }
-
-  void _triggerReactionAnimation(ReactionType type) {
-    final controller = _animationControllers[type]!;
-    controller.forward().then((_) {
-      if (mounted) {
-        controller.reverse();
-      }
-    });
   }
 
   @override
@@ -180,16 +134,12 @@ class _ReactionBarState extends State<ReactionBar>
           reaction: _reactions[ReactionType.like]!,
           onTap: () => _handleReactionTap(ReactionType.like),
           primaryColor: currentTheme.primaryColor,
-          animation: _scaleAnimations[ReactionType.like]!,
-          animationController: _animationControllers[ReactionType.like]!,
         ),
         const Gap(16),
         _ReactionButton(
           reaction: _reactions[ReactionType.dislike]!,
           onTap: () => _handleReactionTap(ReactionType.dislike),
           primaryColor: currentTheme.primaryColor,
-          animation: _scaleAnimations[ReactionType.dislike]!,
-          animationController: _animationControllers[ReactionType.dislike]!,
         ),
       ],
     );
@@ -200,15 +150,11 @@ class _ReactionButton extends StatefulWidget {
   final ReactionData reaction;
   final VoidCallback onTap;
   final Color primaryColor;
-  final Animation<double> animation;
-  final AnimationController animationController;
 
   const _ReactionButton({
     required this.reaction,
     required this.onTap,
     required this.primaryColor,
-    required this.animation,
-    required this.animationController,
   });
 
   @override
@@ -252,10 +198,10 @@ class _ReactionButtonState extends State<_ReactionButton>
       },
       onTapCancel: () => _pressController.reverse(),
       child: AnimatedBuilder(
-        animation: Listenable.merge([_pressAnimation, widget.animation]),
+        animation: _pressAnimation,
         builder: (context, child) {
           return Transform.scale(
-            scale: _pressAnimation.value * widget.animation.value,
+            scale: _pressAnimation.value,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
