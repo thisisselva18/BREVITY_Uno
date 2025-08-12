@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -189,10 +190,68 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   }
 }
 
-class _NewsCard extends StatelessWidget {
+class _NewsCard extends StatefulWidget {
   final Article article;
 
   const _NewsCard({required this.article});
+
+  @override
+  State<_NewsCard> createState() => _NewsCardState();
+}
+
+class _NewsCardState extends State<_NewsCard> {
+  late FlutterTts flutterTts;
+  bool isPlaying = false;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    initTts();
+  }
+
+  initTts() {
+    flutterTts = FlutterTts();
+    flutterTts.setCompletionHandler(() {
+      setState(() {
+        isPlaying = false;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    flutterTts.stop();
+    super.dispose();
+  }
+
+  Future<void> _speak() async {
+    if (isPlaying) {
+      await flutterTts.stop();
+      setState(() {
+        isPlaying = false;
+      });
+    } else {
+      setState(() {
+        isLoading = true;
+      });
+
+      // Combine title and description for TTS
+      String textToSpeak = "${widget.article.title}. ${widget.article.description}";
+
+      await flutterTts.setLanguage("en-US");
+      await flutterTts.setSpeechRate(0.5);
+      await flutterTts.setVolume(1.0);
+      await flutterTts.setPitch(1.0);
+
+      setState(() {
+        isLoading = false;
+        isPlaying = true;
+      });
+
+      await flutterTts.speak(textToSpeak);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -200,10 +259,9 @@ class _NewsCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        // UPDATED: Reverted to static dark color
         color: Colors.black,
         image: DecorationImage(
-          image: CachedNetworkImageProvider(article.urlToImage),
+          image: CachedNetworkImageProvider(widget.article.urlToImage),
           fit: BoxFit.cover,
           onError: (exception, stackTrace) {},
         ),
@@ -213,7 +271,6 @@ class _NewsCard extends StatelessWidget {
         children: [
           Container(
             decoration: const BoxDecoration(
-              // UPDATED: Reverted to static dark gradient
               gradient: LinearGradient(
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
@@ -244,7 +301,7 @@ class _NewsCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        article.sourceName.toUpperCase(),
+                        widget.article.sourceName.toUpperCase(),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 11,
@@ -261,7 +318,7 @@ class _NewsCard extends StatelessWidget {
                         child: Text(
                           DateFormat(
                             'MMM dd, y • h:mm a',
-                          ).format(article.publishedAt),
+                          ).format(widget.article.publishedAt),
                           style: TextStyle(
                             color: Colors.white.withAlpha(229),
                             fontSize: 14,
@@ -272,11 +329,10 @@ class _NewsCard extends StatelessWidget {
                   ],
                 ),
                 const Gap(20),
-                _TappableHeadline(title: article.title, article: article),
+                _TappableHeadline(title: widget.article.title, article: widget.article),
                 const Gap(16),
                 Text(
-                  article.description,
-                  // UPDATED: Reverted to static white color
+                  widget.article.description,
                   style: TextStyle(
                     color: Colors.white.withAlpha(229),
                     fontSize: 16,
@@ -285,16 +341,48 @@ class _NewsCard extends StatelessWidget {
                   maxLines: 7,
                   overflow: TextOverflow.ellipsis,
                 ),
-                if (article.author.trim().isNotEmpty) ...[
+                if (widget.article.author.trim().isNotEmpty) ...[
                   const Gap(12),
-                  Text(
-                    'By ${article.author}',
-                    // UPDATED: Reverted to static white color
-                    style: TextStyle(
-                      color: Colors.white.withAlpha((0.6 * 255).toInt()),
-                      fontSize: 13,
-                      fontStyle: FontStyle.italic,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        'By ${widget.article.author}',
+                        style: TextStyle(
+                          color: Colors.white.withAlpha((0.6 * 255).toInt()),
+                          fontSize: 13,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const Gap(8),
+                      GestureDetector(
+                        onTap: _speak,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withAlpha(26),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withAlpha(51),
+                              width: 1,
+                            ),
+                          ),
+                          child: isLoading
+                              ? SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white.withAlpha(204),
+                            ),
+                          )
+                              : Icon(
+                            isPlaying ? Icons.stop : Icons.volume_up_rounded,
+                            color: Colors.white.withAlpha(204),
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
                 const Gap(24),
@@ -320,11 +408,11 @@ class _NewsCard extends StatelessWidget {
                         color: Colors.white,
                         size: 24,
                       ),
-                      onPressed: () => _launchUrl(article.url),
+                      onPressed: () => _launchUrl(widget.article.url),
                     ),
                     IconButton(
                       onPressed:
-                          () => context.pushNamed('chat', extra: article),
+                          () => context.pushNamed('chat', extra: widget.article),
                       icon: Image.asset(
                         'assets/logos/ai.gif',
                         width: 90,
