@@ -5,10 +5,7 @@ import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
 
 enum ReactionType {
   like('👍'),
-  love('❤️'),
-  fire('🔥'),
-  wow('😮'),
-  laugh('😂');
+  dislike('👎');
 
   const ReactionType(this.emoji);
   final String emoji;
@@ -59,7 +56,6 @@ class _ReactionBarState extends State<ReactionBar>
   late Map<ReactionType, ReactionData> _reactions;
   late Map<ReactionType, AnimationController> _animationControllers;
   late Map<ReactionType, Animation<double>> _scaleAnimations;
-  late Map<ReactionType, Animation<double>> _bounceAnimations;
 
   @override
   void initState() {
@@ -91,11 +87,10 @@ class _ReactionBarState extends State<ReactionBar>
   void _initializeAnimations() {
     _animationControllers = {};
     _scaleAnimations = {};
-    _bounceAnimations = {};
 
     for (final type in ReactionType.values) {
       final controller = AnimationController(
-        duration: const Duration(milliseconds: 120),
+        duration: const Duration(milliseconds: 150),
         vsync: this,
       );
 
@@ -103,18 +98,10 @@ class _ReactionBarState extends State<ReactionBar>
 
       _scaleAnimations[type] = Tween<double>(
         begin: 1.0,
-        end: 1.15,
+        end: 1.2,
       ).animate(CurvedAnimation(
         parent: controller,
-        curve: Curves.easeOutBack,
-      ));
-
-      _bounceAnimations[type] = Tween<double>(
-        begin: 1.0,
-        end: 0.95,
-      ).animate(CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInOut,
+        curve: Curves.elasticOut,
       ));
     }
   }
@@ -169,16 +156,13 @@ class _ReactionBarState extends State<ReactionBar>
       }
     });
 
-    // Optimized animation - only animate the tapped reaction
+    // Trigger animation
     _triggerReactionAnimation(type);
   }
 
   void _triggerReactionAnimation(ReactionType type) {
     final controller = _animationControllers[type]!;
-
-    // Reset and play animation smoothly
-    controller.reset();
-    controller.forward().whenComplete(() {
+    controller.forward().then((_) {
       if (mounted) {
         controller.reverse();
       }
@@ -189,41 +173,25 @@ class _ReactionBarState extends State<ReactionBar>
   Widget build(BuildContext context) {
     final currentTheme = context.read<ThemeCubit>().currentTheme;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.black.withAlpha(76),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withAlpha(25),
-          width: 0.5,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _ReactionButton(
+          reaction: _reactions[ReactionType.like]!,
+          onTap: () => _handleReactionTap(ReactionType.like),
+          primaryColor: currentTheme.primaryColor,
+          animation: _scaleAnimations[ReactionType.like]!,
+          animationController: _animationControllers[ReactionType.like]!,
         ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: ReactionType.values.map((type) {
-          final reaction = _reactions[type]!;
-          final controller = _animationControllers[type]!;
-          final scaleAnimation = _scaleAnimations[type]!;
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
-            child: AnimatedBuilder(
-              animation: controller,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: scaleAnimation.value,
-                  child: _ReactionButton(
-                    reaction: reaction,
-                    onTap: () => _handleReactionTap(type),
-                    primaryColor: currentTheme.primaryColor,
-                  ),
-                );
-              },
-            ),
-          );
-        }).toList(),
-      ),
+        const Gap(16),
+        _ReactionButton(
+          reaction: _reactions[ReactionType.dislike]!,
+          onTap: () => _handleReactionTap(ReactionType.dislike),
+          primaryColor: currentTheme.primaryColor,
+          animation: _scaleAnimations[ReactionType.dislike]!,
+          animationController: _animationControllers[ReactionType.dislike]!,
+        ),
+      ],
     );
   }
 }
@@ -232,11 +200,15 @@ class _ReactionButton extends StatefulWidget {
   final ReactionData reaction;
   final VoidCallback onTap;
   final Color primaryColor;
+  final Animation<double> animation;
+  final AnimationController animationController;
 
   const _ReactionButton({
     required this.reaction,
     required this.onTap,
     required this.primaryColor,
+    required this.animation,
+    required this.animationController,
   });
 
   @override
@@ -257,7 +229,7 @@ class _ReactionButtonState extends State<_ReactionButton>
     );
     _pressAnimation = Tween<double>(
       begin: 1.0,
-      end: 0.95,
+      end: 0.9,
     ).animate(CurvedAnimation(
       parent: _pressController,
       curve: Curves.easeInOut,
@@ -273,72 +245,59 @@ class _ReactionButtonState extends State<_ReactionButton>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) {
-        _pressController.forward();
-      },
+      onTapDown: (_) => _pressController.forward(),
       onTapUp: (_) {
         _pressController.reverse();
         widget.onTap();
       },
-      onTapCancel: () {
-        _pressController.reverse();
-      },
+      onTapCancel: () => _pressController.reverse(),
       child: AnimatedBuilder(
-        animation: _pressAnimation,
+        animation: Listenable.merge([_pressAnimation, widget.animation]),
         builder: (context, child) {
           return Transform.scale(
-            scale: _pressAnimation.value,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            scale: _pressAnimation.value * widget.animation.value,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: widget.reaction.isSelected
-                    ? widget.primaryColor.withAlpha(51)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(16),
-                border: widget.reaction.isSelected
-                    ? Border.all(color: widget.primaryColor.withAlpha(128), width: 1)
-                    : null,
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: widget.reaction.isSelected
+                      ? widget.primaryColor
+                      : Colors.white.withOpacity(0.6),
+                  width: 1.5,
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  AnimatedDefaultTextStyle(
-                    duration: const Duration(milliseconds: 150),
-                    curve: Curves.easeOutCubic,
+                  Text(
+                    widget.reaction.type.emoji,
                     style: TextStyle(
-                      fontSize: widget.reaction.isSelected ? 18 : 16,
+                      fontSize: 16,
                       shadows: widget.reaction.isSelected
                           ? [
                         Shadow(
-                          blurRadius: 8,
-                          color: widget.primaryColor.withAlpha(128),
+                          blurRadius: 4,
+                          color: widget.primaryColor.withOpacity(0.5),
                           offset: const Offset(0, 0),
                         ),
                       ]
                           : null,
                     ),
-                    child: Text(widget.reaction.type.emoji),
                   ),
                   if (widget.reaction.count > 0) ...[
-                    const Gap(4),
-                    AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 150),
-                      curve: Curves.easeOutCubic,
+                    const Gap(6),
+                    Text(
+                      widget.reaction.count > 999
+                          ? '${(widget.reaction.count / 1000).toStringAsFixed(1)}k'
+                          : widget.reaction.count.toString(),
                       style: TextStyle(
                         color: widget.reaction.isSelected
                             ? widget.primaryColor
-                            : Colors.white.withAlpha(178),
+                            : Colors.white.withOpacity(0.8),
                         fontSize: 12,
-                        fontWeight: widget.reaction.isSelected
-                            ? FontWeight.w600
-                            : FontWeight.w400,
-                      ),
-                      child: Text(
-                        widget.reaction.count > 999
-                            ? '${(widget.reaction.count / 1000).toStringAsFixed(1)}k'
-                            : widget.reaction.count.toString(),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],

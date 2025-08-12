@@ -364,7 +364,7 @@ class _NewsCardState extends State<_NewsCard> {
                     fontSize: 16,
                     height: 1.4,
                   ),
-                  maxLines: 7,
+                  maxLines: 6,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const Gap(12),
