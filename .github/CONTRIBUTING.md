@@ -466,7 +466,7 @@ Error responses include detailed messages:
 
 For detailed information about all endpoints, request/response schemas, and advanced features, download our comprehensive API documentation:
 
-📥 **[Download Complete API Documentation](.github/assets/backend_route_overview.docx)**
+📥 **[Download Complete API Documentation](assets/backend_route_overview.docx)**
 
 This document includes:
 - 📝 Detailed endpoint descriptions
