@@ -111,12 +111,12 @@ class _AnimatedHeaderState extends State<AnimatedHeader>
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              const Color(0xFF3D4DFF).withOpacity(0.2),
-                              const Color(0xFF29C0FF).withOpacity(0.1),
+                              const Color(0xFF3D4DFF).withAlpha((0.2 * 255).toInt()),
+                              const Color(0xFF29C0FF).withAlpha((0.1 * 255).toInt()),
                             ],
                           ),
                           border: Border.all(
-                            color: const Color(0xFF3D4DFF).withOpacity(0.3),
+                            color: const Color(0xFF3D4DFF).withAlpha((0.3 * 255).toInt()),
                             width: 1,
                           ),
                         ),

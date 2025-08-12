@@ -55,8 +55,6 @@ class _SignupScreenState extends State<SignupScreen>
   late final AnimationController _pulseController;
   late final AnimationController _shakeController;
 
-  late final Animation<double> _fadeAnim;
-  late final Animation<Offset> _slideAnim;
   late final Animation<double> _floatAnim;
   late final Animation<double> _pulseAnim;
   late final Animation<double> _shakeAnim;
@@ -86,17 +84,6 @@ class _SignupScreenState extends State<SignupScreen>
       duration: const Duration(milliseconds: 600),
     );
 
-    _fadeAnim = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    );
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut));
-    _floatAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
-    );
     _pulseAnim = Tween<double>(begin: 1.0, end: 1.04).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
@@ -334,8 +321,8 @@ class _SignupScreenState extends State<SignupScreen>
                         center: const Alignment(-0.3, -0.4),
                         radius: 1.2,
                         colors: [
-                          primaryA.withOpacity(0.08),
-                          primaryB.withOpacity(0.02),
+                          primaryA.withAlpha((0.08 * 255).toInt()),
+                          primaryB.withAlpha((0.02 * 255).toInt()),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.5, 1.0],
@@ -367,8 +354,8 @@ class _SignupScreenState extends State<SignupScreen>
                         center: const Alignment(0.4, -0.2),
                         radius: 1.0,
                         colors: [
-                          primaryB.withOpacity(0.06),
-                          primaryA.withOpacity(0.01),
+                          primaryB.withAlpha((0.06 * 255).toInt()),
+                          primaryA.withAlpha((0.01 * 255).toInt()),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.6, 1.0],
@@ -400,7 +387,7 @@ class _SignupScreenState extends State<SignupScreen>
                     width: 4,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: primaryB.withOpacity(opacity),
+                      color: primaryB.withAlpha((opacity * 255).toInt()),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -453,7 +440,7 @@ class _SignupScreenState extends State<SignupScreen>
                                         (_emailValid ? 1 : 0) +
                                         (_passwordValid ? 1 : 0)) /
                                     3,
-                        backgroundColor: Colors.white.withOpacity(0.1),
+                        backgroundColor: Colors.white.withAlpha((0.1 * 255).toInt()),
                         valueColor: AlwaysStoppedAnimation(primaryB),
                         minHeight: 2,
                       ),
@@ -488,8 +475,9 @@ class _SignupScreenState extends State<SignupScreen>
                         isValid: _emailValid,
                         errorText: _emailError,
                         validator: (v) {
-                          if (v == null || v.isEmpty)
+                          if (v == null || v.isEmpty) {
                             return 'Email is required';
+                          }
                           if (!RegExp(
                             r'^[\w\-.]+@([\w-]+\.)+[\w-]{2,4}$',
                           ).hasMatch(v)) {
@@ -569,7 +557,7 @@ class _SignupScreenState extends State<SignupScreen>
                                 gradient: LinearGradient(
                                   colors: [
                                     Colors.transparent,
-                                    Colors.white.withOpacity(0.1),
+                                    Colors.white.withAlpha((0.1 * 255).toInt()),
                                     Colors.transparent,
                                   ],
                                 ),
@@ -596,7 +584,7 @@ class _SignupScreenState extends State<SignupScreen>
                                 gradient: LinearGradient(
                                   colors: [
                                     Colors.transparent,
-                                    Colors.white.withOpacity(0.1),
+                                    Colors.white.withAlpha((0.1 * 255).toInt()),
                                     Colors.transparent,
                                   ],
                                 ),
@@ -754,7 +742,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
           height: 4,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(2),
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withAlpha((0.1 * 255).toInt()),
           ),
           child: FractionallySizedBox(
             alignment: Alignment.centerLeft,
@@ -765,7 +753,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
                 color: barColor,
                 boxShadow: [
                   BoxShadow(
-                    color: barColor.withOpacity(0.3),
+                    color: barColor.withAlpha((0.3 * 255).toInt()),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -892,7 +880,7 @@ class _EnhancedTextFieldState extends State<EnhancedTextField>
                   _focused
                       ? [
                         BoxShadow(
-                          color: primaryA.withOpacity(0.1),
+                          color: primaryA.withAlpha((0.1 * 255).toInt()),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -912,7 +900,7 @@ class _EnhancedTextFieldState extends State<EnhancedTextField>
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: TextStyle(
-                  color: Colors.white.withOpacity(0.4),
+                  color: Colors.white.withAlpha((0.4 * 255).toInt()),
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                 ),
@@ -1047,8 +1035,8 @@ class _EnhancedButtonState extends State<EnhancedButton>
                         )
                         : LinearGradient(
                           colors: [
-                            Colors.grey.withOpacity(0.3),
-                            Colors.grey.withOpacity(0.2),
+                            Colors.grey.withAlpha((0.3 * 255).toInt()),
+                            Colors.grey.withAlpha((0.2 * 255).toInt()),
                           ],
                         ),
                 borderRadius: BorderRadius.circular(16),
@@ -1056,8 +1044,8 @@ class _EnhancedButtonState extends State<EnhancedButton>
                     widget.enabled && !widget.isLoading
                         ? [
                           BoxShadow(
-                            color: primaryA.withOpacity(
-                              0.3 + (_glowAnim.value * 0.2),
+                            color: primaryA.withAlpha(
+                              ((0.3 + (_glowAnim.value * 0.2)) * 255).toInt(),
                             ),
                             blurRadius: 12 + (_glowAnim.value * 8),
                             offset: const Offset(0, 6),
@@ -1199,8 +1187,8 @@ class _EnhancedSocialButtonState extends State<EnhancedSocialButton>
                 border: Border.all(
                   color:
                       Color.lerp(
-                        Colors.white.withOpacity(0.08),
-                        Colors.white.withOpacity(0.15),
+                        Colors.white.withAlpha((0.08 * 255).toInt()),
+                        Colors.white.withAlpha((0.15 * 255).toInt()),
                         _hoverAnim.value,
                       )!,
                   width: 1,
@@ -1209,7 +1197,7 @@ class _EnhancedSocialButtonState extends State<EnhancedSocialButton>
                     _isHovered
                         ? [
                           BoxShadow(
-                            color: widget.iconColor.withOpacity(0.1),
+                            color: widget.iconColor.withAlpha((0.1 * 255).toInt()),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
