@@ -27,9 +27,11 @@ import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
 import 'package:brevity/views/inner_screens/contact_screen.dart';
 import 'package:brevity/controller/services/auth_service.dart';
 import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_bloc.dart';
-// UPDATED: Import theme model and state for the builder
 import 'package:brevity/controller/cubit/theme/theme_state.dart';
 import 'package:brevity/models/theme_model.dart';
+// ADD THESE IMPORTS
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:brevity/controller/services/notification_service.dart';
 
 // Create a router with auth state handling
 final _routes = GoRouter(
@@ -308,12 +310,12 @@ final _routes = GoRouter(
 
     // Get the AuthService instance
     final authService = AuthService();
-    
+
     // If user is not signed in, redirect to auth
     if (!authService.isAuthenticated) {
       return '/auth';
     }
-    
+
     // If user is authenticated but email is not verified, redirect to email verification
     if (authService.isAuthenticated && !authService.isEmailVerified) {
       final currentUser = authService.currentUser;
@@ -332,8 +334,16 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
+  // ADD THIS: Initialize timezone data
+  tz.initializeTimeZones();
+
   // Initialize your AuthService
   await AuthService().initializeAuth();
+
+  // ADD THIS: Initialize notification service
+  final notificationService = NotificationService();
+  await notificationService.initialize();
+
   await dotenv.load(fileName: ".env");
 
   final bookmarkRepository = BookmarkServices();

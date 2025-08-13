@@ -2,6 +2,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:brevity/models/article_model.dart';
 import 'dart:convert';
 
+import 'notification_service.dart';
+
 class BookmarkServices {
   static const _bookmarkKey = 'user_bookmarks';
   late SharedPreferences _prefs;
@@ -43,6 +45,10 @@ class BookmarkServices {
         _bookmarkKey,
         bookmarks.map((a) => jsonEncode(a.toJson())).toList(),
       );
+
+      // Update notification reminder after bookmark change
+      final NotificationService notificationService = NotificationService();
+      await notificationService.updateBookmarkReminder();
     } catch (e) {
       rethrow;
     }
