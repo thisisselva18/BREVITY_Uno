@@ -227,7 +227,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
             children: [
               Icon(Icons.error_rounded, color: errorColor, size: 20),
               const SizedBox(width: 8),
-              const Text('Please enter a valid email'),
+              const Text(
+                'Please enter a valid email',
+                style: TextStyle(color: Colors.white),
+              ),
             ],
           ),
           backgroundColor: const Color(0xFF1F2937),
@@ -262,7 +265,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  const Text('OTP sent to your email'),
+                  const Text(
+                    'OTP sent to your email',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ],
               ),
               backgroundColor: const Color(0xFF1F2937),
@@ -287,7 +293,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
             children: [
               Icon(Icons.error_rounded, color: errorColor, size: 20),
               const SizedBox(width: 8),
-              const Text('Please enter a valid email'),
+              const Text(
+                'Please enter a valid email',
+                style: TextStyle(color: Colors.white),
+              ),
             ],
           ),
           backgroundColor: const Color(0xFF1F2937),
@@ -310,6 +319,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
               const SizedBox(width: 8),
               Text(
                 'Please wait $_remainingSeconds seconds before resending OTP',
+                style: TextStyle(color: Colors.white),
               ),
             ],
           ),
@@ -377,7 +387,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      const Text('Password reset successfully!'),
+                      const Text(
+                        'Password reset successfully!',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ],
                   ),
                   backgroundColor: const Color(0xFF1F2937),
