@@ -412,7 +412,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   style: theme.textTheme.titleLarge,
                 ),
                 const SizedBox(height: 20),
-                Container(
+                SizedBox(
                   height: 200,
                   child: Row(
                     children: [
@@ -541,7 +541,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                     ElevatedButton(
                       onPressed: () async {
                         await _notificationService.setReminderTime(_reminderTime);
-                        if (mounted) {
+                        if (context.mounted) {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
