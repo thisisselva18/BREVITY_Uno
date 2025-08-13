@@ -40,13 +40,14 @@ dev_dependencies:
   flutter_lints: ^5.0.0  # MOVED HERE
   flutter_launcher_icons: ^0.14.3
 
-flutter_launcher_icons:  # CONFIGURATION MUST BE AT ROOT LEVEL
+flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/logos/applogo.png"
+  image_path: "assets/icon/icon.png"
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/logos/  # Directory containing applogo.png
+    - assets/logos/
+    - assets/icon/icon.png
     - .env
