@@ -94,97 +94,95 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   }
 
   Widget _buildNewsViewPager(BuildContext context, NewsLoaded state) {
-  final articles = state.articles;
-  if (articles.isEmpty) {
-    return const Center(
-      child: Text(
-        "No articles found.",
-        style: TextStyle(color: Colors.white),
+    final articles = state.articles;
+    if (articles.isEmpty) {
+      return const Center(
+        child: Text(
+          "No articles found.",
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        final velocity = details.primaryVelocity;
+        if (velocity != null && velocity > 300) {
+          context.goNamed('sidepage');
+        }
+      },
+      child: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            scrollDirection: Axis.vertical,
+            itemCount:
+                state.hasReachedMax ? articles.length + 1 : articles.length + 1,
+            onPageChanged: (index) {
+              context.read<NewsBloc>().add(UpdateNewsIndex(index));
+
+              if (!state.hasReachedMax && index >= articles.length - 3) {
+                context.read<NewsBloc>().add(
+                  FetchNextPage(index, widget.category),
+                );
+              }
+            },
+            itemBuilder: (context, index) {
+              // Show end placeholder if we've reached the end
+              if (index >= articles.length) {
+                return Container(
+                  color: Colors.black,
+                  child: Center(
+                    child: Text(
+                      'You\'ve reached the end',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                  ),
+                );
+              }
+
+              final article = articles[index];
+              return _NewsCard(article: article);
+            },
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                children: [
+                  Text(
+                    _getCategoryName(widget.category),
+                    style: const TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                      shadows: [
+                        Shadow(
+                          blurRadius: 15.0,
+                          color: Color.fromRGBO(0, 0, 0, 0.5),
+                          offset: Offset(2.0, 2.0),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.info_outline,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                    onPressed: () => context.pushNamed("contactUs"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
-
-  return GestureDetector(
-    onHorizontalDragEnd: (details) {
-      final velocity = details.primaryVelocity;
-      if (velocity != null && velocity > 300) {
-        context.goNamed('sidepage');
-      }
-    },
-    child: Stack(
-      children: [
-        PageView.builder(
-          controller: _pageController,
-          scrollDirection: Axis.vertical,
-          itemCount: state.hasReachedMax ? articles.length + 1 : articles.length + 1,
-          onPageChanged: (index) {
-            context.read<NewsBloc>().add(UpdateNewsIndex(index));
-
-            if (!state.hasReachedMax && index >= articles.length - 3) {
-              context.read<NewsBloc>().add(
-                FetchNextPage(index, widget.category),
-              );
-            }
-          },
-          itemBuilder: (context, index) {
-            // Show end placeholder if we've reached the end
-            if (index >= articles.length) {
-              return Container(
-                color: Colors.black,
-                child: Center(
-                  child: Text(
-                    'You\'ve reached the end',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),
-                  ),
-                ),
-              );
-            }
-            
-            final article = articles[index];
-            return _NewsCard(article: article);
-          },
-        ),
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Row(
-              children: [
-                Text(
-                  _getCategoryName(widget.category),
-                  style: const TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontFamily: 'Poppins',
-                    shadows: [
-                      Shadow(
-                        blurRadius: 15.0,
-                        color: Color.fromRGBO(0, 0, 0, 0.5),
-                        offset: Offset(2.0, 2.0),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(
-                    Icons.info_outline,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                  onPressed: () => context.pushNamed("contactUs"),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
 
   Widget _buildLoadingShimmer() {
     return Shimmer.fromColors(
@@ -402,22 +400,22 @@ class _NewsCardState extends State<_NewsCard> {
                                 ),
                               ),
                               child:
-                              isLoading
-                                  ? SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white.withAlpha(204),
-                                ),
-                              )
-                                  : Icon(
-                                isPlaying
-                                    ? Icons.stop
-                                    : Icons.volume_up_rounded,
-                                color: Colors.white.withAlpha(204),
-                                size: 16,
-                              ),
+                                  isLoading
+                                      ? SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white.withAlpha(204),
+                                        ),
+                                      )
+                                      : Icon(
+                                        isPlaying
+                                            ? Icons.stop
+                                            : Icons.volume_up_rounded,
+                                        color: Colors.white.withAlpha(204),
+                                        size: 16,
+                                      ),
                             ),
                           ),
                         ],
@@ -439,7 +437,8 @@ class _NewsCardState extends State<_NewsCard> {
                     )..layout();
 
                     final authorTextWidth = textPainter.width;
-                    final shouldWrap = authorTextWidth > (constraints.maxWidth * 0.8);
+                    final shouldWrap =
+                        authorTextWidth > (constraints.maxWidth * 0.8);
 
                     if (shouldWrap) {
                       return Column(
@@ -448,7 +447,9 @@ class _NewsCardState extends State<_NewsCard> {
                           Text(
                             authorText,
                             style: TextStyle(
-                              color: Colors.white.withAlpha((0.6 * 255).toInt()),
+                              color: Colors.white.withAlpha(
+                                (0.6 * 255).toInt(),
+                              ),
                               fontSize: 13,
                               fontStyle: FontStyle.italic,
                             ),
@@ -467,22 +468,22 @@ class _NewsCardState extends State<_NewsCard> {
                                 ),
                               ),
                               child:
-                              isLoading
-                                  ? SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white.withAlpha(204),
-                                ),
-                              )
-                                  : Icon(
-                                isPlaying
-                                    ? Icons.stop
-                                    : Icons.volume_up_rounded,
-                                color: Colors.white.withAlpha(204),
-                                size: 16,
-                              ),
+                                  isLoading
+                                      ? SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white.withAlpha(204),
+                                        ),
+                                      )
+                                      : Icon(
+                                        isPlaying
+                                            ? Icons.stop
+                                            : Icons.volume_up_rounded,
+                                        color: Colors.white.withAlpha(204),
+                                        size: 16,
+                                      ),
                             ),
                           ),
                         ],
@@ -493,7 +494,9 @@ class _NewsCardState extends State<_NewsCard> {
                           Text(
                             authorText,
                             style: TextStyle(
-                              color: Colors.white.withAlpha((0.6 * 255).toInt()),
+                              color: Colors.white.withAlpha(
+                                (0.6 * 255).toInt(),
+                              ),
                               fontSize: 13,
                               fontStyle: FontStyle.italic,
                             ),
@@ -512,22 +515,22 @@ class _NewsCardState extends State<_NewsCard> {
                                 ),
                               ),
                               child:
-                              isLoading
-                                  ? SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white.withAlpha(204),
-                                ),
-                              )
-                                  : Icon(
-                                isPlaying
-                                    ? Icons.stop
-                                    : Icons.volume_up_rounded,
-                                color: Colors.white.withAlpha(204),
-                                size: 16,
-                              ),
+                                  isLoading
+                                      ? SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white.withAlpha(204),
+                                        ),
+                                      )
+                                      : Icon(
+                                        isPlaying
+                                            ? Icons.stop
+                                            : Icons.volume_up_rounded,
+                                        color: Colors.white.withAlpha(204),
+                                        size: 16,
+                                      ),
                             ),
                           ),
                         ],
@@ -619,7 +622,7 @@ class _NewsCardState extends State<_NewsCard> {
                           () =>
                               context.pushNamed('chat', extra: widget.article),
                       icon: Image.asset(
-                        'assets/logos/Siri.gif',
+                        'assets/logos/chatbot.gif',
                         width: 40,
                         height: 40,
                         fit: BoxFit.contain,

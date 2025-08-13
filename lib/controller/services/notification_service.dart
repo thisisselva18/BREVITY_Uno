@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:brevity/utils/logger.dart';
@@ -13,7 +12,8 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notifications =
+      FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
 
   static const String _reminderEnabledKey = 'bookmark_reminder_enabled';
@@ -33,14 +33,15 @@ class NotificationService {
 
       // Android initialization with proper settings
       const AndroidInitializationSettings androidSettings =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+          AndroidInitializationSettings('@mipmap/ic_launcher');
 
       // iOS initialization (if you plan to support iOS)
-      const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-        requestSoundPermission: true,
-        requestBadgePermission: true,
-        requestAlertPermission: true,
-      );
+      const DarwinInitializationSettings iosSettings =
+          DarwinInitializationSettings(
+            requestSoundPermission: true,
+            requestBadgePermission: true,
+            requestAlertPermission: true,
+          );
 
       const InitializationSettings initSettings = InitializationSettings(
         android: androidSettings,
@@ -79,8 +80,10 @@ class NotificationService {
   Future<void> _createNotificationChannel() async {
     if (Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? androidPlugin =
-      _notifications.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+          _notifications
+              .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin
+              >();
 
       if (androidPlugin != null) {
         await androidPlugin.createNotificationChannel(
@@ -115,28 +118,32 @@ class NotificationService {
   Future<bool> requestPermissions() async {
     if (Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? androidPlugin =
-      _notifications.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+          _notifications
+              .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin
+              >();
 
       if (androidPlugin != null) {
         // Request notification permission (Android 13+)
-        final bool? granted = await androidPlugin.requestNotificationsPermission();
+        final bool? granted =
+            await androidPlugin.requestNotificationsPermission();
 
         // Request exact alarm permission (Android 12+)
-        final bool? exactAlarmGranted = await androidPlugin.requestExactAlarmsPermission();
+        final bool? exactAlarmGranted =
+            await androidPlugin.requestExactAlarmsPermission();
 
-        Log.d('Notification permission: $granted, Exact alarm permission: $exactAlarmGranted');
+        Log.d(
+          'Notification permission: $granted, Exact alarm permission: $exactAlarmGranted',
+        );
 
         return granted ?? false;
       }
     } else if (Platform.isIOS) {
       final bool? result = await _notifications
-          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
       return result ?? false;
     }
 
@@ -223,7 +230,12 @@ class NotificationService {
       final hour = int.tryParse(timeParts[0]);
       final minute = int.tryParse(timeParts[1]);
 
-      if (hour == null || minute == null || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      if (hour == null ||
+          minute == null ||
+          hour < 0 ||
+          hour > 23 ||
+          minute < 0 ||
+          minute > 59) {
         Log.e('Invalid hour or minute: $hour:$minute');
         return;
       }
@@ -239,20 +251,23 @@ class NotificationService {
       );
 
       // If the scheduled time has passed today, schedule for tomorrow
-      if (scheduledTime.isBefore(now.add(const Duration(minutes: 1))) && !allowSameDay) {
+      if (scheduledTime.isBefore(now.add(const Duration(minutes: 1))) &&
+          !allowSameDay) {
         scheduledTime = scheduledTime.add(const Duration(days: 1));
       }
 
-      const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-        'bookmark_reminder',
-        'Bookmark Reminders',
-        channelDescription: 'Daily reminders to check your bookmarked articles',
-        importance: Importance.high,
-        icon: '@mipmap/ic_launcher',
-        enableVibration: true,
-        playSound: true,
-        autoCancel: true,
-      );
+      const AndroidNotificationDetails androidDetails =
+          AndroidNotificationDetails(
+            'bookmark_reminder',
+            'Bookmark Reminders',
+            channelDescription:
+                'Daily reminders to check your bookmarked articles',
+            importance: Importance.high,
+            icon: '@mipmap/ic_launcher',
+            enableVibration: true,
+            playSound: true,
+            autoCancel: true,
+          );
 
       const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
         presentAlert: true,
@@ -305,16 +320,17 @@ class NotificationService {
         await initialize();
       }
 
-      const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-        'test_channel',
-        'Test Notifications',
-        channelDescription: 'Test notification channel',
-        importance: Importance.high,
-        icon: '@mipmap/ic_launcher',
-        enableVibration: true,
-        playSound: true,
-        autoCancel: true,
-      );
+      const AndroidNotificationDetails androidDetails =
+          AndroidNotificationDetails(
+            'test_channel',
+            'Test Notifications',
+            channelDescription: 'Test notification channel',
+            importance: Importance.high,
+            icon: '@mipmap/ic_launcher',
+            enableVibration: true,
+            playSound: true,
+            autoCancel: true,
+          );
 
       const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
         presentAlert: true,
@@ -345,8 +361,10 @@ class NotificationService {
   Future<bool> areNotificationsEnabled() async {
     if (Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? androidPlugin =
-      _notifications.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+          _notifications
+              .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin
+              >();
 
       if (androidPlugin != null) {
         return await androidPlugin.areNotificationsEnabled() ?? false;
