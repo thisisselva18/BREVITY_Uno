@@ -1,10 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_event.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_state.dart';
@@ -12,6 +5,13 @@ import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_bloc.dart';
 import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/models/news_category.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -117,7 +117,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
             controller: _pageController,
             scrollDirection: Axis.vertical,
             itemCount:
-            state.hasReachedMax ? articles.length : articles.length + 1,
+                state.hasReachedMax ? articles.length : articles.length + 1,
             onPageChanged: (index) {
               context.read<NewsBloc>().add(UpdateNewsIndex(index));
 
@@ -237,7 +237,8 @@ class _NewsCardState extends State<_NewsCard> {
         isLoading = true;
       });
 
-      String textToSpeak = "${widget.article.title}. ${widget.article.description}";
+      String textToSpeak =
+          "${widget.article.title}. ${widget.article.description}";
 
       await flutterTts.setLanguage("en-US");
       await flutterTts.setSpeechRate(0.5);
@@ -276,7 +277,9 @@ class _NewsCardState extends State<_NewsCard> {
       }
     });
     // TODO: Implement backend integration
-    print('Article ${isDisliked ? 'disliked' : 'undisliked'}: ${widget.article.title}');
+    print(
+      'Article ${isDisliked ? 'disliked' : 'undisliked'}: ${widget.article.title}',
+    );
   }
 
   @override
@@ -355,7 +358,10 @@ class _NewsCardState extends State<_NewsCard> {
                   ],
                 ),
                 const Gap(20),
-                _TappableHeadline(title: widget.article.title, article: widget.article),
+                _TappableHeadline(
+                  title: widget.article.title,
+                  article: widget.article,
+                ),
                 const Gap(16),
                 Text(
                   widget.article.description,
@@ -393,20 +399,23 @@ class _NewsCardState extends State<_NewsCard> {
                             width: 1,
                           ),
                         ),
-                        child: isLoading
-                            ? SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white.withAlpha(204),
-                          ),
-                        )
-                            : Icon(
-                          isPlaying ? Icons.stop : Icons.volume_up_rounded,
-                          color: Colors.white.withAlpha(204),
-                          size: 16,
-                        ),
+                        child:
+                            isLoading
+                                ? SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white.withAlpha(204),
+                                  ),
+                                )
+                                : Icon(
+                                  isPlaying
+                                      ? Icons.stop
+                                      : Icons.volume_up_rounded,
+                                  color: Colors.white.withAlpha(204),
+                                  size: 16,
+                                ),
                       ),
                     ),
                   ],
@@ -423,22 +432,25 @@ class _NewsCardState extends State<_NewsCard> {
                             duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: isLiked
-                                  ? currentTheme.primaryColor.withAlpha(51)
-                                  : Colors.transparent,
+                              color:
+                                  isLiked
+                                      ? currentTheme.primaryColor.withAlpha(51)
+                                      : Colors.transparent,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: isLiked
-                                    ? currentTheme.primaryColor
-                                    : Colors.white.withAlpha(51),
+                                color:
+                                    isLiked
+                                        ? currentTheme.primaryColor
+                                        : Colors.white.withAlpha(51),
                                 width: 1,
                               ),
                             ),
                             child: Icon(
                               Icons.thumb_up_outlined,
-                              color: isLiked
-                                  ? currentTheme.primaryColor
-                                  : Colors.white.withAlpha(204),
+                              color:
+                                  isLiked
+                                      ? currentTheme.primaryColor
+                                      : Colors.white.withAlpha(204),
                               size: 18,
                             ),
                           ),
@@ -450,22 +462,25 @@ class _NewsCardState extends State<_NewsCard> {
                             duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: isDisliked
-                                  ? currentTheme.primaryColor.withAlpha(51)
-                                  : Colors.transparent,
+                              color:
+                                  isDisliked
+                                      ? currentTheme.primaryColor.withAlpha(51)
+                                      : Colors.transparent,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: isDisliked
-                                    ? currentTheme.primaryColor
-                                    : Colors.white.withAlpha(51),
+                                color:
+                                    isDisliked
+                                        ? currentTheme.primaryColor
+                                        : Colors.white.withAlpha(51),
                                 width: 1,
                               ),
                             ),
                             child: Icon(
                               Icons.thumb_down_outlined,
-                              color: isDisliked
-                                  ? currentTheme.primaryColor
-                                  : Colors.white.withAlpha(204),
+                              color:
+                                  isDisliked
+                                      ? currentTheme.primaryColor
+                                      : Colors.white.withAlpha(204),
                               size: 18,
                             ),
                           ),
@@ -485,11 +500,13 @@ class _NewsCardState extends State<_NewsCard> {
                     Spacer(),
 
                     IconButton(
-                      onPressed: () => context.pushNamed('chat', extra: widget.article),
+                      onPressed:
+                          () =>
+                              context.pushNamed('chat', extra: widget.article),
                       icon: Image.asset(
-                        'assets/logos/ai.gif',
-                        width: 90,
-                        height: 70,
+                        'assets/logos/Siri.gif',
+                        width: 40,
+                        height: 40,
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -515,13 +532,14 @@ class _TappableHeadline extends StatelessWidget {
     return BlocBuilder<BookmarkBloc, BookmarkState>(
       builder: (context, state) {
         final isBookmarked =
-        state is BookmarksLoaded
-            ? state.bookmarks.any((a) => a.url == article.url)
-            : false;
+            state is BookmarksLoaded
+                ? state.bookmarks.any((a) => a.url == article.url)
+                : false;
         return GestureDetector(
-          onTap: () => context.read<BookmarkBloc>().add(
-            ToggleBookmarkEvent(article),
-          ),
+          onTap:
+              () => context.read<BookmarkBloc>().add(
+                ToggleBookmarkEvent(article),
+              ),
           child: Text(
             title,
             maxLines: 3,
