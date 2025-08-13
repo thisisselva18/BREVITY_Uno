@@ -94,87 +94,97 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   }
 
   Widget _buildNewsViewPager(BuildContext context, NewsLoaded state) {
-    final articles = state.articles;
-    if (articles.isEmpty) {
-      return const Center(
-        child: Text(
-          "No articles found.",
-          style: TextStyle(color: Colors.white),
-        ),
-      );
-    }
-
-    return GestureDetector(
-      onHorizontalDragEnd: (details) {
-        final velocity = details.primaryVelocity;
-        if (velocity != null && velocity > 300) {
-          context.goNamed('sidepage');
-        }
-      },
-      child: Stack(
-        children: [
-          PageView.builder(
-            controller: _pageController,
-            scrollDirection: Axis.vertical,
-            itemCount:
-                state.hasReachedMax ? articles.length : articles.length + 1,
-            onPageChanged: (index) {
-              context.read<NewsBloc>().add(UpdateNewsIndex(index));
-
-              if (!state.hasReachedMax && index >= articles.length - 3) {
-                context.read<NewsBloc>().add(
-                  FetchNextPage(index, widget.category),
-                );
-              }
-            },
-            itemBuilder: (context, index) {
-              if (index >= articles.length) {
-                return const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
-                );
-              }
-              final article = articles[index];
-              return _NewsCard(article: article);
-            },
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Row(
-                children: [
-                  Text(
-                    _getCategoryName(widget.category),
-                    style: const TextStyle(
-                      fontSize: 23,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontFamily: 'Poppins',
-                      shadows: [
-                        Shadow(
-                          blurRadius: 15.0,
-                          color: Color.fromRGBO(0, 0, 0, 0.5),
-                          offset: Offset(2.0, 2.0),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.info_outline,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                    onPressed: () => context.pushNamed("contactUs"),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+  final articles = state.articles;
+  if (articles.isEmpty) {
+    return const Center(
+      child: Text(
+        "No articles found.",
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
+
+  return GestureDetector(
+    onHorizontalDragEnd: (details) {
+      final velocity = details.primaryVelocity;
+      if (velocity != null && velocity > 300) {
+        context.goNamed('sidepage');
+      }
+    },
+    child: Stack(
+      children: [
+        PageView.builder(
+          controller: _pageController,
+          scrollDirection: Axis.vertical,
+          itemCount: state.hasReachedMax ? articles.length + 1 : articles.length + 1,
+          onPageChanged: (index) {
+            context.read<NewsBloc>().add(UpdateNewsIndex(index));
+
+            if (!state.hasReachedMax && index >= articles.length - 3) {
+              context.read<NewsBloc>().add(
+                FetchNextPage(index, widget.category),
+              );
+            }
+          },
+          itemBuilder: (context, index) {
+            // Show end placeholder if we've reached the end
+            if (index >= articles.length) {
+              return Container(
+                color: Colors.black,
+                child: Center(
+                  child: Text(
+                    'You\'ve reached the end',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              );
+            }
+            
+            final article = articles[index];
+            return _NewsCard(article: article);
+          },
+        ),
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              children: [
+                Text(
+                  _getCategoryName(widget.category),
+                  style: const TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontFamily: 'Poppins',
+                    shadows: [
+                      Shadow(
+                        blurRadius: 15.0,
+                        color: Color.fromRGBO(0, 0, 0, 0.5),
+                        offset: Offset(2.0, 2.0),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(
+                    Icons.info_outline,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                  onPressed: () => context.pushNamed("contactUs"),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildLoadingShimmer() {
     return Shimmer.fromColors(
