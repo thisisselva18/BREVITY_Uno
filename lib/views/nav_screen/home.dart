@@ -472,15 +472,18 @@ class _NewsCardState extends State<_NewsCard> {
                         ),
                       ],
                     ),
-                    const Spacer(),
+                    const Gap(10),
                     IconButton(
                       icon: const Icon(
                         Icons.open_in_new_rounded,
                         color: Colors.white,
-                        size: 24,
+                        size: 28,
                       ),
                       onPressed: () => _launchUrl(widget.article.url),
                     ),
+
+                    Spacer(),
+
                     IconButton(
                       onPressed: () => context.pushNamed('chat', extra: widget.article),
                       icon: Image.asset(

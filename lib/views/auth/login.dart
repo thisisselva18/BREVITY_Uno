@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../common_widgets/auth_header.dart';
+import 'forgot_password.dart';
 
 // Enhanced Palette
 const Color bgStart = Color(0xFF070B14);
@@ -85,6 +86,10 @@ class _LoginScreenState extends State<LoginScreen>
       duration: const Duration(milliseconds: 600),
     );
 
+    // Initialize the missing animations
+    _floatAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
+    );
     _pulseAnim = Tween<double>(begin: 1.0, end: 1.04).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
@@ -98,11 +103,11 @@ class _LoginScreenState extends State<LoginScreen>
     // Start entrance animations
     Future.delayed(
       const Duration(milliseconds: 160),
-      () => _fadeController.forward(),
+          () => _fadeController.forward(),
     );
     Future.delayed(
       const Duration(milliseconds: 300),
-      () => _slideController.forward(),
+          () => _slideController.forward(),
     );
 
     // Add listeners for real-time validation
@@ -126,14 +131,14 @@ class _LoginScreenState extends State<LoginScreen>
     final email = _emailController.text;
     final isValid =
         email.isNotEmpty &&
-        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+            RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
     if (_emailValid != isValid) {
       setState(() {
         _emailValid = isValid;
         _emailError =
-            email.isEmpty
-                ? null
-                : (isValid ? null : 'Please enter a valid email');
+        email.isEmpty
+            ? null
+            : (isValid ? null : 'Please enter a valid email');
       });
     }
   }
@@ -145,9 +150,9 @@ class _LoginScreenState extends State<LoginScreen>
       setState(() {
         _passwordValid = isValid;
         _passwordError =
-            password.isEmpty
-                ? null
-                : (isValid ? null : 'Password must be at least 6 characters');
+        password.isEmpty
+            ? null
+            : (isValid ? null : 'Password must be at least 6 characters');
       });
     }
   }
@@ -347,10 +352,10 @@ class _LoginScreenState extends State<LoginScreen>
                     50 + math.cos(_floatAnim.value * 2 * math.pi + offset) * 30;
                 final y =
                     200 +
-                    math.sin(_floatAnim.value * 2 * math.pi + offset) * 20;
+                        math.sin(_floatAnim.value * 2 * math.pi + offset) * 20;
                 final opacity =
                     (math.sin(_floatAnim.value * 2 * math.pi + offset) + 1) *
-                    0.02;
+                        0.02;
 
                 return Positioned(
                   left: x,
@@ -406,11 +411,11 @@ class _LoginScreenState extends State<LoginScreen>
                       // Progress indicator
                       LinearProgressIndicator(
                         value:
-                            (_emailValid && _passwordValid)
-                                ? 1.0
-                                : (_emailValid || _passwordValid)
-                                ? 0.5
-                                : 0.0,
+                        (_emailValid && _passwordValid)
+                            ? 1.0
+                            : (_emailValid || _passwordValid)
+                            ? 0.5
+                            : 0.0,
                         backgroundColor: Colors.white.withAlpha((0.1 * 255).toInt()),
                         valueColor: AlwaysStoppedAnimation(primaryB),
                         minHeight: 2,
@@ -453,7 +458,7 @@ class _LoginScreenState extends State<LoginScreen>
                           onTap: () {
                             HapticFeedback.selectionClick();
                             setState(
-                              () => _obscurePassword = !_obscurePassword,
+                                  () => _obscurePassword = !_obscurePassword,
                             );
                           },
                           child: AnimatedSwitcher(
@@ -756,15 +761,15 @@ class _EnhancedTextFieldState extends State<EnhancedTextField>
                 width: _focused ? 2 : 1,
               ),
               boxShadow:
-                  _focused
-                      ? [
-                        BoxShadow(
-                          color: primaryA.withAlpha((0.1 * 255).toInt()),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ]
-                      : null,
+              _focused
+                  ? [
+                BoxShadow(
+                  color: primaryA.withAlpha((0.1 * 255).toInt()),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+                  : null,
             ),
             child: TextFormField(
               controller: widget.controller,
@@ -800,13 +805,13 @@ class _EnhancedTextFieldState extends State<EnhancedTextField>
                   },
                 ),
                 suffixIcon:
-                    widget.suffixIcon ??
+                widget.suffixIcon ??
                     (_hasContent && widget.isValid
                         ? Icon(
-                          Icons.check_circle_rounded,
-                          color: successColor,
-                          size: 20,
-                        )
+                      Icons.check_circle_rounded,
+                      color: successColor,
+                      size: 20,
+                    )
                         : null),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
@@ -830,144 +835,6 @@ class _EnhancedTextFieldState extends State<EnhancedTextField>
             ),
           ),
       ],
-    );
-  }
-}
-
-class EnhancedButton extends StatefulWidget {
-  final VoidCallback? onPressed;
-  final bool isLoading;
-  final String text;
-  final bool enabled;
-
-  const EnhancedButton({
-    super.key,
-    required this.onPressed,
-    required this.isLoading,
-    required this.text,
-    this.enabled = true,
-  });
-
-  @override
-  State<EnhancedButton> createState() => _EnhancedButtonState();
-}
-
-class _EnhancedButtonState extends State<EnhancedButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animController;
-  late Animation<double> _scaleAnim;
-  late Animation<double> _glowAnim;
-
-  @override
-  void initState() {
-    super.initState();
-    _animController = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _scaleAnim = Tween<double>(
-      begin: 1.0,
-      end: 0.98,
-    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
-    _glowAnim = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
-  }
-
-  @override
-  void dispose() {
-    _animController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown:
-          widget.enabled && !widget.isLoading
-              ? (_) => _animController.forward()
-              : null,
-      onTapUp:
-          widget.enabled && !widget.isLoading
-              ? (_) => _animController.reverse()
-              : null,
-      onTapCancel:
-          widget.enabled && !widget.isLoading
-              ? () => _animController.reverse()
-              : null,
-      child: AnimatedBuilder(
-        animation: _animController,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnim.value,
-            child: Container(
-              height: 52,
-              decoration: BoxDecoration(
-                gradient:
-                    widget.enabled && !widget.isLoading
-                        ? const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [primaryA, primaryB],
-                        )
-                        : LinearGradient(
-                          colors: [
-                            Colors.grey.withAlpha((0.3 * 255).toInt()),
-                            Colors.grey.withAlpha((0.2 * 255).toInt()),
-                          ],
-                        ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow:
-                    widget.enabled && !widget.isLoading
-                        ? [
-                          BoxShadow(
-                            color: primaryA.withAlpha(
-                              ((0.3 + (_glowAnim.value * 0.2)) * 255).toInt(),
-                            ),
-                            blurRadius: 12 + (_glowAnim.value * 8),
-                            offset: const Offset(0, 6),
-                          ),
-                        ]
-                        : null,
-              ),
-              child: ElevatedButton(
-                onPressed:
-                    widget.enabled && !widget.isLoading
-                        ? widget.onPressed
-                        : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child:
-                    widget.isLoading
-                        ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                        : Text(
-                          widget.text,
-                          style: TextStyle(
-                            color:
-                                widget.enabled ? Colors.white : Colors.white54,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                            letterSpacing: -0.2,
-                          ),
-                        ),
-              ),
-            ),
-          );
-        },
-      ),
     );
   }
 }
