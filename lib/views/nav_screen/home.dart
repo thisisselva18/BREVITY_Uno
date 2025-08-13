@@ -68,7 +68,6 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // UPDATED: Reverted to a static dark background color
       backgroundColor: const Color.fromARGB(255, 24, 24, 24),
       body: BlocConsumer<NewsBloc, NewsState>(
         listener: (context, state) {},
@@ -118,7 +117,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
             controller: _pageController,
             scrollDirection: Axis.vertical,
             itemCount:
-                state.hasReachedMax ? articles.length : articles.length + 1,
+            state.hasReachedMax ? articles.length : articles.length + 1,
             onPageChanged: (index) {
               context.read<NewsBloc>().add(UpdateNewsIndex(index));
 
@@ -203,6 +202,8 @@ class _NewsCardState extends State<_NewsCard> {
   late FlutterTts flutterTts;
   bool isPlaying = false;
   bool isLoading = false;
+  bool isLiked = false;
+  bool isDisliked = false;
 
   @override
   void initState() {
@@ -236,7 +237,6 @@ class _NewsCardState extends State<_NewsCard> {
         isLoading = true;
       });
 
-      // Combine title and description for TTS
       String textToSpeak = "${widget.article.title}. ${widget.article.description}";
 
       await flutterTts.setLanguage("en-US");
@@ -251,6 +251,32 @@ class _NewsCardState extends State<_NewsCard> {
 
       await flutterTts.speak(textToSpeak);
     }
+  }
+
+  void _handleLike() {
+    setState(() {
+      if (isLiked) {
+        isLiked = false;
+      } else {
+        isLiked = true;
+        isDisliked = false;
+      }
+    });
+    // TODO: Implement backend integration
+    print('Article ${isLiked ? 'liked' : 'unliked'}: ${widget.article.title}');
+  }
+
+  void _handleDislike() {
+    setState(() {
+      if (isDisliked) {
+        isDisliked = false;
+      } else {
+        isDisliked = true;
+        isLiked = false;
+      }
+    });
+    // TODO: Implement backend integration
+    print('Article ${isDisliked ? 'disliked' : 'undisliked'}: ${widget.article.title}');
   }
 
   @override
@@ -338,7 +364,7 @@ class _NewsCardState extends State<_NewsCard> {
                     fontSize: 16,
                     height: 1.4,
                   ),
-                  maxLines: 7,
+                  maxLines: 6,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const Gap(12),
@@ -388,31 +414,78 @@ class _NewsCardState extends State<_NewsCard> {
                 const Gap(24),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.arrow_upward_rounded,
-                      color: Color.fromRGBO(255, 255, 255, 0.7),
-                      size: 24,
+                    // Like/Dislike Buttons
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: _handleLike,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: isLiked
+                                  ? currentTheme.primaryColor.withAlpha(51)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isLiked
+                                    ? currentTheme.primaryColor
+                                    : Colors.white.withAlpha(51),
+                                width: 1,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.thumb_up_outlined,
+                              color: isLiked
+                                  ? currentTheme.primaryColor
+                                  : Colors.white.withAlpha(204),
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                        const Gap(12),
+                        GestureDetector(
+                          onTap: _handleDislike,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: isDisliked
+                                  ? currentTheme.primaryColor.withAlpha(51)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isDisliked
+                                    ? currentTheme.primaryColor
+                                    : Colors.white.withAlpha(51),
+                                width: 1,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.thumb_down_outlined,
+                              color: isDisliked
+                                  ? currentTheme.primaryColor
+                                  : Colors.white.withAlpha(204),
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const Gap(8),
-                    Text(
-                      'Swipe to continue',
-                      style: TextStyle(
-                        color: Colors.white.withAlpha(204),
-                        fontSize: 16,
-                      ),
-                    ),
-                    const Spacer(),
+                    const Gap(10),
                     IconButton(
                       icon: const Icon(
                         Icons.open_in_new_rounded,
                         color: Colors.white,
-                        size: 24,
+                        size: 28,
                       ),
                       onPressed: () => _launchUrl(widget.article.url),
                     ),
+
+                    Spacer(),
+
                     IconButton(
-                      onPressed:
-                          () => context.pushNamed('chat', extra: widget.article),
+                      onPressed: () => context.pushNamed('chat', extra: widget.article),
                       icon: Image.asset(
                         'assets/logos/ai.gif',
                         width: 90,
@@ -442,20 +515,18 @@ class _TappableHeadline extends StatelessWidget {
     return BlocBuilder<BookmarkBloc, BookmarkState>(
       builder: (context, state) {
         final isBookmarked =
-            state is BookmarksLoaded
-                ? state.bookmarks.any((a) => a.url == article.url)
-                : false;
+        state is BookmarksLoaded
+            ? state.bookmarks.any((a) => a.url == article.url)
+            : false;
         return GestureDetector(
-          onTap:
-              () => context.read<BookmarkBloc>().add(
-                ToggleBookmarkEvent(article),
-              ),
+          onTap: () => context.read<BookmarkBloc>().add(
+            ToggleBookmarkEvent(article),
+          ),
           child: Text(
             title,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              // UPDATED: Reverted to static white color for non-bookmarked items
               color: isBookmarked ? currentTheme.primaryColor : Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.w700,

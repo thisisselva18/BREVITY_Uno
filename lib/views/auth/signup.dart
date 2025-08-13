@@ -90,6 +90,9 @@ class _SignupScreenState extends State<SignupScreen>
     _shakeAnim = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _shakeController, curve: Curves.elasticOut),
     );
+    _floatAnim = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
+    );
 
     _floatController.repeat(reverse: true);
     _pulseController.repeat(reverse: true);
