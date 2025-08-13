@@ -374,51 +374,156 @@ class _NewsCardState extends State<_NewsCard> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const Gap(12),
-                Row(
-                  children: [
-                    if (widget.article.author.trim().isNotEmpty) ...[
-                      Text(
-                        'By ${widget.article.author}',
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (widget.article.author.trim().isEmpty) {
+                      return Row(
+                        children: [
+                          GestureDetector(
+                            onTap: _speak,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withAlpha(26),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withAlpha(51),
+                                  width: 1,
+                                ),
+                              ),
+                              child:
+                              isLoading
+                                  ? SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white.withAlpha(204),
+                                ),
+                              )
+                                  : Icon(
+                                isPlaying
+                                    ? Icons.stop
+                                    : Icons.volume_up_rounded,
+                                color: Colors.white.withAlpha(204),
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    // Calculate if author text would take more than 80% of available width
+                    final authorText = 'By ${widget.article.author}';
+                    final textPainter = TextPainter(
+                      text: TextSpan(
+                        text: authorText,
                         style: TextStyle(
                           color: Colors.white.withAlpha((0.6 * 255).toInt()),
                           fontSize: 13,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
-                      const Gap(8),
-                    ],
-                    GestureDetector(
-                      onTap: _speak,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(26),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withAlpha(51),
-                            width: 1,
+                      textDirection: Directionality.of(context),
+                    )..layout();
+
+                    final authorTextWidth = textPainter.width;
+                    final shouldWrap = authorTextWidth > (constraints.maxWidth * 0.8);
+
+                    if (shouldWrap) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            authorText,
+                            style: TextStyle(
+                              color: Colors.white.withAlpha((0.6 * 255).toInt()),
+                              fontSize: 13,
+                              fontStyle: FontStyle.italic,
+                            ),
                           ),
-                        ),
-                        child:
-                            isLoading
-                                ? SizedBox(
-                                  width: 14,
-                                  height: 14,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white.withAlpha(204),
-                                  ),
-                                )
-                                : Icon(
-                                  isPlaying
-                                      ? Icons.stop
-                                      : Icons.volume_up_rounded,
-                                  color: Colors.white.withAlpha(204),
-                                  size: 16,
+                          const Gap(8),
+                          GestureDetector(
+                            onTap: _speak,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withAlpha(26),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withAlpha(51),
+                                  width: 1,
                                 ),
-                      ),
-                    ),
-                  ],
+                              ),
+                              child:
+                              isLoading
+                                  ? SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white.withAlpha(204),
+                                ),
+                              )
+                                  : Icon(
+                                isPlaying
+                                    ? Icons.stop
+                                    : Icons.volume_up_rounded,
+                                color: Colors.white.withAlpha(204),
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Row(
+                        children: [
+                          Text(
+                            authorText,
+                            style: TextStyle(
+                              color: Colors.white.withAlpha((0.6 * 255).toInt()),
+                              fontSize: 13,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          const Gap(8),
+                          GestureDetector(
+                            onTap: _speak,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withAlpha(26),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withAlpha(51),
+                                  width: 1,
+                                ),
+                              ),
+                              child:
+                              isLoading
+                                  ? SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white.withAlpha(204),
+                                ),
+                              )
+                                  : Icon(
+                                isPlaying
+                                    ? Icons.stop
+                                    : Icons.volume_up_rounded,
+                                color: Colors.white.withAlpha(204),
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 ),
                 const Gap(24),
                 Row(

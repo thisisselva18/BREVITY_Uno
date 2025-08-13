@@ -223,7 +223,10 @@ class _SignupScreenState extends State<SignupScreen>
             children: [
               Icon(Icons.check_circle_rounded, color: successColor, size: 20),
               const SizedBox(width: 8),
-              const Text('Account created! Check your email to verify.'),
+              const Text(
+                'Account created! Check your email to verify.',
+                style: TextStyle(color: Colors.white),
+              ),
             ],
           ),
           backgroundColor: const Color(0xFF1F2937),
@@ -249,7 +252,10 @@ class _SignupScreenState extends State<SignupScreen>
             children: [
               Icon(Icons.error_rounded, color: errorColor, size: 20),
               const SizedBox(width: 8),
-              Expanded(child: Text('Signup failed: $errorMessage')),
+              Expanded(child: Text(
+                'Signup failed: $errorMessage',
+                style: TextStyle(color: Colors.white),
+              )),
             ],
           ),
           backgroundColor: const Color(0xFF1F2937),

@@ -190,7 +190,10 @@ class _LoginScreenState extends State<LoginScreen>
             children: [
               Icon(Icons.check_circle_rounded, color: successColor, size: 20),
               const SizedBox(width: 8),
-              const Text('Welcome back! Signing you in...'),
+              const Text(
+                'Welcome back! Signing you in...',
+                style: TextStyle(color: Colors.white),
+              ),
             ],
           ),
           backgroundColor: const Color(0xFF1F2937),
@@ -220,7 +223,10 @@ class _LoginScreenState extends State<LoginScreen>
               children: [
                 Icon(Icons.error_rounded, color: errorColor, size: 20),
                 const SizedBox(width: 8),
-                Expanded(child: Text(errorMessage)),
+                Expanded(child: Text(
+                  errorMessage,
+                  style: TextStyle(color: Colors.white),
+                )),
               ],
             ),
             backgroundColor: const Color(0xFF1F2937),
