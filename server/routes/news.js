@@ -4,6 +4,6 @@ const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.get('/',getArticlesWithReactions);
+router.get('/',authMiddleware,getArticlesWithReactions);
 
 module.exports = router;

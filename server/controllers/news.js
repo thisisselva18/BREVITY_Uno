@@ -9,7 +9,7 @@ const getArticlesWithReactions = async (req, res) => {
   const _everythingUrl = "https://newsapi.org/v2/everything";
 
   const { category, q, page = 1, pageSize = 10, sortedBy } = req.query;
-  const userId = "689dcb14cbcb28d2395a214f";
+  const userId =  req.user._id;
 
   let url;
 

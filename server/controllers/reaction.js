@@ -4,7 +4,7 @@ const toggleReaction = async (req, res) => {
   try {
     const { articleid, reactiontype } = req.body;
 
-    const userid = "689dca9c6d582035fe7257f5";
+    const userid = req.user._id;;
 
     const existingReaction = await Reaction.findOne({ userid, articleid });
 
