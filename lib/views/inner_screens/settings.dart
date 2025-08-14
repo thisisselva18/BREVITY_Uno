@@ -12,6 +12,7 @@ import 'package:brevity/views/common_widgets/common_appbar.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../controller/cubit/theme/theme_cubit.dart';
 import '../../controller/cubit/theme/theme_state.dart';
+import '../../controller/services/notification_service.dart';
 import '../../models/theme_model.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -29,6 +30,9 @@ class _SettingsScreenState extends State<SettingsScreen>
   late Animation<double> _animation;
   late AnimationController _particleAnimationController;
   final UserProfileCubit _userProfileCubit = UserProfileCubit();
+  bool _reminderEnabled = false;
+  String _reminderTime = '09:00';
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
@@ -50,6 +54,18 @@ class _SettingsScreenState extends State<SettingsScreen>
 
     _particleAnimationController.addListener(() {
       setState(() {});
+    });
+
+    _initializeNotifications();
+  }
+
+  Future<void> _initializeNotifications() async {
+    await _notificationService.initialize();
+    final enabled = await _notificationService.isReminderEnabled();
+    final time = await _notificationService.getReminderTime();
+    setState(() {
+      _reminderEnabled = enabled;
+      _reminderTime = time;
     });
   }
 
@@ -135,7 +151,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           decoration: BoxDecoration(
             color: isSelected
-                ? themeState.currentTheme.primaryColor.withOpacity(0.1)
+                ? themeState.currentTheme.primaryColor.withAlpha((0.1 * 255).toInt())
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
@@ -360,6 +376,239 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
   }
 
+  void _showTimePickerDialog() {
+    final theme = Theme.of(context);
+    final themeCubit = context.read<ThemeCubit>();
+
+    final timeParts = _reminderTime.split(':');
+    final currentHour = int.parse(timeParts[0]);
+    final currentMinute = int.parse(timeParts[1]);
+
+    showDialog(
+      context: context,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: themeCubit.currentTheme.primaryColor.withAlpha(50),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Set Reminder Time',
+                  style: theme.textTheme.titleLarge,
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  height: 200,
+                  child: Row(
+                    children: [
+                      // Hour picker
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Text(
+                              'Hour',
+                              style: theme.textTheme.titleSmall,
+                            ),
+                            const SizedBox(height: 10),
+                            Expanded(
+                              child: ListWheelScrollView.useDelegate(
+                                itemExtent: 40,
+                                diameterRatio: 1.5,
+                                perspective: 0.003,
+                                onSelectedItemChanged: (index) {
+                                  final hour = index.toString().padLeft(2, '0');
+                                  final minute = _reminderTime.split(':')[1];
+                                  setState(() {
+                                    _reminderTime = '$hour:$minute';
+                                  });
+                                },
+                                controller: FixedExtentScrollController(
+                                  initialItem: currentHour,
+                                ),
+                                childDelegate: ListWheelChildBuilderDelegate(
+                                  builder: (context, index) {
+                                    if (index < 0 || index > 23) return null;
+                                    return Container(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        index.toString().padLeft(2, '0'),
+                                        style: theme.textTheme.titleMedium?.copyWith(
+                                          color: index == currentHour
+                                              ? themeCubit.currentTheme.primaryColor
+                                              : theme.colorScheme.onSurface,
+                                          fontWeight: index == currentHour
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  childCount: 24,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      // Minute picker
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Text(
+                              'Minute',
+                              style: theme.textTheme.titleSmall,
+                            ),
+                            const SizedBox(height: 10),
+                            Expanded(
+                              child: ListWheelScrollView.useDelegate(
+                                itemExtent: 40,
+                                diameterRatio: 1.5,
+                                perspective: 0.003,
+                                onSelectedItemChanged: (index) {
+                                  final minute = (index * 5).toString().padLeft(2, '0');
+                                  final hour = _reminderTime.split(':')[0];
+                                  setState(() {
+                                    _reminderTime = '$hour:$minute';
+                                  });
+                                },
+                                controller: FixedExtentScrollController(
+                                  initialItem: (currentMinute / 5).round(),
+                                ),
+                                childDelegate: ListWheelChildBuilderDelegate(
+                                  builder: (context, index) {
+                                    if (index < 0 || index > 11) return null;
+                                    final minute = index * 5;
+                                    return Container(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        minute.toString().padLeft(2, '0'),
+                                        style: theme.textTheme.titleMedium?.copyWith(
+                                          color: minute == currentMinute
+                                              ? themeCubit.currentTheme.primaryColor
+                                              : theme.colorScheme.onSurface,
+                                          fontWeight: minute == currentMinute
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  childCount: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey.shade700,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await _notificationService.setReminderTime(_reminderTime);
+                        if (mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Reminder time set to $_reminderTime'),
+                              backgroundColor: themeCubit.currentTheme.primaryColor,
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: themeCubit.currentTheme.primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('Save'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _toggleReminderEnabled(bool enabled) async {
+    if (enabled) {
+      // Request permissions first
+      final hasPermission = await _notificationService.requestPermissions();
+      if (!hasPermission) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Notification permission is required for reminders'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    await _notificationService.setReminderEnabled(enabled);
+    setState(() {
+      _reminderEnabled = enabled;
+    });
+
+    if (mounted) {
+      final message = enabled
+          ? 'Daily reminders enabled for $_reminderTime'
+          : 'Daily reminders disabled';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: enabled ? Colors.green : Colors.orange,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -367,7 +616,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     return BlocProvider(
       create: (context) => _userProfileCubit,
       child: Scaffold(
-        backgroundColor: theme.colorScheme.background,
+        backgroundColor: theme.colorScheme.surface,
         body: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, themeState) {
             return BlocBuilder<UserProfileCubit, UserProfileState>(
@@ -406,13 +655,13 @@ class _SettingsScreenState extends State<SettingsScreen>
                   physics: const BouncingScrollPhysics(),
                   slivers: [
                     SliverAppBar(
-                      backgroundColor: theme.colorScheme.surface.withOpacity(0.85),
+                      backgroundColor: theme.colorScheme.surface.withAlpha((0.85 * 255).toInt()),
                       expandedHeight: 220,
                       pinned: true,
                       elevation: 0,
                       leading: IconButton(
                         icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       flexibleSpace: FlexibleSpaceBar(
@@ -468,7 +717,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                               Text(
                                 state.user?.email ?? '',
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurface.withOpacity(0.8),
+                                  color: theme.colorScheme.onSurface.withAlpha((0.8 * 255).toInt()),
                                   shadows: const [
                                     Shadow(
                                       color: Colors.black45,
@@ -556,7 +805,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                           BoxShadow(
                                             color: themeState
                                                 .currentTheme.primaryColor
-                                                .withOpacity(0.4),
+                                                .withAlpha((0.4 * 255).toInt()),
                                             blurRadius: 5,
                                             spreadRadius: 1,
                                           ),
@@ -578,6 +827,24 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     value: _notificationsEnabled,
                                     onChanged: (val) =>
                                         setState(() => _notificationsEnabled = val),
+                                  ),
+                                ),
+                                _buildAnimatedCard(
+                                  child: _buildSwitchTile(
+                                    icon: Icons.bookmark_add_outlined,
+                                    title: 'Daily Bookmark Reminder',
+                                    themeColor: themeState.currentTheme.primaryColor,
+                                    value: _reminderEnabled,
+                                    onChanged: _toggleReminderEnabled,
+                                  ),
+                                ),
+                                _buildAnimatedCard(
+                                  child: _buildListTile(
+                                    icon: Icons.schedule,
+                                    title: 'Reminder Time',
+                                    subtitle: _reminderTime,
+                                    themeColor: themeState.currentTheme.primaryColor,
+                                    onTap: _reminderEnabled ? _showTimePickerDialog : null,
                                   ),
                                 ),
                                 _buildAnimatedCard(
@@ -658,7 +925,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   ),
                                 ),
                                 _buildAnimatedCard(
-                                  color: Colors.red.withOpacity(0.1),
+                                  color: Colors.red.withAlpha((0.1 * 255).toInt()),
                                   child: _buildListTile(
                                     icon: Icons.delete_forever,
                                     iconColor: Colors.red,
@@ -730,10 +997,10 @@ class _SettingsScreenState extends State<SettingsScreen>
                   style: theme.textTheme.bodyLarge,
                   decoration: InputDecoration(
                     labelText: 'Display Name',
-                    labelStyle: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7)),
+                    labelStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt())),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.3)),
+                      borderSide: BorderSide(color: theme.colorScheme.onSurface.withAlpha((0.3 * 255).toInt())),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -801,7 +1068,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).toInt()),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -831,7 +1098,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               height: 1,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [themeColor.withOpacity(0.5), Colors.transparent],
+                  colors: [themeColor.withAlpha((0.5 * 255).toInt()), Colors.transparent],
                 ),
               ),
             ),
@@ -853,7 +1120,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       secondary: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: themeColor.withOpacity(0.1),
+          color: themeColor.withAlpha((0.1 * 255).toInt()),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, color: themeColor, size: 24),
@@ -882,7 +1149,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: (iconColor ?? themeColor).withOpacity(0.1),
+          color: (iconColor ?? themeColor).withAlpha((0.1 * 255).toInt()),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, color: iconColor ?? themeColor, size: 24),
@@ -895,13 +1162,13 @@ class _SettingsScreenState extends State<SettingsScreen>
           ? Text(
         subtitle,
         style: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.7),
+          color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
         ),
       )
           : null,
       trailing: trailingWidget ??
           Icon(Icons.arrow_forward_ios,
-              color: theme.colorScheme.onSurface.withOpacity(0.4), size: 16),
+              color: theme.colorScheme.onSurface.withAlpha((0.4 * 255).toInt()), size: 16),
       onTap: onTap,
     );
   }

@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/applogo.png" width="140"/>
+  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/Brevity_white.png" width="200"/>
   <h1>🚀 Brevity - Short, Smart, Straight to the point</h1>
   <p>
     <b>Stay informed effortlessly with real-time news, seamless navigation, and a personalized reading experience.</b>
@@ -11,8 +11,8 @@
     <a href="LICENSE">
       <img src="https://img.shields.io/badge/License-MIT-green" alt="License" />
     </a>
-    <img src="https://img.shields.io/badge/Version-1.0.0-orange" alt="Version" />
-     <a href="https://discord.gg/ueAnrmWr">
+    <img src="https://img.shields.io/badge/Version-2.1.0-orange" alt="Version" />
+     <a href="https://discord.gg/fS6AbcUW">
       <img src="https://img.shields.io/badge/Discord-Join%20Community-7289da?style=flat&logo=discord&logoColor=white" alt="Join Discord" />
     </a>
   </p>
@@ -241,7 +241,7 @@ We're excited to connect with you! Whether you have questions, ideas, or just wa
 The heart of our project is the community. Join our Discord server to ask questions, share your contributions, and collaborate with us in real-time!
 
 <p align="center">
-  <a href="https://discord.gg/ueAnrmWr">
+  <a href="https://discord.gg/fS6AbcUW">
     <img src="https://img.shields.io/badge/Discord-Join%20Our%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Join Discord" />
   </a>
 </p>

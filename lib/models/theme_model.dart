@@ -78,7 +78,7 @@ class AppTheme {
     return AppTheme(
       name: json['name'],
       primaryColor: Color(json['colorValue']),
-      secondaryColor: Color(json['colorValue']).withOpacity(0.8),
+      secondaryColor: Color(json['colorValue']).withAlpha((0.8 * 255).toInt()),
       colorValue: json['colorValue'],
       isDarkMode: json['isDarkMode'] ?? true,
     );
@@ -104,7 +104,7 @@ class AppTheme {
 MaterialColor _createMaterialColor(Color color) {
   final strengths = <double>[.05];
   final swatch = <int, Color>{};
-  final int r = color.red, g = color.green, b = color.blue;
+  final int r = (color.r * 255.0).round() & 0xff, g = (color.g * 255.0).round() & 0xff, b = (color.b * 255.0).round() & 0xff;
 
   for (int i = 1; i < 10; i++) {
     strengths.add(0.1 * i);
@@ -120,7 +120,7 @@ MaterialColor _createMaterialColor(Color color) {
     );
   }
 
-  return MaterialColor(color.value, swatch);
+  return MaterialColor(color.toARGB32(), swatch);
 }
 
 ThemeData createAppTheme(AppTheme appTheme) {
@@ -138,12 +138,10 @@ ThemeData createAppTheme(AppTheme appTheme) {
       primary: appTheme.primaryColor,
       secondary: appTheme.secondaryColor,
       surface: surfaceColor,
-      background: appTheme.isDarkMode ? const Color(0xFF121212) : Colors.grey[50]!,
       error: Colors.red,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onSurface: onSurfaceColor,
-      onBackground: onSurfaceColor,
       onError: Colors.white,
     ),
     appBarTheme: AppBarTheme(
@@ -163,14 +161,14 @@ ThemeData createAppTheme(AppTheme appTheme) {
       foregroundColor: Colors.white,
     ),
     switchTheme: SwitchThemeData(
-      thumbColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return appTheme.primaryColor;
         }
         return Colors.grey[400];
       }),
-      trackColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return appTheme.primaryColor.withAlpha((0.3 * 255).toInt());
         }
         return Colors.grey[800];

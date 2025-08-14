@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:brevity/utils/logger.dart';
 import 'package:equatable/equatable.dart';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/models/news_category.dart';
@@ -12,7 +13,7 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
   final NewsService newsService;
   int _page = 1;
   // --- CHANGE THIS VALUE ---
-  final int _pageSize = 8; // Change from 10 to 8
+  final int _pageSize = 10; // Change from 10 to 8
   // -------------------------
   NewsCategory _currentCategory = NewsCategory.general;
 
@@ -61,13 +62,13 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
     try {
       _page++;
 
-      // DEBUG: Print which page you are fetching
-      print('--- FETCHING PAGE: $_page FOR CATEGORY: $_currentCategory ---');
+      // DEBUG: Log.d which page you are fetching
+      Log.d('--- FETCHING PAGE: $_page FOR CATEGORY: $_currentCategory ---');
 
       final newArticles = await _fetchCategoryNews(page: _page);
 
-      // DEBUG: Print the number of new articles received
-      print('--- RECEIVED ${newArticles.length} NEW ARTICLES ---');
+      // DEBUG: Log.d the number of new articles received
+      Log.d('--- RECEIVED ${newArticles.length} NEW ARTICLES ---');
 
       emit(NewsLoaded(
         articles: List.of(currentState.articles)..addAll(newArticles),
@@ -78,8 +79,8 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
       ));
 
     } catch (e) {
-      // DEBUG: Print any errors that occur during the fetch
-      print('---!!! ERROR FETCHING PAGE $_page: $e !!!---');
+      // DEBUG: Log.d any errors that occur during the fetch
+      Log.e('---!!! ERROR FETCHING PAGE $_page: $e !!!---');
       _page--;
       emit(currentState.copyWith(isLoadingMore: false));
     }

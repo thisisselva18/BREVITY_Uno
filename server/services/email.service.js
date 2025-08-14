@@ -39,7 +39,7 @@ async function sendEmail({ to, subject, userName, token, url }) {
             const safeUrl = _url.replace(/&/g, '&amp;');
             let fullHtml = fs.readFileSync('services/templates/email-verification.html', 'utf8');
             fullHtml = fullHtml.replace('{{userName}}', userName);
-            fullHtml = fullHtml.replace('{{verificationLink}}', safeUrl);
+            fullHtml = fullHtml.replaceAll('{{verificationLink}}', safeUrl);
             mailOptions.html = fullHtml;
         }
         await transporter.sendMail(mailOptions);

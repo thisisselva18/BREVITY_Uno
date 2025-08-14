@@ -98,7 +98,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
               physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverAppBar(
-                  backgroundColor: theme.colorScheme.surface.withOpacity(0.85),
+                  backgroundColor: theme.colorScheme.surface.withAlpha((0.85 * 255).toInt()),
                   expandedHeight: 155,
                   elevation: 0,
                   flexibleSpace: FlexibleSpaceBar(
@@ -163,12 +163,12 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                 hintText: 'Search news topics...',
                                 hintStyle: theme.textTheme.bodyLarge?.copyWith(
                                   color: theme.colorScheme.onSurface
-                                      .withOpacity(0.6),
+                                      .withAlpha((0.6 * 255).toInt()),
                                 ),
                                 suffixIcon: IconButton(
                                   icon: const Icon(Icons.search),
                                   color: theme.colorScheme.onSurface
-                                      .withOpacity(0.7),
+                                      .withAlpha((0.7 * 255).toInt()),
                                   onPressed: _handleSearch,
                                 ),
                                 border: OutlineInputBorder(
@@ -179,7 +179,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                 fillColor: theme
                                     .colorScheme
                                     .surfaceContainerHighest
-                                    .withOpacity(0.7),
+                                    .withAlpha((0.7 * 255).toInt()),
                               ),
                               onSubmitted: (_) => _handleSearch(),
                             ),
@@ -196,7 +196,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          currentTheme.primaryColor.withOpacity(0.1),
+                          currentTheme.primaryColor.withAlpha((0.1 * 255).toInt()),
                           Colors.transparent,
                         ],
                       ),
@@ -456,7 +456,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                   ),
                 ),
               ],
@@ -488,7 +488,7 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
             image: NetworkImage(imageUrl),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.4),
+              Colors.black.withAlpha((0.4 * 255).toInt()),
               BlendMode.darken,
             ),
           ),

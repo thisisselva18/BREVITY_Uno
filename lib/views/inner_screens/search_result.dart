@@ -67,7 +67,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: FutureBuilder<List<Article>>(
         future: _searchResults,
         builder: (context, snapshot) {
@@ -75,7 +75,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
             physics: const BouncingScrollPhysics(),
             slivers: [
               SliverAppBar(
-                backgroundColor: theme.colorScheme.surface.withOpacity(0.85),
+                backgroundColor: theme.colorScheme.surface.withAlpha((0.85 * 255).toInt()),
                 expandedHeight: 70,
                 pinned: true,
                 elevation: 0,
@@ -89,7 +89,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                 centerTitle: true,
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ),
@@ -213,7 +213,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                   borderRadius: BorderRadius.circular(100),
                   boxShadow: [
                     BoxShadow(
-                      color: currentTheme.primaryColor.withOpacity(0.15),
+                      color: currentTheme.primaryColor.withAlpha((0.15 * 255).toInt()),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -237,7 +237,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
               Text(
                 'Try a different search term',
                 style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                 ),
               ),
               const SizedBox(height: 24),
@@ -253,7 +253,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen>
                     borderRadius: BorderRadius.circular(12),
                   ),
                   elevation: 4,
-                  shadowColor: currentTheme.primaryColor.withOpacity(0.5),
+                  shadowColor: currentTheme.primaryColor.withAlpha((0.5 * 255).toInt()),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Row(
