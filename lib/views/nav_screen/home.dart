@@ -1,9 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_event.dart';
 import 'package:brevity/controller/bloc/bookmark_bloc/bookmark_state.dart';
@@ -11,6 +5,13 @@ import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_bloc.dart';
 import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/models/news_category.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -43,7 +44,8 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     final currentState = newsBloc.state;
 
     int initialPage = 0;
-    if (currentState is NewsLoaded && currentState.category == widget.category) {
+    if (currentState is NewsLoaded &&
+        currentState.category == widget.category) {
       initialPage = currentState.currentIndex;
     } else {
       newsBloc.add(FetchInitialNews(category: widget.category));
@@ -66,7 +68,6 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // UPDATED: Reverted to a static dark background color
       backgroundColor: const Color.fromARGB(255, 24, 24, 24),
       body: BlocConsumer<NewsBloc, NewsState>(
         listener: (context, state) {},
@@ -96,8 +97,11 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     final articles = state.articles;
     if (articles.isEmpty) {
       return const Center(
-          child: Text("No articles found.",
-              style: TextStyle(color: Colors.white)));
+        child: Text(
+          "No articles found.",
+          style: TextStyle(color: Colors.white),
+        ),
+      );
     }
 
     return GestureDetector(
@@ -113,22 +117,30 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
             controller: _pageController,
             scrollDirection: Axis.vertical,
             itemCount:
-            state.hasReachedMax ? articles.length : articles.length + 1,
+                state.hasReachedMax ? articles.length + 1 : articles.length + 1,
             onPageChanged: (index) {
               context.read<NewsBloc>().add(UpdateNewsIndex(index));
 
               if (!state.hasReachedMax && index >= articles.length - 3) {
-                context
-                    .read<NewsBloc>()
-                    .add(FetchNextPage(index, widget.category));
+                context.read<NewsBloc>().add(
+                  FetchNextPage(index, widget.category),
+                );
               }
             },
             itemBuilder: (context, index) {
+              // Show end placeholder if we've reached the end
               if (index >= articles.length) {
-                return const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
+                return Container(
+                  color: Colors.black,
+                  child: Center(
+                    child: Text(
+                      'You\'ve reached the end',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                  ),
                 );
               }
+
               final article = articles[index];
               return _NewsCard(article: article);
             },
@@ -185,12 +197,98 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   }
 }
 
-class _NewsCard extends StatelessWidget {
+class _NewsCard extends StatefulWidget {
   final Article article;
 
-  const _NewsCard({
-    required this.article,
-  });
+  const _NewsCard({required this.article});
+
+  @override
+  State<_NewsCard> createState() => _NewsCardState();
+}
+
+class _NewsCardState extends State<_NewsCard> {
+  late FlutterTts flutterTts;
+  bool isPlaying = false;
+  bool isLoading = false;
+  bool isLiked = false;
+  bool isDisliked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    initTts();
+  }
+
+  initTts() {
+    flutterTts = FlutterTts();
+    flutterTts.setCompletionHandler(() {
+      setState(() {
+        isPlaying = false;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    flutterTts.stop();
+    super.dispose();
+  }
+
+  Future<void> _speak() async {
+    if (isPlaying) {
+      await flutterTts.stop();
+      setState(() {
+        isPlaying = false;
+      });
+    } else {
+      setState(() {
+        isLoading = true;
+      });
+
+      String textToSpeak =
+          "${widget.article.title}. ${widget.article.description}";
+
+      await flutterTts.setLanguage("en-US");
+      await flutterTts.setSpeechRate(0.5);
+      await flutterTts.setVolume(1.0);
+      await flutterTts.setPitch(1.0);
+
+      setState(() {
+        isLoading = false;
+        isPlaying = true;
+      });
+
+      await flutterTts.speak(textToSpeak);
+    }
+  }
+
+  void _handleLike() {
+    setState(() {
+      if (isLiked) {
+        isLiked = false;
+      } else {
+        isLiked = true;
+        isDisliked = false;
+      }
+    });
+    // TODO: Implement backend integration
+    print('Article ${isLiked ? 'liked' : 'unliked'}: ${widget.article.title}');
+  }
+
+  void _handleDislike() {
+    setState(() {
+      if (isDisliked) {
+        isDisliked = false;
+      } else {
+        isDisliked = true;
+        isLiked = false;
+      }
+    });
+    // TODO: Implement backend integration
+    print(
+      'Article ${isDisliked ? 'disliked' : 'undisliked'}: ${widget.article.title}',
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -198,10 +296,9 @@ class _NewsCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        // UPDATED: Reverted to static dark color
         color: Colors.black,
         image: DecorationImage(
-          image: CachedNetworkImageProvider(article.urlToImage),
+          image: CachedNetworkImageProvider(widget.article.urlToImage),
           fit: BoxFit.cover,
           onError: (exception, stackTrace) {},
         ),
@@ -211,7 +308,6 @@ class _NewsCard extends StatelessWidget {
         children: [
           Container(
             decoration: const BoxDecoration(
-              // UPDATED: Reverted to static dark gradient
               gradient: LinearGradient(
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
@@ -242,7 +338,7 @@ class _NewsCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        article.sourceName.toUpperCase(),
+                        widget.article.sourceName.toUpperCase(),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 11,
@@ -252,79 +348,283 @@ class _NewsCard extends StatelessWidget {
                       ),
                     ),
                     const Gap(12),
-                    Text(
-                      DateFormat('MMM dd, y • h:mm a')
-                          .format(article.publishedAt),
-                      // UPDATED: Reverted to static white color
-                      style: TextStyle(
-                        color: Colors.white.withAlpha(229),
-                        fontSize: 14,
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          DateFormat(
+                            'MMM dd, y • h:mm a',
+                          ).format(widget.article.publishedAt),
+                          style: TextStyle(
+                            color: Colors.white.withAlpha(229),
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
                 const Gap(20),
-                _TappableHeadline(title: article.title, article: article),
+                _TappableHeadline(
+                  title: widget.article.title,
+                  article: widget.article,
+                ),
                 const Gap(16),
                 Text(
-                  article.description,
-                  // UPDATED: Reverted to static white color
+                  widget.article.description,
                   style: TextStyle(
                     color: Colors.white.withAlpha(229),
                     fontSize: 16,
                     height: 1.4,
                   ),
-                  maxLines: 7,
+                  maxLines: 6,
                   overflow: TextOverflow.ellipsis,
                 ),
-                if (article.author.trim().isNotEmpty) ...[
-                  const Gap(12),
-                  Text(
-                    'By ${article.author}',
-                    // UPDATED: Reverted to static white color
-                    style: TextStyle(
-                      color: Colors.white.withAlpha((0.6 * 255).toInt()),
-                      fontSize: 13,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
+                const Gap(12),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (widget.article.author.trim().isEmpty) {
+                      return Row(
+                        children: [
+                          GestureDetector(
+                            onTap: _speak,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withAlpha(26),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withAlpha(51),
+                                  width: 1,
+                                ),
+                              ),
+                              child:
+                                  isLoading
+                                      ? SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white.withAlpha(204),
+                                        ),
+                                      )
+                                      : Icon(
+                                        isPlaying
+                                            ? Icons.stop
+                                            : Icons.volume_up_rounded,
+                                        color: Colors.white.withAlpha(204),
+                                        size: 16,
+                                      ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    // Calculate if author text would take more than 80% of available width
+                    final authorText = 'By ${widget.article.author}';
+                    final textPainter = TextPainter(
+                      text: TextSpan(
+                        text: authorText,
+                        style: TextStyle(
+                          color: Colors.white.withAlpha((0.6 * 255).toInt()),
+                          fontSize: 13,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      textDirection: Directionality.of(context),
+                    )..layout();
+
+                    final authorTextWidth = textPainter.width;
+                    final shouldWrap =
+                        authorTextWidth > (constraints.maxWidth * 0.8);
+
+                    if (shouldWrap) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            authorText,
+                            style: TextStyle(
+                              color: Colors.white.withAlpha(
+                                (0.6 * 255).toInt(),
+                              ),
+                              fontSize: 13,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          const Gap(8),
+                          GestureDetector(
+                            onTap: _speak,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withAlpha(26),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withAlpha(51),
+                                  width: 1,
+                                ),
+                              ),
+                              child:
+                                  isLoading
+                                      ? SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white.withAlpha(204),
+                                        ),
+                                      )
+                                      : Icon(
+                                        isPlaying
+                                            ? Icons.stop
+                                            : Icons.volume_up_rounded,
+                                        color: Colors.white.withAlpha(204),
+                                        size: 16,
+                                      ),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Row(
+                        children: [
+                          Text(
+                            authorText,
+                            style: TextStyle(
+                              color: Colors.white.withAlpha(
+                                (0.6 * 255).toInt(),
+                              ),
+                              fontSize: 13,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          const Gap(8),
+                          GestureDetector(
+                            onTap: _speak,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withAlpha(26),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withAlpha(51),
+                                  width: 1,
+                                ),
+                              ),
+                              child:
+                                  isLoading
+                                      ? SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white.withAlpha(204),
+                                        ),
+                                      )
+                                      : Icon(
+                                        isPlaying
+                                            ? Icons.stop
+                                            : Icons.volume_up_rounded,
+                                        color: Colors.white.withAlpha(204),
+                                        size: 16,
+                                      ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
                 const Gap(24),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.arrow_upward_rounded,
-                      color: Color.fromRGBO(255, 255, 255, 0.7),
-                      size: 24,
+                    // Like/Dislike Buttons
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: _handleLike,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color:
+                                  isLiked
+                                      ? currentTheme.primaryColor.withAlpha(51)
+                                      : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color:
+                                    isLiked
+                                        ? currentTheme.primaryColor
+                                        : Colors.white.withAlpha(51),
+                                width: 1,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.thumb_up_outlined,
+                              color:
+                                  isLiked
+                                      ? currentTheme.primaryColor
+                                      : Colors.white.withAlpha(204),
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                        const Gap(12),
+                        GestureDetector(
+                          onTap: _handleDislike,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color:
+                                  isDisliked
+                                      ? currentTheme.primaryColor.withAlpha(51)
+                                      : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color:
+                                    isDisliked
+                                        ? currentTheme.primaryColor
+                                        : Colors.white.withAlpha(51),
+                                width: 1,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.thumb_down_outlined,
+                              color:
+                                  isDisliked
+                                      ? currentTheme.primaryColor
+                                      : Colors.white.withAlpha(204),
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const Gap(8),
-                    Text(
-                      'Swipe to continue',
-                      // UPDATED: Reverted to static white color
-                      style: TextStyle(
-                        color: Colors.white.withAlpha(204),
-                        fontSize: 16,
-                      ),
-                    ),
-                    const Spacer(),
+                    const Gap(10),
                     IconButton(
-                      // UPDATED: Reverted to static white color
                       icon: const Icon(
                         Icons.open_in_new_rounded,
                         color: Colors.white,
-                        size: 24,
+                        size: 28,
                       ),
-                      onPressed: () => _launchUrl(article.url),
+                      onPressed: () => _launchUrl(widget.article.url),
                     ),
+
+                    Spacer(),
+
                     IconButton(
-                      onPressed: () => context.pushNamed(
-                        'chat',
-                        extra: article,
-                      ),
+                      onPressed:
+                          () =>
+                              context.pushNamed('chat', extra: widget.article),
                       icon: Image.asset(
-                        'assets/logos/ai.gif',
-                        width: 90,
-                        height: 70,
+                        'assets/logos/chatbot.gif',
+                        width: 40,
+                        height: 40,
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -349,19 +649,20 @@ class _TappableHeadline extends StatelessWidget {
     final currentTheme = context.read<ThemeCubit>().currentTheme;
     return BlocBuilder<BookmarkBloc, BookmarkState>(
       builder: (context, state) {
-        final isBookmarked = state is BookmarksLoaded
-            ? state.bookmarks.any((a) => a.url == article.url)
-            : false;
+        final isBookmarked =
+            state is BookmarksLoaded
+                ? state.bookmarks.any((a) => a.url == article.url)
+                : false;
         return GestureDetector(
-          onTap: () => context.read<BookmarkBloc>().add(
-            ToggleBookmarkEvent(article),
-          ),
+          onTap:
+              () => context.read<BookmarkBloc>().add(
+                ToggleBookmarkEvent(article),
+              ),
           child: Text(
             title,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              // UPDATED: Reverted to static white color for non-bookmarked items
               color: isBookmarked ? currentTheme.primaryColor : Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.w700,
