@@ -623,7 +623,7 @@ class _NewsCardState extends State<_NewsCard> {
                           () =>
                               context.pushNamed('chat', extra: widget.article),
                       icon: Image.asset(
-                        'assets/logos/Siri.gif',
+                        'assets/logos/chatbot.gif',
                         width: 40,
                         height: 40,
                         fit: BoxFit.contain,

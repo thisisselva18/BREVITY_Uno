@@ -9,10 +9,16 @@ const {
     forgotPassword,
     resetPassword,
     verifyEmail,
-    resendVerification
+    resendVerification,
+    googleAuth,
+    googleCallback
 } = require('../controllers/auth');
 
 const router = express.Router();
+
+//oauth routes
+router.get('/google', googleAuth);
+router.get('/google/callback', googleCallback);
 
 // Routes
 router.post('/register', upload.single('profileImage'), register);
