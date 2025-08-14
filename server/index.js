@@ -9,6 +9,7 @@ const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const bookmarkRoutes = require('./routes/bookmark');
+const passport = require('passport');
 
 // Import controllers
 const { verifyEmail } = require('./controllers/auth');
@@ -49,8 +50,13 @@ mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch((err) => console.error('MongoDB connection error:', err));
+.then(() => console.log('Connected to MongoDB'))
+.catch((err) => console.error('MongoDB connection error:', err));
+
+// Passport configuration
+require('./config/passport'); 
+app.use(passport.initialize());
+
 
 // Routes
 app.use('/api/auth', authRoutes);

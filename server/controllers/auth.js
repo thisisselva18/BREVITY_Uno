@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const passport = require('passport');
 const { generateTokens } = require('../services/jwt');
 const { sendEmail } = require('../services/email.service');
 const { jwt, decode } = require('jsonwebtoken');
@@ -402,6 +403,30 @@ const resendVerification = async (req, res) => {
     }
 }
 
+const googleAuth = passport.authenticate('google', { scope: ['profile', 'email'] });
+
+const googleCallback = [
+    passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+    async (req, res) => {
+        try {
+            const { accessToken, refreshToken } = generateTokens(req.user._id);
+            req.user.refreshTokens.push({ token: refreshToken });
+            await req.user.save();
+
+            res.json({
+                success: true,
+                message: 'Google login successful',
+                data: {
+                    user: req.user,
+                    accessToken,
+                    refreshToken,
+                },
+            });
+        } catch (error) {
+            res.status(500).json({ success: false, message: 'Authentication failed', error: error.message });
+        }
+    }
+];
 
 module.exports = {
     register,
@@ -411,5 +436,7 @@ module.exports = {
     resetPassword,
     getCurrentUser,
     verifyEmail,
-    resendVerification
+    resendVerification,
+    googleAuth,
+    googleCallback
 };
