@@ -519,7 +519,7 @@ class _SignupScreenState extends State<SignupScreen>
 
                           const SizedBox(width: 16),
 
-                          // Profile picture - smaller, left side
+                          // Profile picture
                           GestureDetector(
                             onTap: _pickImage,
                             child: Container(

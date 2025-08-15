@@ -393,6 +393,21 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
   }
 
+  bool _hasProfileImage(UserProfileState state, user) {
+    return state.localProfileImage != null ||
+        (user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty);
+  }
+
+  ImageProvider? _getProfileImage(UserProfileState state, user) {
+    if (state.localProfileImage != null) {
+      return FileImage(state.localProfileImage!);
+    }
+    if (user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty) {
+      return NetworkImage(user.profileImageUrl!);
+    }
+    return null;
+  }
+
   void _showTimePickerDialog() {
     final theme = Theme.of(context);
     final themeCubit = context.read<ThemeCubit>();
@@ -759,12 +774,24 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     ),
                                   ],
                                 ),
-                                child: const CircleAvatar(
+                                child: CircleAvatar(
                                   radius: 40,
-                                  backgroundColor: Colors.white,
-                                  backgroundImage: NetworkImage(
-                                    'https://a0.anyrgb.com/pngimg/1140/162/user-profile-login-avatar-heroes-user-blue-icons-circle-symbol-logo-thumbnail.png',
-                                  ),
+                                  backgroundColor: _hasProfileImage(state, state.user)
+                                      ? Colors.transparent
+                                      : themeState.currentTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
+                                  backgroundImage: _getProfileImage(state, state.user),
+                                  child: !_hasProfileImage(state, state.user)
+                                      ? Text(
+                                    state.user?.displayName.isNotEmpty == true
+                                        ? state.user!.displayName[0].toUpperCase()
+                                        : '?',
+                                    style: TextStyle(
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                      : null,
                                 ),
                               ),
                               const SizedBox(height: 16),
