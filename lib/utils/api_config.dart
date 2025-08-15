@@ -1,6 +1,7 @@
 class ApiConfig {
   // Update this URL to match your backend deployment
-  static const String baseUrl = 'https://brevitybackend.onrender.com/api';
+  static const String baseUrl = 'https://brevity-backend-khaki.vercel.app/api';
+  //static const String baseUrl = 'http://10.0.2.2:5001/api';
 
   // API endpoints
   static const String newsEndpoint = '/news';

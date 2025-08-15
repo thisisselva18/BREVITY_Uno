@@ -21,7 +21,9 @@ const { errorHandler } = require('./middleware/error');
 const app = express();
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: false, // Disable CSP for Vercel
+}));
 app.use(compression());
 
 // Rate limiting
@@ -46,18 +48,32 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
-// Database connection
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-    .then(() => console.log('Connected to MongoDB'))
-    .catch((err) => console.error('MongoDB connection error:', err));
+// Database connection with better error handling for Vercel
+let isConnected = false;
+
+const connectDB = async () => {
+    if (isConnected) {
+        return;
+    }
+
+    try {
+        await mongoose.connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 30000
+        });
+        isConnected = true;
+        console.log('Connected to MongoDB');
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+    }
+};
+
+connectDB();
 
 // Passport configuration
 require('./config/passport');
 app.use(passport.initialize());
-
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -75,6 +91,15 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Root route for testing
+app.get('/', (req, res) => {
+    res.json({
+        success: true,
+        message: 'NewsAI Backend API',
+        version: '1.0.0'
+    });
+});
+
 // Email verification route
 app.get('/auth/verify-email', verifyEmail);
 
@@ -89,4 +114,5 @@ app.use('*', (req, res) => {
     });
 });
 
+// For Vercel serverless functions
 module.exports = app;

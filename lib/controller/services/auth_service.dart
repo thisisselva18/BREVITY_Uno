@@ -16,7 +16,8 @@ class AuthService {
   factory AuthService() => _instance;
   AuthService._internal();
 
-  final String _baseUrl = 'https://brevitybackend.onrender.com/api/auth';
+  final String _baseUrl = 'https://brevity-backend-khaki.vercel.app/api/auth';
+  //static const String _baseUrl = 'http://10.0.2.2:5001/api/auth';
 
   // HTTP timeout duration
   static const Duration _httpTimeout = Duration(seconds: 30);
@@ -127,13 +128,13 @@ class AuthService {
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
           createdAt:
-          userData['createdAt'] != null
-              ? DateTime.parse(userData['createdAt'])
-              : null,
+              userData['createdAt'] != null
+                  ? DateTime.parse(userData['createdAt'])
+                  : null,
           updatedAt:
-          userData['updatedAt'] != null
-              ? DateTime.parse(userData['updatedAt'])
-              : null,
+              userData['updatedAt'] != null
+                  ? DateTime.parse(userData['updatedAt'])
+                  : null,
           profileImageUrl: userData['profileImage']?['url'],
         );
 
@@ -251,13 +252,13 @@ class AuthService {
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
           createdAt:
-          userData['createdAt'] != null
-              ? DateTime.parse(userData['createdAt'])
-              : null,
+              userData['createdAt'] != null
+                  ? DateTime.parse(userData['createdAt'])
+                  : null,
           updatedAt:
-          userData['updatedAt'] != null
-              ? DateTime.parse(userData['updatedAt'])
-              : null,
+              userData['updatedAt'] != null
+                  ? DateTime.parse(userData['updatedAt'])
+                  : null,
           profileImageUrl: userData['profileImage']?['url'],
         );
 
@@ -380,13 +381,13 @@ class AuthService {
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
           createdAt:
-          userData['createdAt'] != null
-              ? DateTime.parse(userData['createdAt'])
-              : null,
+              userData['createdAt'] != null
+                  ? DateTime.parse(userData['createdAt'])
+                  : null,
           updatedAt:
-          userData['updatedAt'] != null
-              ? DateTime.parse(userData['updatedAt'])
-              : null,
+              userData['updatedAt'] != null
+                  ? DateTime.parse(userData['updatedAt'])
+                  : null,
           profileImageUrl: userData['profileImage']?['url'],
         );
 
