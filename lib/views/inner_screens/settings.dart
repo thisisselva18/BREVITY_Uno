@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 
+import 'package:brevity/views/inner_screens/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -767,10 +768,11 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     title: 'Edit Profile',
                                     subtitle: 'Update your personal information',
                                     themeColor: themeState.currentTheme.primaryColor,
-                                    onTap: () => _showEditProfileDialog(
+                                    onTap: () => Navigator.push(
                                       context,
-                                      state.user,
-                                      themeState.currentTheme.primaryColor,
+                                      MaterialPageRoute(
+                                        builder: (context) => const ProfileScreen(),
+                                      ),
                                     ),
                                   ),
                                 ),

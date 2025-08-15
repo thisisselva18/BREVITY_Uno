@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:brevity/models/user_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:http_parser/http_parser.dart';
 
 class UserRepository {
   final String _baseUrl = 'https://brevitybackend.onrender.com/api/users';
@@ -30,18 +34,19 @@ class UserRepository {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final userData = data['data']['user'];
-        
+
         return UserModel(
           uid: userData['_id'], // Node.js uses _id
           displayName: userData['displayName'] ?? '',
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
-          createdAt: userData['createdAt'] != null 
-              ? DateTime.parse(userData['createdAt']) 
+          createdAt: userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'])
               : null,
-          updatedAt: userData['updatedAt'] != null 
-              ? DateTime.parse(userData['updatedAt']) 
+          updatedAt: userData['updatedAt'] != null
+              ? DateTime.parse(userData['updatedAt'])
               : null,
+          profileImageUrl: userData['profileImage']?['url'],
         );
       } else {
         final errorData = json.decode(response.body);
@@ -53,35 +58,72 @@ class UserRepository {
   }
 
   // Update user profile
-  Future<UserModel> updateUserProfile(UserModel user) async {
+  Future<UserModel> updateUserProfile(UserModel user, {File? profileImage}) async {
     try {
-      final response = await http.put(
-        Uri.parse('$_baseUrl/profile'),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
-          'displayName': user.displayName,
-          // Add other fields you want to update
-        }),
-      );
+      final uri = Uri.parse('$_baseUrl/profile');
+      final request = http.MultipartRequest('PUT', uri);
+
+      // Add auth header
+      if (_accessToken != null) {
+        request.headers['Authorization'] = 'Bearer $_accessToken';
+      }
+
+      // Add form fields
+      request.fields['displayName'] = user.displayName;
+
+      // Add profile image if provided
+      if (profileImage != null) {
+        // Get file extension and determine content type
+        final extension = profileImage.path.split('.').last.toLowerCase();
+        String contentType;
+
+        switch (extension) {
+          case 'jpg':
+          case 'jpeg':
+            contentType = 'image/jpeg';
+            break;
+          case 'png':
+            contentType = 'image/png';
+            break;
+          case 'gif':
+            contentType = 'image/gif';
+            break;
+          case 'webp':
+            contentType = 'image/webp';
+            break;
+          default:
+            contentType = 'image/jpeg'; // Default fallback
+        }
+
+        final multipartFile = http.MultipartFile(
+          'profileImage',
+          profileImage.readAsBytes().asStream(),
+          profileImage.lengthSync(),
+          filename: 'profile_image.$extension',
+          contentType: MediaType.parse(contentType),
+        );
+        request.files.add(multipartFile);
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final userData = data['data']['user'];
-        
+
         return UserModel(
           uid: userData['_id'],
           displayName: userData['displayName'] ?? '',
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
-          createdAt: userData['createdAt'] != null 
-              ? DateTime.parse(userData['createdAt']) 
+          createdAt: userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'])
               : null,
-          updatedAt: userData['updatedAt'] != null 
-              ? DateTime.parse(userData['updatedAt']) 
+          updatedAt: userData['updatedAt'] != null
+              ? DateTime.parse(userData['updatedAt'])
               : null,
+          profileImageUrl: userData['profileImage']?['url'],
         );
       } else {
         final errorData = json.decode(response.body);
@@ -106,18 +148,19 @@ class UserRepository {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final userData = data['data']['user'];
-        
+
         return UserModel(
           uid: userData['_id'],
           displayName: userData['displayName'] ?? '',
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
-          createdAt: userData['createdAt'] != null 
-              ? DateTime.parse(userData['createdAt']) 
+          createdAt: userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'])
               : null,
-          updatedAt: userData['updatedAt'] != null 
-              ? DateTime.parse(userData['updatedAt']) 
+          updatedAt: userData['updatedAt'] != null
+              ? DateTime.parse(userData['updatedAt'])
               : null,
+          profileImageUrl: userData['profileImage']?['url'],
         );
       } else {
         final errorData = json.decode(response.body);
