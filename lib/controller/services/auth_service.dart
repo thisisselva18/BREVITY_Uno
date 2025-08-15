@@ -108,6 +108,7 @@ class AuthService {
           userData['updatedAt'] != null
               ? DateTime.parse(userData['updatedAt'])
               : null,
+          profileImageUrl: userData['profileImage']?['url'],
         );
 
         if (context != null && context.mounted) {
@@ -224,13 +225,14 @@ class AuthService {
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
           createdAt:
-              userData['createdAt'] != null
-                  ? DateTime.parse(userData['createdAt'])
-                  : null,
+          userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'])
+              : null,
           updatedAt:
-              userData['updatedAt'] != null
-                  ? DateTime.parse(userData['updatedAt'])
-                  : null,
+          userData['updatedAt'] != null
+              ? DateTime.parse(userData['updatedAt'])
+              : null,
+          profileImageUrl: userData['profileImage']?['url'],
         );
 
         if (context != null && context.mounted) {
@@ -352,13 +354,14 @@ class AuthService {
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
           createdAt:
-              userData['createdAt'] != null
-                  ? DateTime.parse(userData['createdAt'])
-                  : null,
+          userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'])
+              : null,
           updatedAt:
-              userData['updatedAt'] != null
-                  ? DateTime.parse(userData['updatedAt'])
-                  : null,
+          userData['updatedAt'] != null
+              ? DateTime.parse(userData['updatedAt'])
+              : null,
+          profileImageUrl: userData['profileImage']?['url'],
         );
 
         _authStateController.add(_currentUser);

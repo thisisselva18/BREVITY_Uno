@@ -34,19 +34,19 @@ class UserRepository {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final userData = data['data']['user'];
-        
+
         return UserModel(
           uid: userData['_id'], // Node.js uses _id
           displayName: userData['displayName'] ?? '',
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
-          createdAt: userData['createdAt'] != null 
-              ? DateTime.parse(userData['createdAt']) 
+          createdAt: userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'])
               : null,
-          updatedAt: userData['updatedAt'] != null 
-              ? DateTime.parse(userData['updatedAt']) 
+          updatedAt: userData['updatedAt'] != null
+              ? DateTime.parse(userData['updatedAt'])
               : null,
-          profileImageUrl: userData['profileImageUrl'],
+          profileImageUrl: userData['profileImage']?['url'],
         );
       } else {
         final errorData = json.decode(response.body);
@@ -123,7 +123,7 @@ class UserRepository {
           updatedAt: userData['updatedAt'] != null
               ? DateTime.parse(userData['updatedAt'])
               : null,
-          profileImageUrl: userData['profileImageUrl'],
+          profileImageUrl: userData['profileImage']?['url'],
         );
       } else {
         final errorData = json.decode(response.body);
@@ -148,19 +148,19 @@ class UserRepository {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final userData = data['data']['user'];
-        
+
         return UserModel(
           uid: userData['_id'],
           displayName: userData['displayName'] ?? '',
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
-          createdAt: userData['createdAt'] != null 
-              ? DateTime.parse(userData['createdAt']) 
+          createdAt: userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'])
               : null,
-          updatedAt: userData['updatedAt'] != null 
-              ? DateTime.parse(userData['updatedAt']) 
+          updatedAt: userData['updatedAt'] != null
+              ? DateTime.parse(userData['updatedAt'])
               : null,
-          profileImageUrl: userData['profileImageUrl'],
+          profileImageUrl: userData['profileImage']?['url'],
         );
       } else {
         final errorData = json.decode(response.body);
