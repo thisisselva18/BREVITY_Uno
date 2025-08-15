@@ -7,6 +7,7 @@ import 'package:brevity/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 
 class AuthService {
@@ -74,9 +75,34 @@ class AuthService {
 
       // Add profile image if provided
       if (profileImage != null) {
-        final multipartFile = await http.MultipartFile.fromPath(
-          'profileImage', // This matches your backend field name
-          profileImage.path,
+        // Get file extension and determine content type
+        final extension = profileImage.path.split('.').last.toLowerCase();
+        String contentType;
+
+        switch (extension) {
+          case 'jpg':
+          case 'jpeg':
+            contentType = 'image/jpeg';
+            break;
+          case 'png':
+            contentType = 'image/png';
+            break;
+          case 'gif':
+            contentType = 'image/gif';
+            break;
+          case 'webp':
+            contentType = 'image/webp';
+            break;
+          default:
+            contentType = 'image/jpeg'; // Default fallback
+        }
+
+        final multipartFile = http.MultipartFile(
+          'profileImage',
+          profileImage.readAsBytes().asStream(),
+          profileImage.lengthSync(),
+          filename: 'profile_image.$extension',
+          contentType: MediaType.parse(contentType),
         );
         request.files.add(multipartFile);
       }
