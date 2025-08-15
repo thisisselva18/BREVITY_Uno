@@ -189,15 +189,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 children: [
                                   CircleAvatar(
                                     radius: 50,
-                                    backgroundColor: (state.localProfileImage != null || _selectedImage != null)
+                                    backgroundColor: _hasProfileImage(state, user)
                                         ? Colors.transparent
                                         : currentTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
-                                    backgroundImage: (_selectedImage ?? state.localProfileImage) != null
-                                        ? FileImage(_selectedImage ?? state.localProfileImage!)
-                                        : (user?.profileImageUrl != null
-                                        ? NetworkImage(user!.profileImageUrl!)
-                                        : null),
-                                    child: (_selectedImage == null && state.localProfileImage == null && user?.profileImageUrl == null)
+                                    backgroundImage: _getProfileImage(state, user),
+                                    child: !_hasProfileImage(state, user)
                                         ? Text(
                                       user?.displayName.isNotEmpty == true
                                           ? user!.displayName[0].toUpperCase()
@@ -224,19 +220,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                                     ),
                                   ),
                                 ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                  color: currentTheme.primaryColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: theme.colorScheme.surface, width: 2)
-                              ),
-                              child: Icon(
-                                Icons.edit,
-                                size: 20,
-                                color: theme.colorScheme.onPrimary,
                               ),
                             ),
                           ],
@@ -315,6 +298,26 @@ class _ProfileScreenState extends State<ProfileScreen>
         );
       },
     );
+  }
+
+  bool _hasProfileImage(UserProfileState state, user) {
+    return _selectedImage != null ||
+        state.localProfileImage != null ||
+        (user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty);
+  }
+
+  ImageProvider? _getProfileImage(UserProfileState state, user) {
+    // Priority: selected image -> local image -> network image
+    if (_selectedImage != null) {
+      return FileImage(_selectedImage!);
+    }
+    if (state.localProfileImage != null) {
+      return FileImage(state.localProfileImage!);
+    }
+    if (user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty) {
+      return NetworkImage(user.profileImageUrl!);
+    }
+    return null;
   }
 
   Widget _buildProfileField({
