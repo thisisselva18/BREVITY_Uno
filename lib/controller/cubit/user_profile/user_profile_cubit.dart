@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brevity/controller/services/firestore_service.dart'; // This is your UserRepository
 import 'package:brevity/controller/services/auth_service.dart';
@@ -61,12 +62,18 @@ class UserProfileCubit extends Cubit<UserProfileState> {
       ));
     }
   }
-  
+
   // Update user profile
-  Future<void> updateProfile({required String displayName}) async {
+  Future<void> updateProfile({
+    required String displayName,
+    File? profileImage,
+  }) async {
     try {
-      emit(state.copyWith(status: UserProfileStatus.loading));
-      
+      emit(state.copyWith(
+        status: UserProfileStatus.loading,
+        localProfileImage: profileImage, // Store local image immediately
+      ));
+
       final UserModel? currentUser = _authService.currentUser;
       if (currentUser == null) {
         emit(state.copyWith(
@@ -75,7 +82,7 @@ class UserProfileCubit extends Cubit<UserProfileState> {
         ));
         return;
       }
-      
+
       final UserModel updatedUser = UserModel(
         uid: currentUser.uid,
         displayName: displayName,
@@ -84,22 +91,23 @@ class UserProfileCubit extends Cubit<UserProfileState> {
         createdAt: currentUser.createdAt,
         updatedAt: DateTime.now(),
       );
-      
+
       // Set access token in repository
       final String? accessToken = _authService.accessToken;
       if (accessToken != null) {
         _userRepository.setAccessToken(accessToken);
       }
-      
-      await _userRepository.updateUserProfile(updatedUser);
-      
-      // After successful update, load the updated profile
+
+      await _userRepository.updateUserProfile(updatedUser, profileImage: profileImage);
+
+      // After successful update, load the updated profile but keep local image
       await loadUserProfile();
-      
+
     } catch (e) {
       emit(state.copyWith(
         status: UserProfileStatus.error,
         errorMessage: 'Failed to update profile: ${e.toString()}',
+        localProfileImage: null, // Clear local image on error
       ));
     }
   }

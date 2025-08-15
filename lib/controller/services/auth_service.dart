@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:brevity/models/user_model.dart';
 import 'package:brevity/utils/logger.dart';
@@ -60,19 +61,31 @@ class AuthService {
     required String password,
     required String userName,
     BuildContext? context,
+    File? profileImage, // Add this parameter
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'displayName': userName,
-          'email': email.trim(),
-          'password': password.trim(),
-        }),
-      );
+      final uri = Uri.parse('$_baseUrl/register');
+      final request = http.MultipartRequest('POST', uri);
+
+      // Add form fields
+      request.fields['displayName'] = userName;
+      request.fields['email'] = email.trim();
+      request.fields['password'] = password.trim();
+
+      // Add profile image if provided
+      if (profileImage != null) {
+        final multipartFile = await http.MultipartFile.fromPath(
+          'profileImage', // This matches your backend field name
+          profileImage.path,
+        );
+        request.files.add(multipartFile);
+      }
+
+      final streamedResponse = await request.send().timeout(_httpTimeout);
+      final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 201) {
+        // Rest of your existing success handling code remains the same
         final data = json.decode(response.body);
         _accessToken = data['data']['accessToken'];
         final userData = data['data']['user'];
@@ -88,13 +101,13 @@ class AuthService {
           email: userData['email'] ?? '',
           emailVerified: userData['emailVerified'] ?? false,
           createdAt:
-              userData['createdAt'] != null
-                  ? DateTime.parse(userData['createdAt'])
-                  : null,
+          userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'])
+              : null,
           updatedAt:
-              userData['updatedAt'] != null
-                  ? DateTime.parse(userData['updatedAt'])
-                  : null,
+          userData['updatedAt'] != null
+              ? DateTime.parse(userData['updatedAt'])
+              : null,
         );
 
         if (context != null && context.mounted) {

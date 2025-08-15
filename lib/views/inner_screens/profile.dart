@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
@@ -5,6 +7,7 @@ import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
 import 'package:brevity/controller/cubit/user_profile/user_profile_state.dart';
 import 'package:brevity/views/common_widgets/common_appbar.dart';
 import 'package:brevity/models/theme_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -18,6 +21,8 @@ class _ProfileScreenState extends State<ProfileScreen>
   late AnimationController _particleAnimationController;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final ImagePicker _imagePicker = ImagePicker();
+  File? _selectedImage;
 
   @override
   void initState() {
@@ -42,7 +47,10 @@ class _ProfileScreenState extends State<ProfileScreen>
   void _saveProfile() {
     final userProfileCubit = context.read<UserProfileCubit>();
     userProfileCubit
-        .updateProfile(displayName: _nameController.text)
+        .updateProfile(
+      displayName: _nameController.text,
+      profileImage: _selectedImage, // Pass the selected image
+    )
         .then((_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -54,6 +62,60 @@ class _ProfileScreenState extends State<ProfileScreen>
         SnackBar(content: Text('Error updating profile: $error')),
       );
     });
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImage = File(image.path);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to pick image: $e')),
+      );
+    }
+  }
+
+  void _showImageOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Choose from Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage();
+                },
+              ),
+              if (_selectedImage != null)
+                ListTile(
+                  leading: const Icon(Icons.delete),
+                  title: const Text('Remove Photo'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _selectedImage = null;
+                    });
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -120,19 +182,48 @@ class _ProfileScreenState extends State<ProfileScreen>
                         Stack(
                           alignment: Alignment.bottomRight,
                           children: [
-                            CircleAvatar(
-                              radius: 50,
-                              backgroundColor:
-                              currentTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
-                              child: Text(
-                                user?.displayName.isNotEmpty == true
-                                    ? user!.displayName[0].toUpperCase()
-                                    : '?',
-                                style: TextStyle(
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold,
-                                  color: currentTheme.primaryColor,
-                                ),
+                            GestureDetector(
+                              onTap: _showImageOptions,
+                              child: Stack(
+                                alignment: Alignment.bottomRight,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: (state.localProfileImage != null || _selectedImage != null)
+                                        ? Colors.transparent
+                                        : currentTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
+                                    backgroundImage: (_selectedImage ?? state.localProfileImage) != null
+                                        ? FileImage(_selectedImage ?? state.localProfileImage!)
+                                        : (user?.profileImageUrl != null
+                                        ? NetworkImage(user!.profileImageUrl!)
+                                        : null),
+                                    child: (_selectedImage == null && state.localProfileImage == null && user?.profileImageUrl == null)
+                                        ? Text(
+                                      user?.displayName.isNotEmpty == true
+                                          ? user!.displayName[0].toUpperCase()
+                                          : '?',
+                                      style: TextStyle(
+                                        fontSize: 40,
+                                        fontWeight: FontWeight.bold,
+                                        color: currentTheme.primaryColor,
+                                      ),
+                                    )
+                                        : null,
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                        color: currentTheme.primaryColor,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(color: theme.colorScheme.surface, width: 2)
+                                    ),
+                                    child: Icon(
+                                      Icons.edit,
+                                      size: 20,
+                                      color: theme.colorScheme.onPrimary,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             Container(
