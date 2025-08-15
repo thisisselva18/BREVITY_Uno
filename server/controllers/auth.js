@@ -1,8 +1,8 @@
 const User = require('../models/user');
-const passport = require('passport');
 const { generateTokens } = require('../services/jwt');
 const { sendEmail } = require('../services/email.service');
 const { jwt, decode } = require('jsonwebtoken');
+const { verifyGoogleToken } = require('../config/passport');
 
 // Register user
 const register = async (req, res) => {
@@ -403,30 +403,66 @@ const resendVerification = async (req, res) => {
     }
 }
 
-const googleAuth = passport.authenticate('google', { scope: ['profile', 'email'] });
+// Updated Google authentication for Android - handles ID token verification
+const googleAuth = async (req, res) => {
+    try {
+        const { idToken } = req.body;
 
-const googleCallback = [
-    passport.authenticate('google', { session: false, failureRedirect: '/login' }),
-    async (req, res) => {
-        try {
-            const { accessToken, refreshToken } = generateTokens(req.user._id);
-            req.user.refreshTokens.push({ token: refreshToken });
-            await req.user.save();
-
-            res.json({
-                success: true,
-                message: 'Google login successful',
-                data: {
-                    user: req.user,
-                    accessToken,
-                    refreshToken,
-                },
+        if (!idToken) {
+            return res.status(400).json({
+                success: false,
+                message: 'Google ID token is required'
             });
-        } catch (error) {
-            res.status(500).json({ success: false, message: 'Authentication failed', error: error.message });
         }
+
+        // Verify the Google ID token
+        const googleUser = await verifyGoogleToken(idToken);
+
+        // Check if user exists
+        let user = await User.findOne({ email: googleUser.email });
+
+        if (!user) {
+            // Create new user if doesn't exist
+            user = new User({
+                displayName: googleUser.name,
+                email: googleUser.email,
+                emailVerified: googleUser.emailVerified,
+                profileImage: { url: googleUser.picture },
+                password: Math.random().toString(36), // Dummy password for Google users
+            });
+            await user.save();
+        }
+
+        // Generate tokens
+        const { accessToken, refreshToken } = generateTokens(user._id);
+
+        // Save refresh token to user
+        user.refreshTokens.push({ token: refreshToken });
+        user.lastLogin = new Date();
+        await user.save();
+
+        // Return user data (without password)
+        const userData = await User.findById(user._id).select('-password -refreshTokens');
+
+        res.json({
+            success: true,
+            message: 'Google login successful',
+            data: {
+                user: userData,
+                accessToken,
+                refreshToken
+            }
+        });
+
+    } catch (error) {
+        console.error('Google authentication error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Google authentication failed',
+            error: error.message
+        });
     }
-];
+};
 
 module.exports = {
     register,
@@ -437,6 +473,5 @@ module.exports = {
     getCurrentUser,
     verifyEmail,
     resendVerification,
-    googleAuth,
-    googleCallback
+    googleAuth
 };

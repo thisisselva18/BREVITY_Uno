@@ -1,33 +1,39 @@
 const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/user');
+const { OAuth2Client } = require('google-auth-library');
 
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/api/auth/google/callback',
-}, async (accessToken, refreshToken, profile, done) => {
+// Initialize Google OAuth2 Client for Android
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+async function verifyGoogleToken(idToken) {
     try {
-        let user = await User.findOne({ email: profile.emails[0].value });
-        if (!user) {
-            user = new User({
-                displayName: profile.displayName,
-                email: profile.emails[0].value,
-                emailVerified: true,
-                profileImage: { url: profile.photos[0].value },
-                password: Math.random().toString(36), // Dummy password
-            });
-            await user.save();
-        }
-        return done(null, user);
-    } catch (err) {
-        return done(err, null);
+        const ticket = await client.verifyIdToken({
+            idToken: idToken,
+            audience: process.env.GOOGLE_CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
+        });
+
+        const payload = ticket.getPayload();
+        return {
+            googleId: payload['sub'],
+            email: payload['email'],
+            name: payload['name'],
+            picture: payload['picture'],
+            emailVerified: payload['email_verified']
+        };
+    } catch (error) {
+        throw new Error('Invalid Google token');
     }
-}));
+}
 
-
+// Keep the serialize/deserialize functions for session management if needed
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
-    const user = await User.findById(id);
-    done(null, user);
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (error) {
+        done(error, null);
+    }
 });
+
+module.exports = { verifyGoogleToken };
