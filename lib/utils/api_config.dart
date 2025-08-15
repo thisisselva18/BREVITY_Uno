@@ -1,6 +1,6 @@
 class ApiConfig {
   // Update this URL to match your backend deployment
-  static const String baseUrl = 'https://brevitybackend.onrender.com/api/auth';
+  static const String baseUrl = 'https://brevitybackend.onrender.com/api';
 
   // API endpoints
   static const String newsEndpoint = '/news';

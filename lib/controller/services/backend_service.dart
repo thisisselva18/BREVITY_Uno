@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   // Update this URL to match your backend
-  static const String baseUrl = 'https://brevitybackend.onrender.com/api/auth';
+  static const String baseUrl = 'https://brevitybackend.onrender.com/api';
   // For Android emulator: http://10.0.2.2:5000/api
   // For iOS simulator: http://localhost:5000/api
   // For production: https://your-domain.com/api

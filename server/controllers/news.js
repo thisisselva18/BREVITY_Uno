@@ -20,8 +20,8 @@ const makeNewsRequest = async (url, params) => {
 // Fetch trending news
 const getTrendingNews = async (req, res) => {
     try {
-        const { page , pageSize } = req.query;
-        
+        const { page, pageSize } = req.query;
+
         const data = await makeNewsRequest(`${NEWS_BASE_URL}/top-headlines`, {
             country: 'us',
             category: 'general',
@@ -29,7 +29,7 @@ const getTrendingNews = async (req, res) => {
             pageSize: parseInt(pageSize),
             apiKey: NEWS_API_KEY
         });
-        
+
         res.json({
             success: true,
             data: data,
@@ -48,8 +48,8 @@ const getTrendingNews = async (req, res) => {
 const getNewsByCategory = async (req, res) => {
     try {
         const { category } = req.params;
-        const { page , pageSize } = req.query;
-        
+        const { page, pageSize } = req.query;
+
         const data = await makeNewsRequest(`${NEWS_BASE_URL}/top-headlines`, {
             country: 'us',
             category: category,
@@ -57,7 +57,7 @@ const getNewsByCategory = async (req, res) => {
             pageSize: parseInt(pageSize),
             apiKey: NEWS_API_KEY
         });
-        
+
         res.json({
             success: true,
             data: data,
@@ -75,15 +75,15 @@ const getNewsByCategory = async (req, res) => {
 // Fetch general news
 const getGeneralNews = async (req, res) => {
     try {
-        const { page, pageSize} = req.query;
-        
+        const { page, pageSize } = req.query;
+
         const data = await makeNewsRequest(`${NEWS_BASE_URL}/top-headlines`, {
             country: 'us',
             page: parseInt(page),
             pageSize: parseInt(pageSize),
             apiKey: NEWS_API_KEY
         });
-        
+
         res.json({
             success: true,
             data: data,
@@ -102,7 +102,7 @@ const getGeneralNews = async (req, res) => {
 const getPoliticsNews = async (req, res) => {
     try {
         const { page, pageSize } = req.query;
-        
+
         const data = await makeNewsRequest(`${NEWS_BASE_URL}/everything`, {
             q: 'politics',
             language: 'en',
@@ -111,7 +111,7 @@ const getPoliticsNews = async (req, res) => {
             pageSize: parseInt(pageSize),
             apiKey: NEWS_API_KEY
         });
-        
+
         res.json({
             success: true,
             data: data,
@@ -130,14 +130,14 @@ const getPoliticsNews = async (req, res) => {
 const searchNews = async (req, res) => {
     try {
         const { q: query, page, pageSize } = req.query;
-        
+
         if (!query) {
             return res.status(400).json({
                 success: false,
                 error: 'Search query is required'
             });
         }
-        
+
         const data = await makeNewsRequest(`${NEWS_BASE_URL}/everything`, {
             q: query,
             language: 'en',
@@ -146,7 +146,7 @@ const searchNews = async (req, res) => {
             pageSize: parseInt(pageSize),
             apiKey: NEWS_API_KEY
         });
-        
+
         res.json({
             success: true,
             data: data,
