@@ -32,6 +32,8 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
     super.initState();
     _topNewsFuture = _newsService.fetchGeneralNews(page: 1, pageSize: 3);
 
+    context.read<UserProfileCubit>().loadUserProfile();
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
