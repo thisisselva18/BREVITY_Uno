@@ -193,7 +193,7 @@ class _SignupScreenState extends State<SignupScreen>
     }
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImageFromGallery() async {
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
@@ -216,6 +216,81 @@ class _SignupScreenState extends State<SignupScreen>
         ),
       );
     }
+  }
+
+  Future<void> _pickImageFromCamera() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImage = File(image.path);
+        });
+        HapticFeedback.lightImpact();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to take photo: $e'),
+          backgroundColor: errorColor,
+        ),
+      );
+    }
+  }
+
+  void _showImageOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: panelBottom,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(Icons.camera_alt, color: primaryB),
+                      title: const Text('Take Photo', style: TextStyle(color: Colors.white)),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _pickImageFromCamera();
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.photo_library, color: primaryB),
+                      title: const Text('Choose from Gallery', style: TextStyle(color: Colors.white)),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _pickImageFromGallery();
+                      },
+                    ),
+                    if (_selectedImage != null)
+                      ListTile(
+                        leading: Icon(Icons.delete, color: errorColor),
+                        title: const Text('Remove Photo', style: TextStyle(color: Colors.white)),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _removeImage();
+                        },
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _removeImage() {
@@ -521,7 +596,7 @@ class _SignupScreenState extends State<SignupScreen>
 
                           // Profile picture
                           GestureDetector(
-                            onTap: _pickImage,
+                            onTap: _showImageOptions,
                             child: Container(
                               margin: const EdgeInsets.only(top: 20),
                               height: 60,
