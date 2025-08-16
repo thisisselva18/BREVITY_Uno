@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:brevity/controller/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../common_widgets/auth_header.dart';
 
@@ -38,6 +40,8 @@ class _SignupScreenState extends State<SignupScreen>
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  File? _selectedImage;
+  final ImagePicker _imagePicker = ImagePicker();
 
   // Validation states
   bool _nameValid = false;
@@ -189,10 +193,41 @@ class _SignupScreenState extends State<SignupScreen>
     }
   }
 
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImage = File(image.path);
+        });
+        HapticFeedback.lightImpact();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to pick image: $e'),
+          backgroundColor: errorColor,
+        ),
+      );
+    }
+  }
+
+  void _removeImage() {
+    setState(() {
+      _selectedImage = null;
+    });
+    HapticFeedback.lightImpact();
+  }
+
   bool get _canSignup =>
       _nameValid && _emailValid && _passwordValid && !_isLoading;
 
-  // Signup handler
   Future<void> _handleSignup() async {
     HapticFeedback.lightImpact();
 
@@ -211,6 +246,7 @@ class _SignupScreenState extends State<SignupScreen>
         password: _passwordController.text,
         userName: _nameController.text,
         context: context,
+        profileImage: _selectedImage, // Pass the selected image
       );
 
       if (!mounted) return;
@@ -455,6 +491,85 @@ class _SignupScreenState extends State<SignupScreen>
                       ),
 
                       const SizedBox(height: 20), // was 24
+
+                      // Profile Image Picker
+                      GestureDetector(
+                        onTap: _pickImage,
+                        child: Container(
+                          height: 120,
+                          width: 120,
+                          margin: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withAlpha((0.05 * 255).toInt()),
+                            border: Border.all(
+                              color: _selectedImage != null ? primaryB : Colors.white.withAlpha((0.1 * 255).toInt()),
+                              width: 2,
+                            ),
+                          ),
+                          child: _selectedImage != null
+                              ? Stack(
+                            children: [
+                              ClipOval(
+                                child: Image.file(
+                                  _selectedImage!,
+                                  width: 116,
+                                  height: 116,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: _removeImage,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: errorColor,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 2),
+                                    ),
+                                    child: const Icon(
+                                      Icons.close,
+                                      color: Colors.white,
+                                      size: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                              : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.add_a_photo_rounded,
+                                color: primaryB,
+                                size: 32,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Add Photo',
+                                style: TextStyle(
+                                  color: primaryB,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Text(
+                                '(Optional)',
+                                style: TextStyle(
+                                  color: mutedText,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 14),
 
                       EnhancedTextField(
                         controller: _nameController,

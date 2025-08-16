@@ -22,11 +22,7 @@ class ReactionData {
     required this.isSelected,
   });
 
-  ReactionData copyWith({
-    ReactionType? type,
-    int? count,
-    bool? isSelected,
-  }) {
+  ReactionData copyWith({ReactionType? type, int? count, bool? isSelected}) {
     return ReactionData(
       type: type ?? this.type,
       count: count ?? this.count,
@@ -173,13 +169,9 @@ class _ReactionButtonState extends State<_ReactionButton>
       duration: const Duration(milliseconds: 100),
       vsync: this,
     );
-    _pressAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.9,
-    ).animate(CurvedAnimation(
-      parent: _pressController,
-      curve: Curves.easeInOut,
-    ));
+    _pressAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
+      CurvedAnimation(parent: _pressController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -208,9 +200,10 @@ class _ReactionButtonState extends State<_ReactionButton>
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: widget.reaction.isSelected
-                      ? widget.primaryColor
-                      : Colors.white.withOpacity(0.6),
+                  color:
+                      widget.reaction.isSelected
+                          ? widget.primaryColor
+                          : Colors.white.withAlpha((0.6 * 255).toInt()),
                   width: 1.5,
                 ),
               ),
@@ -221,15 +214,18 @@ class _ReactionButtonState extends State<_ReactionButton>
                     widget.reaction.type.emoji,
                     style: TextStyle(
                       fontSize: 16,
-                      shadows: widget.reaction.isSelected
-                          ? [
-                        Shadow(
-                          blurRadius: 4,
-                          color: widget.primaryColor.withOpacity(0.5),
-                          offset: const Offset(0, 0),
-                        ),
-                      ]
-                          : null,
+                      shadows:
+                          widget.reaction.isSelected
+                              ? [
+                                Shadow(
+                                  blurRadius: 4,
+                                  color: widget.primaryColor.withAlpha(
+                                    (0.5 * 255).toInt(),
+                                  ),
+                                  offset: const Offset(0, 0),
+                                ),
+                              ]
+                              : null,
                     ),
                   ),
                   if (widget.reaction.count > 0) ...[
@@ -239,9 +235,10 @@ class _ReactionButtonState extends State<_ReactionButton>
                           ? '${(widget.reaction.count / 1000).toStringAsFixed(1)}k'
                           : widget.reaction.count.toString(),
                       style: TextStyle(
-                        color: widget.reaction.isSelected
-                            ? widget.primaryColor
-                            : Colors.white.withOpacity(0.8),
+                        color:
+                            widget.reaction.isSelected
+                                ? widget.primaryColor
+                                : Colors.white.withAlpha((0.8 * 255).toInt()),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),

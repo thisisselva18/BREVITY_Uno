@@ -9,12 +9,16 @@ const {
     forgotPassword,
     resetPassword,
     verifyEmail,
-    resendVerification
+    resendVerification,
+    googleAuth
 } = require('../controllers/auth');
 
 const router = express.Router();
 
-// Routes
+// Updated Google OAuth route for Android - accepts ID token in POST request
+router.post('/google', googleAuth);
+
+// Regular authentication routes
 router.post('/register', upload.single('profileImage'), register);
 router.post('/resend-verification', resendVerification);
 router.get('/verify-email', verifyEmail);

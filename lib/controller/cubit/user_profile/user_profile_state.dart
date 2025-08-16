@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:equatable/equatable.dart';
 import '../../../models/user_model.dart';
 
@@ -7,22 +8,26 @@ class UserProfileState extends Equatable {
   final UserProfileStatus status;
   final UserModel? user;
   final String? errorMessage;
+  final File? localProfileImage; // Add this line
 
   const UserProfileState({
     this.status = UserProfileStatus.initial,
     this.user,
     this.errorMessage,
+    this.localProfileImage, // Add this line
   });
 
   UserProfileState copyWith({
     UserProfileStatus? status,
     UserModel? user,
     String? errorMessage,
+    File? localProfileImage, // Add this line
   }) {
     return UserProfileState(
       status: status ?? this.status,
       user: user ?? this.user,
       errorMessage: errorMessage,
+      localProfileImage: localProfileImage ?? this.localProfileImage, // Add this line
     );
   }
 
@@ -34,5 +39,5 @@ class UserProfileState extends Equatable {
   bool get hasUser => user != null;
 
   @override
-  List<Object?> get props => [status, user, errorMessage];
+  List<Object?> get props => [status, user, errorMessage, localProfileImage]; // Add localProfileImage here
 }

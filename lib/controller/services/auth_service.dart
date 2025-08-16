@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:brevity/models/user_model.dart';
 import 'package:brevity/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 
 class AuthService {
@@ -14,7 +16,8 @@ class AuthService {
   factory AuthService() => _instance;
   AuthService._internal();
 
-  final String _baseUrl = 'https://brevitybackend.onrender.com/api/auth';
+  final String _baseUrl = 'https://brevity-backend-khaki.vercel.app/api/auth';
+  //static const String _baseUrl = 'http://10.0.2.2:5001/api/auth';
 
   // HTTP timeout duration
   static const Duration _httpTimeout = Duration(seconds: 30);
@@ -60,19 +63,56 @@ class AuthService {
     required String password,
     required String userName,
     BuildContext? context,
+    File? profileImage, // Add this parameter
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'displayName': userName,
-          'email': email.trim(),
-          'password': password.trim(),
-        }),
-      );
+      final uri = Uri.parse('$_baseUrl/register');
+      final request = http.MultipartRequest('POST', uri);
+
+      // Add form fields
+      request.fields['displayName'] = userName;
+      request.fields['email'] = email.trim();
+      request.fields['password'] = password.trim();
+
+      // Add profile image if provided
+      if (profileImage != null) {
+        // Get file extension and determine content type
+        final extension = profileImage.path.split('.').last.toLowerCase();
+        String contentType;
+
+        switch (extension) {
+          case 'jpg':
+          case 'jpeg':
+            contentType = 'image/jpeg';
+            break;
+          case 'png':
+            contentType = 'image/png';
+            break;
+          case 'gif':
+            contentType = 'image/gif';
+            break;
+          case 'webp':
+            contentType = 'image/webp';
+            break;
+          default:
+            contentType = 'image/jpeg'; // Default fallback
+        }
+
+        final multipartFile = http.MultipartFile(
+          'profileImage',
+          profileImage.readAsBytes().asStream(),
+          profileImage.lengthSync(),
+          filename: 'profile_image.$extension',
+          contentType: MediaType.parse(contentType),
+        );
+        request.files.add(multipartFile);
+      }
+
+      final streamedResponse = await request.send().timeout(_httpTimeout);
+      final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 201) {
+        // Rest of your existing success handling code remains the same
         final data = json.decode(response.body);
         _accessToken = data['data']['accessToken'];
         final userData = data['data']['user'];
@@ -95,6 +135,7 @@ class AuthService {
               userData['updatedAt'] != null
                   ? DateTime.parse(userData['updatedAt'])
                   : null,
+          profileImageUrl: userData['profileImage']?['url'],
         );
 
         if (context != null && context.mounted) {
@@ -218,6 +259,7 @@ class AuthService {
               userData['updatedAt'] != null
                   ? DateTime.parse(userData['updatedAt'])
                   : null,
+          profileImageUrl: userData['profileImage']?['url'],
         );
 
         if (context != null && context.mounted) {
@@ -346,6 +388,7 @@ class AuthService {
               userData['updatedAt'] != null
                   ? DateTime.parse(userData['updatedAt'])
                   : null,
+          profileImageUrl: userData['profileImage']?['url'],
         );
 
         _authStateController.add(_currentUser);

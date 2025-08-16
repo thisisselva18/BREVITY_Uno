@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:brevity/utils/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,7 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   // Update this URL to match your backend
-  static const String baseUrl = 'http://localhost:5000/api';
+  static const String baseUrl = 'https://brevity-backend-khaki.vercel.app/api';
+  //static const String baseUrl = 'http://10.0.2.2:5000/api';
+
   // For Android emulator: http://10.0.2.2:5000/api
   // For iOS simulator: http://localhost:5000/api
   // For production: https://your-domain.com/api
