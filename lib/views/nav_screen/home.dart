@@ -16,6 +16,8 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../common_widgets/end_of_news.dart';
+
 class HomeScreen extends StatelessWidget {
   final NewsCategory category;
 
@@ -131,14 +133,8 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
             itemBuilder: (context, index) {
               // Show end placeholder if we've reached the end
               if (index >= articles.length) {
-                return Container(
-                  color: Colors.black,
-                  child: Center(
-                    child: Text(
-                      'You\'ve reached the end',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                  ),
+                return const EndOfNewsScreen(
+                  customMessage: "You're done for the day",
                 );
               }
 
