@@ -425,14 +425,49 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
-              image: DecorationImage(
-                image:
-                    article?.urlToImage != null
-                        ? CachedNetworkImageProvider(article!.urlToImage)
-                        : const AssetImage('assets/placeholder.png')
-                            as ImageProvider,
+            ),
+            child: article == null
+                ? Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    theme.brightness == Brightness.light
+                        ? Colors.black54
+                        : Colors.white70,
+                  ),
+                ),
+              ),
+            )
+                : ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: CachedNetworkImage(
+                imageUrl: article.urlToImage ?? '',
                 fit: BoxFit.cover,
-                onError: (exception, stackTrace) {},
+                placeholder: (context, url) => Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        theme.brightness == Brightness.light
+                            ? Colors.black54
+                            : Colors.white70,
+                      ),
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  child: Icon(
+                    Icons.image_not_supported,
+                    color: theme.colorScheme.onSurface.withAlpha((0.5 * 255).toInt()),
+                    size: 30,
+                  ),
+                ),
               ),
             ),
           ),
