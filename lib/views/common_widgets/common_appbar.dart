@@ -51,10 +51,14 @@ class ParticlesHeader extends StatelessWidget {
                   child ??
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Roboto',
                       letterSpacing: 1.2,
-                      color: Color.fromARGB(255, 223, 223, 223),
+                      // Darker text in light mode; light text in dark mode
+                      color:
+                          Theme.of(context).brightness == Brightness.light
+                              ? Colors.black87
+                              : const Color.fromARGB(255, 223, 223, 223),
                       fontWeight: FontWeight.bold,
                       fontSize: 23,
                     ),
