@@ -28,42 +28,6 @@ class UserProfileCubit extends Cubit<UserProfileState> {
     });
   }
 
-  // Load user profile once
-  Future<void> loadUserProfile() async {
-    emit(state.copyWith(status: UserProfileStatus.loading));
-
-    try {
-      final UserModel? currentUser = _authService.currentUser;
-
-      if (currentUser == null) {
-        emit(state.copyWith(
-          status: UserProfileStatus.error,
-          errorMessage: 'No authenticated user found',
-        ));
-        return;
-      }
-
-      // Set access token in repository
-      final String? accessToken = _authService.accessToken;
-      if (accessToken != null) {
-        _userRepository.setAccessToken(accessToken);
-      }
-
-      final UserModel profile = await _userRepository.getUserProfile(currentUser.uid);
-
-      emit(state.copyWith(
-        status: UserProfileStatus.loaded,
-        user: profile,
-        localProfileImage: null, // Clear local image when loading from server
-      ));
-    } catch (e) {
-      emit(state.copyWith(
-        status: UserProfileStatus.error,
-        errorMessage: e.toString(),
-      ));
-    }
-  }
-
   // Update user profile
   Future<void> updateProfile({
     required String displayName,
@@ -133,13 +97,18 @@ class UserProfileCubit extends Cubit<UserProfileState> {
   // Remove profile image specifically
   Future<void> removeProfileImage() async {
     try {
-      emit(state.copyWith(status: UserProfileStatus.loading));
+      // Immediately update state to show loading and clear local image
+      emit(state.copyWith(
+        status: UserProfileStatus.loading,
+        clearLocalImage: true, // Use the flag to explicitly clear
+      ));
 
       final UserModel? currentUser = _authService.currentUser;
       if (currentUser == null) {
         emit(state.copyWith(
           status: UserProfileStatus.error,
           errorMessage: 'No authenticated user found',
+          clearLocalImage: true,
         ));
         return;
       }
@@ -171,13 +140,51 @@ class UserProfileCubit extends Cubit<UserProfileState> {
       emit(state.copyWith(
         status: UserProfileStatus.loaded,
         user: updatedUser,
-        localProfileImage: null,
+        clearLocalImage: true, // Ensure local image is null
       ));
 
     } catch (e) {
+      // On error, still clear the local image but show error
       emit(state.copyWith(
         status: UserProfileStatus.error,
         errorMessage: 'Failed to remove profile image: ${e.toString()}',
+        clearLocalImage: true, // Clear local image even on error
+      ));
+    }
+  }
+
+// Also update the loadUserProfile method to clear local image when loading from server
+  Future<void> loadUserProfile() async {
+    emit(state.copyWith(status: UserProfileStatus.loading));
+
+    try {
+      final UserModel? currentUser = _authService.currentUser;
+
+      if (currentUser == null) {
+        emit(state.copyWith(
+          status: UserProfileStatus.error,
+          errorMessage: 'No authenticated user found',
+        ));
+        return;
+      }
+
+      // Set access token in repository
+      final String? accessToken = _authService.accessToken;
+      if (accessToken != null) {
+        _userRepository.setAccessToken(accessToken);
+      }
+
+      final UserModel profile = await _userRepository.getUserProfile(currentUser.uid);
+
+      emit(state.copyWith(
+        status: UserProfileStatus.loaded,
+        user: profile,
+        clearLocalImage: true, // Clear local image when loading from server
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: UserProfileStatus.error,
+        errorMessage: e.toString(),
       ));
     }
   }

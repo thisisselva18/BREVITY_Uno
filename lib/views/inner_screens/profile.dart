@@ -138,22 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       title: const Text('Remove Photo'),
                       onTap: () {
                         Navigator.pop(context);
-                        setState(() {
-                          _selectedImage = null;
-                        });
-                        // Remove the profile picture completely
-                        final userProfileCubit = context.read<UserProfileCubit>();
-                        userProfileCubit.removeProfileImage().then((_) {
-                          if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Profile photo removed successfully')),
-                          );
-                        }).catchError((error) {
-                          if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error removing photo: $error')),
-                          );
-                        });
+                        _removeProfilePhoto(); // Use the new method
                       },
                     ),
                 ],
@@ -163,6 +148,30 @@ class _ProfileScreenState extends State<ProfileScreen>
         );
       },
     );
+  }
+
+  void _removeProfilePhoto() async {
+    // Immediately clear the selected image for instant UI update
+    setState(() {
+      _selectedImage = null;
+    });
+
+    try {
+      final userProfileCubit = context.read<UserProfileCubit>();
+      await userProfileCubit.removeProfileImage();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile photo removed successfully')),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error removing photo: $error')),
+        );
+      }
+    }
   }
 
   @override
