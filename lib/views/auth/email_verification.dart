@@ -423,19 +423,32 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   }
 
   Widget _buildPortraitLayout(Size size) {
-    return Column(
-      children: [
-        AnimatedHeader(
-          title: 'Verify Your Email',
-          subtitle: widget.isFromLogin
-              ? 'Check your email to continue'
-              : 'Activate your Brevity account',
-          logoAssetPath: 'assets/logos/Brevity_white.png',
-          screenSize: size,
-          isLandscape: false,
-        ),
-        _buildFormPanel(),
-      ],
+    final isSmallScreen = size.height < 700;
+    final isTinyScreen = size.height < 600;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          children: [
+            // Responsive header height based on screen size
+            SizedBox(
+              height: isTinyScreen ? constraints.maxHeight * 0.25 :
+              isSmallScreen ? constraints.maxHeight * 0.3 :
+              constraints.maxHeight * 0.35,
+              child: AnimatedHeader(
+                title: 'Verify Your Email',
+                subtitle: widget.isFromLogin
+                    ? 'Check your email to continue'
+                    : 'Activate your Brevity account',
+                logoAssetPath: 'assets/logos/Brevity_white.png',
+                screenSize: size,
+                isLandscape: false,
+              ),
+            ),
+            Expanded(child: _buildFormPanel()),
+          ],
+        );
+      },
     );
   }
 
@@ -550,229 +563,252 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   }
 
   Widget _buildFormPanel() {
-    return Expanded(
-      child: AnimatedBuilder(
-        animation: _shakeAnim,
-        builder: (context, child) {
-          final shakeOffset = math.sin(_shakeAnim.value * math.pi * 8) * 2;
-          return Transform.translate(
-            offset: Offset(shakeOffset, 0),
-            child: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [panelTop, panelBottom],
-                ),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
-              ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  // vertical: 32,
-                ),
-                child: Column(
-                  children: [
-                    // Progress indicator
-                    LinearProgressIndicator(
-                      value: 0.6, // 60% as verification is in progress
-                      backgroundColor: Colors.white.withAlpha((0.1 * 255).toInt()),
-                      valueColor: AlwaysStoppedAnimation(primaryB),
-                      minHeight: 2,
-                    ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = MediaQuery.of(context).size.height < 700;
+        final isTinyScreen = MediaQuery.of(context).size.height < 600;
 
-                    const SizedBox(height: 20),
+        return AnimatedBuilder(
+          animation: _shakeAnim,
+          builder: (context, child) {
+            final shakeOffset = math.sin(_shakeAnim.value * math.pi * 8) * 2;
+            return Transform.translate(
+              offset: Offset(shakeOffset, 0),
+              child: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [panelTop, panelBottom],
+                  ),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isTinyScreen ? 16 : 24,
+                    vertical: isTinyScreen ? 8 : 4,
+                  ),
+                  child: Column(
+                    children: [
+                      // Progress indicator
+                      LinearProgressIndicator(
+                        value: 0.6,
+                        backgroundColor: Colors.white.withAlpha((0.1 * 255).toInt()),
+                        valueColor: AlwaysStoppedAnimation(primaryB),
+                        minHeight: 2,
+                      ),
 
-                    // Status section with subtle animation
-                    FadeTransition(
-                      opacity: _fadeController,
-                      child: AnimatedBuilder(
-                        animation: _pulseAnim,
-                        builder: (context, _) {
-                          return Transform.scale(
-                            scale: 1.0 + (_pulseAnim.value - 1.0) * 0.02,
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    primaryA.withAlpha((0.08 * 255).toInt()),
-                                    primaryB.withAlpha((0.04 * 255).toInt()),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: primaryB.withAlpha((0.2 * 255).toInt()),
-                                  width: 1,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: primaryA.withAlpha((0.1 * 255).toInt()),
-                                    blurRadius: 20,
-                                    spreadRadius: -5,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  // Status icon
-                                  Container(
-                                    width: 56,
-                                    height: 56,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [primaryA, primaryB],
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: primaryB.withAlpha((0.3 * 255).toInt()),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 4),
-                                        ),
+                      SizedBox(height: isTinyScreen ? 12 : 20),
+
+                      // Status section - made more compact
+                      Flexible(
+                        flex: isTinyScreen ? 3 : 4,
+                        child: FadeTransition(
+                          opacity: _fadeController,
+                          child: AnimatedBuilder(
+                            animation: _pulseAnim,
+                            builder: (context, _) {
+                              return Transform.scale(
+                                scale: 1.0 + (_pulseAnim.value - 1.0) * 0.02,
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(isTinyScreen ? 12 : 20),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        primaryA.withAlpha((0.08 * 255).toInt()),
+                                        primaryB.withAlpha((0.04 * 255).toInt()),
                                       ],
                                     ),
-                                    child: Icon(
-                                      Icons.schedule_rounded,
-                                      size: 28,
-                                      color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: primaryB.withAlpha((0.2 * 255).toInt()),
+                                      width: 1,
                                     ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: primaryA.withAlpha((0.1 * 255).toInt()),
+                                        blurRadius: 20,
+                                        spreadRadius: -5,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
                                   ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Status icon - responsive size
+                                      Container(
+                                        width: isTinyScreen ? 40 : 56,
+                                        height: isTinyScreen ? 40 : 56,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [primaryA, primaryB],
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: primaryB.withAlpha((0.3 * 255).toInt()),
+                                              blurRadius: 12,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Icon(
+                                          Icons.schedule_rounded,
+                                          size: isTinyScreen ? 20 : 28,
+                                          color: Colors.white,
+                                        ),
+                                      ),
 
-                                  const SizedBox(height: 16),
+                                      SizedBox(height: isTinyScreen ? 8 : 16),
 
-                                  Text(
-                                    'Verification Pending',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                                      Text(
+                                        'Verification Pending',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: isTinyScreen ? 16 : 18,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: isTinyScreen ? 4 : 8),
+
+                                      Text(
+                                        'Almost there! Just one more step',
+                                        style: TextStyle(
+                                          color: mutedText,
+                                          fontSize: isTinyScreen ? 12 : 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-
-                                  const SizedBox(height: 8),
-
-                                  Text(
-                                    'Almost there! Just one more step',
-                                    style: TextStyle(
-                                      color: mutedText,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Email address display
-                    FadeTransition(
-                      opacity: _fadeController,
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0B131A),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: primaryB.withAlpha((0.3 * 255).toInt()),
-                            width: 1,
+                                ),
+                              );
+                            },
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.email_outlined,
-                              color: primaryB,
-                              size: 20,
+                      ),
+
+                      SizedBox(height: isTinyScreen ? 8 : 16),
+
+                      // Email display - more compact
+                      FadeTransition(
+                        opacity: _fadeController,
+                        child: Container(
+                          padding: EdgeInsets.all(isTinyScreen ? 12 : 16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0B131A),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: primaryB.withAlpha((0.3 * 255).toInt()),
+                              width: 1,
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                widget.email,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.email_outlined,
+                                color: primaryB,
+                                size: isTinyScreen ? 16 : 20,
+                              ),
+                              SizedBox(width: isTinyScreen ? 8 : 12),
+                              Expanded(
+                                child: Text(
+                                  widget.email,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: isTinyScreen ? 13 : 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: isTinyScreen ? 8 : 12),
+
+                      // Description - more compact
+                      FadeTransition(
+                        opacity: _fadeController,
+                        child: Text(
+                          widget.isFromLogin
+                              ? 'Check your email and click the verification link, then try logging in again.'
+                              : 'We\'ve sent a verification link to your email. Check your inbox and spam folder.',
+                          style: TextStyle(
+                            fontSize: isTinyScreen ? 12 : 14,
+                            color: mutedText,
+                            height: 1.3,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: isTinyScreen ? 2 : 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+
+                      const Spacer(),
+
+                      // Buttons section
+                      Column(
+                        children: [
+                          // Check Verification Button
+                          if (AuthService().isAuthenticated) ...[
+                            FadeTransition(
+                              opacity: _fadeController,
+                              child: SizedBox(
+                                height: isTinyScreen ? 44 : 52,
+                                child: EnhancedButton(
+                                  onPressed: _isCheckingVerification ? null : _checkVerification,
+                                  isLoading: _isCheckingVerification,
+                                  text: 'CHECK VERIFICATION',
+                                  enabled: !_isCheckingVerification,
+                                  loadingText: 'Checking...',
                                 ),
                               ),
                             ),
+                            SizedBox(height: isTinyScreen ? 8 : 12),
                           ],
-                        ),
+
+                          // Resend Email Button
+                          FadeTransition(
+                            opacity: _fadeController,
+                            child: SizedBox(
+                              height: isTinyScreen ? 44 : 52,
+                              child: EnhancedOutlinedButton(
+                                onPressed: (_isResendingEmail || _resendCooldown > 0) ? null : _resendVerificationEmail,
+                                isLoading: _isResendingEmail,
+                                text: _resendCooldown > 0
+                                    ? 'RESEND IN ${_formatTime(_resendCooldown).toUpperCase()}'
+                                    : 'RESEND EMAIL',
+                                loadingText: 'Sending...',
+                                enabled: !_isResendingEmail && _resendCooldown == 0,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
 
-                    const SizedBox(height: 16),
-
-                    // Description text
-                    FadeTransition(
-                      opacity: _fadeController,
-                      child: Text(
-                        widget.isFromLogin
-                            ? 'Please check your email and click the verification link, then try logging in again.'
-                            : 'We\'ve sent a verification link to your email address. Please check your inbox and spam folder, then click the link to activate your account.',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: mutedText,
-                          height: 1.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Check Verification Button - Only show if token is stored
-                    if (AuthService().isAuthenticated) ...[
-                      FadeTransition(
-                        opacity: _fadeController,
-                        child: EnhancedButton(
-                          onPressed: _isCheckingVerification ? null : _checkVerification,
-                          isLoading: _isCheckingVerification,
-                          text: 'CHECK VERIFICATION',
-                          enabled: !_isCheckingVerification,
-                          loadingText: 'Checking...',
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: isTinyScreen ? 8 : 16),
                     ],
-
-                    // Resend Email Button
-                    FadeTransition(
-                      opacity: _fadeController,
-                      child: EnhancedOutlinedButton(
-                        onPressed: (_isResendingEmail || _resendCooldown > 0) ? null : _resendVerificationEmail,
-                        isLoading: _isResendingEmail,
-                        text: _resendCooldown > 0
-                            ? 'RESEND IN ${_formatTime(_resendCooldown).toUpperCase()}'
-                            : 'RESEND VERIFICATION EMAIL',
-                        loadingText: 'Sending...',
-                        enabled: !_isResendingEmail && _resendCooldown == 0,
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -829,30 +865,23 @@ class _EnhancedButtonState extends State<EnhancedButton>
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isTinyScreen = screenSize.height < 600;
+
     return GestureDetector(
-      onTapDown:
-      widget.enabled && !widget.isLoading
-          ? (_) => _animController.forward()
-          : null,
-      onTapUp:
-      widget.enabled && !widget.isLoading
-          ? (_) => _animController.reverse()
-          : null,
-      onTapCancel:
-      widget.enabled && !widget.isLoading
-          ? () => _animController.reverse()
-          : null,
+      onTapDown: widget.enabled && !widget.isLoading ? (_) => _animController.forward() : null,
+      onTapUp: widget.enabled && !widget.isLoading ? (_) => _animController.reverse() : null,
+      onTapCancel: widget.enabled && !widget.isLoading ? () => _animController.reverse() : null,
       child: AnimatedBuilder(
         animation: _animController,
         builder: (context, child) {
           return Transform.scale(
             scale: _scaleAnim.value,
             child: Container(
-              height: 52,
+              height: double.infinity,
               width: double.infinity,
               decoration: BoxDecoration(
-                gradient:
-                widget.enabled && !widget.isLoading
+                gradient: widget.enabled && !widget.isLoading
                     ? const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -865,8 +894,7 @@ class _EnhancedButtonState extends State<EnhancedButton>
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
-                boxShadow:
-                widget.enabled && !widget.isLoading
+                boxShadow: widget.enabled && !widget.isLoading
                     ? [
                   BoxShadow(
                     color: primaryA.withAlpha(
@@ -879,38 +907,38 @@ class _EnhancedButtonState extends State<EnhancedButton>
                     : null,
               ),
               child: ElevatedButton(
-                onPressed:
-                widget.enabled && !widget.isLoading
-                    ? widget.onPressed
-                    : null,
+                onPressed: widget.enabled && !widget.isLoading ? widget.onPressed : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
+                  padding: EdgeInsets.zero,
                 ),
-                child:
-                widget.isLoading
+                child: widget.isLoading
                     ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
+                    SizedBox(
+                      width: isTinyScreen ? 18 : 24,
+                      height: isTinyScreen ? 18 : 24,
+                      child: const CircularProgressIndicator(
                         color: Colors.white,
                         strokeWidth: 2,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      widget.loadingText,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                        letterSpacing: -0.2,
+                    SizedBox(width: isTinyScreen ? 8 : 12),
+                    Flexible(
+                      child: Text(
+                        widget.loadingText,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: isTinyScreen ? 14 : 16,
+                          letterSpacing: -0.2,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -918,12 +946,13 @@ class _EnhancedButtonState extends State<EnhancedButton>
                     : Text(
                   widget.text,
                   style: TextStyle(
-                    color:
-                    widget.enabled ? Colors.white : Colors.white54,
+                    color: widget.enabled ? Colors.white : Colors.white54,
                     fontWeight: FontWeight.w700,
-                    fontSize: 16,
+                    fontSize: isTinyScreen ? 14 : 16,
                     letterSpacing: -0.2,
                   ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
@@ -934,7 +963,6 @@ class _EnhancedButtonState extends State<EnhancedButton>
   }
 }
 
-// Enhanced Outlined Button (consistent with login/signup)
 class EnhancedOutlinedButton extends StatefulWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
@@ -991,6 +1019,9 @@ class _EnhancedOutlinedButtonState extends State<EnhancedOutlinedButton>
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isTinyScreen = screenSize.height < 600;
+
     return MouseRegion(
       onEnter: (_) => _onHover(true),
       onExit: (_) => _onHover(false),
@@ -1000,7 +1031,7 @@ class _EnhancedOutlinedButtonState extends State<EnhancedOutlinedButton>
           animation: _hoverAnim,
           builder: (context, child) {
             return Container(
-              height: 52,
+              height: double.infinity,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Color.lerp(
@@ -1037,21 +1068,24 @@ class _EnhancedOutlinedButtonState extends State<EnhancedOutlinedButton>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: 20,
-                      height: 20,
+                      width: isTinyScreen ? 16 : 20,
+                      height: isTinyScreen ? 16 : 20,
                       child: CircularProgressIndicator(
                         color: primaryB,
                         strokeWidth: 2,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      widget.loadingText,
-                      style: TextStyle(
-                        color: primaryB,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                        letterSpacing: -0.2,
+                    SizedBox(width: isTinyScreen ? 8 : 12),
+                    Flexible(
+                      child: Text(
+                        widget.loadingText,
+                        style: TextStyle(
+                          color: primaryB,
+                          fontWeight: FontWeight.w700,
+                          fontSize: isTinyScreen ? 14 : 16,
+                          letterSpacing: -0.2,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -1063,9 +1097,11 @@ class _EnhancedOutlinedButtonState extends State<EnhancedOutlinedButton>
                         ? primaryB
                         : Colors.grey.withAlpha((0.7 * 255).toInt()),
                     fontWeight: FontWeight.w700,
-                    fontSize: 16,
+                    fontSize: isTinyScreen ? 14 : 16,
                     letterSpacing: -0.2,
                   ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             );
