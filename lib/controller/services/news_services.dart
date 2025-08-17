@@ -171,6 +171,10 @@ class NewsService {
   }
 
   // Fetch Technology news
+
+  Future<List<Article>> fetchTechnologyNews({int page = 1, int pageSize = 10}) async {
+    return _fetchNewsByCategory('technology', page: page, pageSize: pageSize); 
+
   Future<List<Article>> fetchTechnologyNews({
     int page = 1,
     int pageSize = 10,
@@ -180,7 +184,7 @@ class NewsService {
       'technology',
       page: params['page']!,
       pageSize: params['pageSize']!,
-    );
+
   }
 
   // Fetch Sports news

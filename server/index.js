@@ -9,8 +9,13 @@ const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const bookmarkRoutes = require('./routes/bookmark');
+
+const newsRouter = require('./routes/news');
+const reactionRouter = require('./routes/reaction');
+
 const newsRoutes = require('./routes/news');
 const passport = require('passport');
+
 
 // Import controllers
 const { verifyEmail } = require('./controllers/auth');
@@ -79,7 +84,12 @@ app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/bookmarks', bookmarkRoutes);
+
+app.use('/api/news', newsRouter);
+app.use('/api/reaction', reactionRouter);
+
 app.use('/api/news', newsRoutes);
+
 
 // Health check
 app.get('/api/health', (req, res) => {
