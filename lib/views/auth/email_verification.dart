@@ -316,7 +316,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       } else {
         if (!mounted) return;
         HapticFeedback.lightImpact();
-        _showWarningMessage('Email not yet verified. Please check your email and click the verification link.');
+        _showWarningMessage('Email not yet verified. Please check your\nemail and click the verification link.');
       }
     } catch (e) {
       if (!mounted) return;
@@ -368,7 +368,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
               Icon(Icons.send_rounded, color: primaryB, size: 20),
               const SizedBox(width: 8),
               const Text(
-                'Verification email sent! Please check your inbox and spam folder.',
+                'Verification email sent! Please check your\ninbox and spam folder.',
                 style: TextStyle(color: Colors.white),
               ),
             ],
