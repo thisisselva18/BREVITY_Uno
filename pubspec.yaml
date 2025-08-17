@@ -53,4 +53,5 @@ flutter:
   assets:
     - assets/logos/
     - assets/icon/icon.png
+    - assets/lottie/
     - .env
