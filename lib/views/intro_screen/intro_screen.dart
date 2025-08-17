@@ -1,6 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:math' as math;
+import '../../controller/cubit/theme/theme_cubit.dart';
+import '../../controller/services/tutorial_service.dart';
+import '../../models/theme_model.dart';
+
+// Enhanced Palette (matching auth design)
+const Color bgStart = Color(0xFF070B14);
+const Color bgEnd = Color(0xFF0E1624);
+const Color primaryA = Color(0xFF3D4DFF);
+const Color primaryB = Color(0xFF29C0FF);
+const Color panelTop = Color(0xFF0F1724);
+const Color panelBottom = Color(0xFF111827);
+const Color mutedText = Color(0xFF9AA8BF);
+const Color successColor = Color(0xFF10B981);
 
 class IntroductionScreen extends StatefulWidget {
   const IntroductionScreen({super.key});
@@ -10,430 +24,874 @@ class IntroductionScreen extends StatefulWidget {
 }
 
 class _IntroductionScreenState extends State<IntroductionScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _slideAnimation;
-  late Animation<double> _opacityAnimation;
-  bool _didPrecache = false;
+  bool _showThemeSelection = false;
+  AppTheme _selectedTheme = AppTheme.defaultTheme;
+  bool _isDarkMode = true;
 
-  final List<IntroductionPage> _pages = [
-    IntroductionPage(
-      title: 'Concise News,\nMaximum Clarity',
-      description:
-          'Get AI-curated news briefs in 50-60 words - stay informed without information overload',
-      image:
-          'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=60',
-      color: Color(0xFF2A2E3D),
+  // Animation controllers
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late AnimationController _floatController;
+  late AnimationController _pulseController;
+  late AnimationController _particleController;
+
+  // Animations
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _floatAnim;
+  late Animation<double> _pulseAnim;
+
+  final List<IntroPage> _pages = [
+    IntroPage(
+      title: 'Welcome to\nBrevity',
+      subtitle: 'Your Smart News Companion',
+      description: 'Get AI-curated news briefs in 50-60 words. Stay informed without information overload.',
+      icon: Icons.newspaper_outlined,
     ),
-    IntroductionPage(
-      title: 'AI-Powered\nNews Companion',
-      description:
-          'Ask detailed questions about any story with our advanced AI assistant - context-aware answers at your fingertips',
-      image:
-          'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=60',
-      color: Color(0xFF1F2833),
+    IntroPage(
+      title: 'AI-Powered\nInsights',
+      subtitle: 'Intelligent News Assistant',
+      description: 'Ask detailed questions about any story with our advanced AI assistant for context-aware answers.',
+      icon: Icons.psychology_outlined,
     ),
-    IntroductionPage(
-      title: 'Your News,\nYour Style',
-      description:
-          'Personalize reading experience with customizable themes - dark mode, accent colors, and visual preferences',
-      image:
-          'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=60',
-      color: Color(0xFF151A21),
+    IntroPage(
+      title: 'Personalize\nYour Experience',
+      subtitle: 'Themes & Customization',
+      description: 'Choose your preferred theme and customize your reading experience with multiple color options.',
+      icon: Icons.palette_outlined,
     ),
   ];
 
   @override
   void initState() {
     super.initState();
+    _initAnimations();
+  }
 
-    _controller = AnimationController(
+  void _initAnimations() {
+    _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 850),
     );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.95,
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 650),
+    );
+
+    _floatController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 4200),
+    );
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    );
+
+    _particleController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeInOut,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOut,
+    ));
+
+    _floatAnim = Tween<double>(
+      begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutExpo));
+    ).animate(CurvedAnimation(
+      parent: _floatController,
+      curve: Curves.easeInOut,
+    ));
 
-    _slideAnimation = Tween<double>(begin: 120.0, end: 0.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic),
-      ),
-    );
+    _pulseAnim = Tween<double>(
+      begin: 1.0,
+      end: 1.04,
+    ).animate(CurvedAnimation(
+      parent: _pulseController,
+      curve: Curves.easeInOut,
+    ));
 
-    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.4, 1.0, curve: Curves.easeIn),
-      ),
-    );
+    // Start animations
+    _floatController.repeat(reverse: true);
+    _pulseController.repeat(reverse: true);
+    _particleController.repeat();
 
-    _controller.forward();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (!_didPrecache) {
-      _precacheImages();
-      _didPrecache = true;
-    }
-  }
-
-  Future<void> _precacheImages() async {
-    for (final page in _pages) {
-      final provider = CachedNetworkImageProvider(page.image);
-      await precacheImage(provider, context);
-    }
+    Future.delayed(const Duration(milliseconds: 160), () {
+      if (mounted) _fadeController.forward();
+    });
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) _slideController.forward();
+    });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _fadeController.dispose();
+    _slideController.dispose();
+    _floatController.dispose();
+    _pulseController.dispose();
+    _particleController.dispose();
     _pageController.dispose();
     super.dispose();
   }
 
   void _onPageChanged(int page) {
-    setState(() {
-      _currentPage = page;
-      _controller.reset();
-      _controller.forward();
-    });
+    setState(() => _currentPage = page);
+    _slideController.reset();
+    _slideController.forward();
   }
 
-  void _navigateToHome() {
-    context.pushReplacement('/home/0');
+  void _showThemeSelectionScreen() {
+    setState(() => _showThemeSelection = true);
+    _slideController.reset();
+    _slideController.forward();
+  }
+
+  void _completeIntro() async {
+    // Apply the selected theme
+    context.read<ThemeCubit>().changeTheme(
+      _selectedTheme.copyWith(isDarkMode: _isDarkMode),
+    );
+
+    // Mark tutorial as completed
+    await TutorialService.completeTutorial();
+
+    // Navigate to home
+    if (mounted) {
+      context.pushReplacement('/home/0');
+    }
+  }
+
+  // Helper method to get surface color based on theme mode
+  Color _getSurfaceColor(bool isDarkMode) {
+    return isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+  }
+
+  // Helper method to get card color based on theme mode
+  Color _getCardColor(bool isDarkMode) {
+    return isDarkMode ? const Color(0xFF2C2C2C) : const Color(0xFFF5F5F5);
+  }
+
+  // Helper method to get on surface color based on theme mode
+  Color _getOnSurfaceColor(bool isDarkMode) {
+    return isDarkMode ? Colors.white : Colors.black87;
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
+      backgroundColor: bgStart,
       body: Stack(
         children: [
-          // Background Images that cover the full screen
-          PageView.builder(
-            controller: _pageController,
-            onPageChanged: _onPageChanged,
-            itemCount: _pages.length,
-            itemBuilder: (context, index) {
-              return _BackgroundImage(
-                image: _pages[index].image,
-                color: _pages[index].color,
-                isActive: index == _currentPage,
-              );
-            },
-          ),
+          // Background matching auth design
+          Positioned.fill(child: _buildBackground(size)),
 
-          // Overlay Content
+          // Main Content
           SafeArea(
-            child: Column(
-              children: [
-                // Navigation Controls - Removed the back button, kept only Skip button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      const Spacer(),
-                      TextButton(
-                        onPressed: _navigateToHome,
-                        child: const Text(
-                          'Skip',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.1,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Page Indicator
-                _PageIndicator(
-                  pageCount: _pages.length,
-                  currentPage: _currentPage,
-                  color: const Color.fromARGB(255, 5, 118, 218),
-                ),
-
-                // Content area
-                Expanded(
-                  child: AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, child) {
-                      return _PageContent(
-                        page: _pages[_currentPage],
-                        slideValue: _slideAnimation.value,
-                        opacityValue: _opacityAnimation.value,
-                        scaleValue: _scaleAnimation.value,
-                        showButton: _currentPage == _pages.length - 1,
-                        onPressed: _navigateToHome,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Add a transparent GestureDetector to handle swipes across the entire screen
-          Positioned.fill(
-            child: GestureDetector(
-              onHorizontalDragEnd: (details) {
-                if (details.primaryVelocity! > 0 && _currentPage > 0) {
-                  // Swipe right - go to previous page
-                  _pageController.previousPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOutQuad,
-                  );
-                } else if (details.primaryVelocity! < 0 &&
-                    _currentPage < _pages.length - 1) {
-                  // Swipe left - go to next page
-                  _pageController.nextPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOutQuad,
-                  );
-                }
-              },
-              behavior: HitTestBehavior.translucent,
-            ),
+            child: _showThemeSelection
+                ? _buildThemeSelectionScreen()
+                : _buildIntroPages(size),
           ),
         ],
       ),
     );
   }
-}
 
-class _BackgroundImage extends StatelessWidget {
-  final String image;
-  final Color color;
-  final bool isActive;
-
-  const _BackgroundImage({
-    required this.image,
-    required this.color,
-    required this.isActive,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedOpacity(
-      opacity: isActive ? 1 : 0,
-      duration: const Duration(milliseconds: 500),
+  Widget _buildBackground(Size size) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [bgStart, bgEnd],
+        ),
+      ),
       child: Stack(
-        fit: StackFit.expand, // This ensures the stack fills its parent
         children: [
-          // Full-screen image
-          CachedNetworkImage(
-            imageUrl: image,
-            fit: BoxFit.cover,
-            height: double.infinity, // Ensure the image takes full height
-            width: double.infinity, // Ensure the image takes full width
-            memCacheWidth: 600, // Limit memory cache size
-            placeholder: (context, url) => Container(color: Colors.black),
-            errorWidget:
-                (context, url, error) => Container(
-                  color: Colors.black,
-                  child: const Icon(Icons.error, color: Colors.white),
-                ),
-          ),
-          // Gradient Overlay
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  color.withAlpha(225),
-                  Colors.transparent,
-                  color.withAlpha(225),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: const [0.0, 0.5, 1.0],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PageContent extends StatelessWidget {
-  final IntroductionPage page;
-  final double slideValue;
-  final double opacityValue;
-  final double scaleValue;
-  final bool showButton;
-  final VoidCallback onPressed;
-
-  const _PageContent({
-    required this.page,
-    required this.slideValue,
-    required this.opacityValue,
-    required this.scaleValue,
-    required this.showButton,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.scale(
-      scale: scaleValue,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title with sliding animation
-            Container(
-              padding: EdgeInsets.only(top: slideValue * 0.5),
-              child: Opacity(
-                opacity: opacityValue,
-                child: Text(
-                  page.title,
-                  style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    height: 1.2,
-                    fontFamily: 'Georgia',
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Description with sliding animation
-            Container(
-              padding: EdgeInsets.only(top: slideValue),
-              child: Opacity(
-                opacity: opacityValue,
-                child: Text(
-                  page.description,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white.withAlpha(225),
-                    height: 1.4,
-                    fontFamily: 'Helvetica',
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 40),
-
-            // Get Started Button with sliding animation
-            if (showButton)
-              Container(
-                padding: EdgeInsets.only(top: slideValue * 1.5, bottom: 30),
-                child: Opacity(
-                  opacity: opacityValue,
-                  child: _SimplerButton(
-                    onPressed: onPressed,
-                    child: const Text(
-                      'GET STARTED',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
+          // Floating particles (matching auth design)
+          AnimatedBuilder(
+            animation: _floatAnim,
+            builder: (context, _) {
+              final t = _floatAnim.value;
+              final yOsc = math.sin(t * 2 * math.pi) * 20;
+              final xOsc = math.cos(t * 2 * math.pi) * 12;
+              return Positioned(
+                left: -40 + xOsc,
+                top: 80 + yOsc,
+                child: Transform.rotate(
+                  angle: 0.15 * math.sin(t * 2 * math.pi),
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      gradient: RadialGradient(
+                        center: const Alignment(-0.3, -0.4),
+                        radius: 1.2,
+                        colors: [
+                          primaryA.withAlpha((0.08 * 255).toInt()),
+                          primaryB.withAlpha((0.02 * 255).toInt()),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
                       ),
                     ),
                   ),
                 ),
+              );
+            },
+          ),
+
+          AnimatedBuilder(
+            animation: Listenable.merge([_floatAnim, _pulseAnim]),
+            builder: (context, _) {
+              final f = _floatAnim.value;
+              final p = _pulseAnim.value;
+              final y = math.cos(f * 2 * math.pi + math.pi / 3) * 15;
+              final x = math.sin(f * 2 * math.pi + math.pi / 3) * 10;
+              return Positioned(
+                right: -20 + x,
+                top: 140 + y,
+                child: Transform.scale(
+                  scale: p,
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(80),
+                      gradient: RadialGradient(
+                        center: const Alignment(0.4, -0.2),
+                        radius: 1.0,
+                        colors: [
+                          primaryB.withAlpha((0.06 * 255).toInt()),
+                          primaryA.withAlpha((0.01 * 255).toInt()),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.6, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // Particle dots
+          ...List.generate(6, (i) {
+            return AnimatedBuilder(
+              animation: _floatAnim,
+              builder: (context, _) {
+                final offset = (i * math.pi / 3);
+                final x = 50 + math.cos(_floatAnim.value * 2 * math.pi + offset) * 30;
+                final y = 200 + math.sin(_floatAnim.value * 2 * math.pi + offset) * 20;
+                final opacity = (math.sin(_floatAnim.value * 2 * math.pi + offset) + 1) * 0.02;
+
+                return Positioned(
+                  left: x,
+                  top: y,
+                  child: Container(
+                    width: 4,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: primaryB.withAlpha((opacity * 255).toInt()),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                );
+              },
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIntroPages(Size size) {
+    return Column(
+      children: [
+        // Page Content
+        Expanded(
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: _onPageChanged,
+            itemCount: _pages.length,
+            itemBuilder: (context, index) => _buildPage(_pages[index]),
+          ),
+        ),
+
+        // Bottom panel (matching auth design)
+        _buildBottomPanel(),
+      ],
+    );
+  }
+
+  Widget _buildPage(IntroPage page) {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Icon with animation
+              AnimatedBuilder(
+                animation: _pulseAnim,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _pulseAnim.value,
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            primaryA.withAlpha((0.2 * 255).toInt()),
+                            primaryB.withAlpha((0.1 * 255).toInt()),
+                          ],
+                        ),
+                        border: Border.all(
+                          color: primaryA.withAlpha((0.3 * 255).toInt()),
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        page.icon,
+                        size: 40,
+                        color: Colors.white,
+                      ),
+                    ),
+                  );
+                },
               ),
 
-            if (!showButton) const SizedBox(height: 30),
+              const SizedBox(height: 32),
+
+              // Title
+              Text(
+                page.title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: -0.5,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Subtitle
+              Text(
+                page.subtitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: primaryB,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Description
+              Text(
+                page.description,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.white.withAlpha((0.8 * 255).toInt()),
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomPanel() {
+    final isLastPage = _currentPage == _pages.length - 1;
+
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [panelTop, panelBottom],
+        ),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          // Page indicators
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(_pages.length, (index) {
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: _currentPage == index ? 24 : 8,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: _currentPage == index
+                      ? primaryB
+                      : Colors.white.withAlpha((0.3 * 255).toInt()),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              );
+            }),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Navigation Button
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: () {
+                if (isLastPage) {
+                  _showThemeSelectionScreen();
+                } else {
+                  _pageController.nextPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [primaryA, primaryB],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryA.withAlpha((0.3 * 255).toInt()),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  isLastPage ? 'CUSTOMIZE THEME' : 'NEXT',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildThemeSelectionScreen() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [panelTop, panelBottom],
+        ),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Back button
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _showThemeSelection = false;
+                          _currentPage = 0;
+                        });
+                      },
+                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Header
+                const Text(
+                  'Customize Your\nExperience',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Choose your preferred theme and mode',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: mutedText,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Dark/Light Mode Toggle
+                _buildModeSelector(),
+
+                const SizedBox(height: 24),
+
+                // Theme Colors
+                Text(
+                  'THEME COLOR',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildThemeSelector(),
+
+                const SizedBox(height: 32),
+
+                // Preview Card
+                _buildThemePreview(),
+
+                const SizedBox(height: 32),
+
+                // Action Buttons
+                _buildActionButtons(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModeSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'MODE',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF0B131A),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFF1F2937),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildModeOption(
+                  'Dark Mode',
+                  Icons.dark_mode_outlined,
+                  true,
+                  _isDarkMode,
+                ),
+              ),
+              Expanded(
+                child: _buildModeOption(
+                  'Light Mode',
+                  Icons.light_mode_outlined,
+                  false,
+                  !_isDarkMode,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildModeOption(String title, IconData icon, bool isDark, bool isSelected) {
+    return GestureDetector(
+      onTap: () => setState(() => _isDarkMode = isDark),
+      child: Container(
+        // Removed AnimatedContainer - this makes the change instant
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          gradient: isSelected
+              ? const LinearGradient(colors: [primaryA, primaryB])
+              : null,
+          color: isSelected ? null : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : Colors.white54,
+              size: 20,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.white54,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                fontSize: 12,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
-}
 
-class _PageIndicator extends StatelessWidget {
-  final int pageCount;
-  final int currentPage;
-  final Color color;
-
-  const _PageIndicator({
-    required this.pageCount,
-    required this.currentPage,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 30),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(pageCount, (index) {
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 6),
-            width: currentPage == index ? 24 : 8,
-            height: 4,
+  Widget _buildThemeSelector() {
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      children: AppTheme.availableThemes.map((theme) {
+        final isSelected = _selectedTheme.name == theme.name;
+        return GestureDetector(
+          onTap: () => setState(() => _selectedTheme = theme),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
-              color: currentPage == index ? color : Colors.white.withAlpha(75),
-              borderRadius: BorderRadius.circular(2),
+              color: theme.primaryColor,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isSelected ? Colors.white : Colors.transparent,
+                width: 3,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.primaryColor.withAlpha(isSelected ? (0.4 * 255).toInt() : (0.2 * 255).toInt()),
+                  blurRadius: isSelected ? 12 : 6,
+                  spreadRadius: isSelected ? 2 : 0,
+                ),
+              ],
             ),
-          );
-        }),
+            child: isSelected
+                ? const Icon(Icons.check, color: Colors.white, size: 24)
+                : null,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildThemePreview() {
+    final surfaceColor = _getSurfaceColor(_isDarkMode);
+    final cardColor = _getCardColor(_isDarkMode);
+    final onSurfaceColor = _getOnSurfaceColor(_isDarkMode);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withAlpha((0.1 * 255).toInt()),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Preview',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: onSurfaceColor,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                _selectedTheme.name,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _selectedTheme.primaryColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: _selectedTheme.primaryColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.article, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Sample News Article',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: onSurfaceColor,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'This is how your news cards will look',
+                        style: TextStyle(
+                          color: onSurfaceColor.withAlpha((0.7 * 255).toInt()),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
-}
 
-// Simpler button without animations
-class _SimplerButton extends StatelessWidget {
-  final Widget child;
-  final VoidCallback onPressed;
-
-  const _SimplerButton({required this.child, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          gradient: const LinearGradient(
-            colors: [
-              Color.fromARGB(255, 35, 137, 246),
-              Color.fromARGB(255, 24, 109, 236),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+  Widget _buildActionButtons() {
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton(
+            onPressed: _completeIntro,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [primaryA, primaryB],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: primaryA.withAlpha((0.3 * 255).toInt()),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              alignment: Alignment.center,
+              child: const Text(
+                'GET STARTED',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ),
           ),
         ),
-        child: child,
-      ),
+      ],
     );
   }
 }
 
-class IntroductionPage {
+class IntroPage {
   final String title;
+  final String subtitle;
   final String description;
-  final String image;
-  final Color color;
+  final IconData icon;
 
-  IntroductionPage({
+  IntroPage({
     required this.title,
+    required this.subtitle,
     required this.description,
-    required this.image,
-    required this.color,
+    required this.icon,
   });
 }
