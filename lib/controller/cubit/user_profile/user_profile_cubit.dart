@@ -28,7 +28,132 @@ class UserProfileCubit extends Cubit<UserProfileState> {
     });
   }
 
-  // Load user profile once
+  // Update user profile
+  Future<void> updateProfile({
+    required String displayName,
+    File? profileImage,
+    bool removeImage = false,
+  }) async {
+    try {
+      emit(state.copyWith(
+        status: UserProfileStatus.loading,
+        localProfileImage: removeImage ? null : profileImage, // Handle image removal
+      ));
+
+      final UserModel? currentUser = _authService.currentUser;
+      if (currentUser == null) {
+        emit(state.copyWith(
+          status: UserProfileStatus.error,
+          errorMessage: 'No authenticated user found',
+          localProfileImage: null, // Clear local image on error
+        ));
+        return;
+      }
+
+      final UserModel updatedUser = UserModel(
+        uid: currentUser.uid,
+        displayName: displayName,
+        email: currentUser.email,
+        emailVerified: currentUser.emailVerified,
+        createdAt: currentUser.createdAt,
+        updatedAt: DateTime.now(),
+        // Set profileImageUrl to null if removing image, otherwise keep existing
+        profileImageUrl: removeImage ? null : currentUser.profileImageUrl,
+      );
+
+      // Set access token in repository
+      final String? accessToken = _authService.accessToken;
+      if (accessToken != null) {
+        _userRepository.setAccessToken(accessToken);
+      }
+
+      // Update profile on server - this should return the updated user with new profileImageUrl
+      final UserModel updatedProfile = await _userRepository.updateUserProfile(
+          updatedUser,
+          profileImage: removeImage ? null : profileImage,
+          removeImage: removeImage
+      );
+
+      // Update the auth service's current user with the new profile data
+      // This ensures the auth service has the latest user info including profileImageUrl
+      await _authService.refreshUser();
+
+      // Emit the updated profile (which should include the new profileImageUrl from server)
+      emit(state.copyWith(
+        status: UserProfileStatus.loaded,
+        user: updatedProfile, // Use the profile returned from server
+        localProfileImage: null, // Clear local image since we now have the server URL
+      ));
+
+    } catch (e) {
+      emit(state.copyWith(
+        status: UserProfileStatus.error,
+        errorMessage: 'Failed to update profile: ${e.toString()}',
+        localProfileImage: null, // Clear local image on error
+      ));
+    }
+  }
+
+  // Remove profile image specifically
+  Future<void> removeProfileImage() async {
+    try {
+      // Immediately update state to show loading and clear local image
+      emit(state.copyWith(
+        status: UserProfileStatus.loading,
+        clearLocalImage: true, // Use the flag to explicitly clear
+      ));
+
+      final UserModel? currentUser = _authService.currentUser;
+      if (currentUser == null) {
+        emit(state.copyWith(
+          status: UserProfileStatus.error,
+          errorMessage: 'No authenticated user found',
+          clearLocalImage: true,
+        ));
+        return;
+      }
+
+      // Set access token in repository
+      final String? accessToken = _authService.accessToken;
+      if (accessToken != null) {
+        _userRepository.setAccessToken(accessToken);
+      }
+
+      // Remove the profile image from server
+      await _userRepository.removeUserProfileImage(currentUser.uid);
+
+      // Create updated user model without profile image
+      final UserModel updatedUser = UserModel(
+        uid: currentUser.uid,
+        displayName: currentUser.displayName,
+        email: currentUser.email,
+        emailVerified: currentUser.emailVerified,
+        createdAt: currentUser.createdAt,
+        updatedAt: DateTime.now(),
+        profileImageUrl: null, // Remove the image URL
+      );
+
+      // Update the auth service's current user
+      await _authService.refreshUser();
+
+      // Emit the updated profile without the image
+      emit(state.copyWith(
+        status: UserProfileStatus.loaded,
+        user: updatedUser,
+        clearLocalImage: true, // Ensure local image is null
+      ));
+
+    } catch (e) {
+      // On error, still clear the local image but show error
+      emit(state.copyWith(
+        status: UserProfileStatus.error,
+        errorMessage: 'Failed to remove profile image: ${e.toString()}',
+        clearLocalImage: true, // Clear local image even on error
+      ));
+    }
+  }
+
+// Also update the loadUserProfile method to clear local image when loading from server
   Future<void> loadUserProfile() async {
     emit(state.copyWith(status: UserProfileStatus.loading));
 
@@ -54,76 +179,12 @@ class UserProfileCubit extends Cubit<UserProfileState> {
       emit(state.copyWith(
         status: UserProfileStatus.loaded,
         user: profile,
-        localProfileImage: null, // Clear local image when loading from server
+        clearLocalImage: true, // Clear local image when loading from server
       ));
     } catch (e) {
       emit(state.copyWith(
         status: UserProfileStatus.error,
         errorMessage: e.toString(),
-      ));
-    }
-  }
-
-  // Update user profile
-  Future<void> updateProfile({
-    required String displayName,
-    File? profileImage,
-  }) async {
-    try {
-      emit(state.copyWith(
-        status: UserProfileStatus.loading,
-        localProfileImage: profileImage, // Store local image immediately for UI feedback
-      ));
-
-      final UserModel? currentUser = _authService.currentUser;
-      if (currentUser == null) {
-        emit(state.copyWith(
-          status: UserProfileStatus.error,
-          errorMessage: 'No authenticated user found',
-          localProfileImage: null, // Clear local image on error
-        ));
-        return;
-      }
-
-      final UserModel updatedUser = UserModel(
-        uid: currentUser.uid,
-        displayName: displayName,
-        email: currentUser.email,
-        emailVerified: currentUser.emailVerified,
-        createdAt: currentUser.createdAt,
-        updatedAt: DateTime.now(),
-        // Keep the existing profileImageUrl if no new image is provided
-        profileImageUrl: currentUser.profileImageUrl,
-      );
-
-      // Set access token in repository
-      final String? accessToken = _authService.accessToken;
-      if (accessToken != null) {
-        _userRepository.setAccessToken(accessToken);
-      }
-
-      // Update profile on server - this should return the updated user with new profileImageUrl
-      final UserModel updatedProfile = await _userRepository.updateUserProfile(
-          updatedUser,
-          profileImage: profileImage
-      );
-
-      // Update the auth service's current user with the new profile data
-      // This ensures the auth service has the latest user info including profileImageUrl
-      await _authService.refreshUser();
-
-      // Emit the updated profile (which should include the new profileImageUrl from server)
-      emit(state.copyWith(
-        status: UserProfileStatus.loaded,
-        user: updatedProfile, // Use the profile returned from server
-        localProfileImage: null, // Clear local image since we now have the server URL
-      ));
-
-    } catch (e) {
-      emit(state.copyWith(
-        status: UserProfileStatus.error,
-        errorMessage: 'Failed to update profile: ${e.toString()}',
-        localProfileImage: null, // Clear local image on error
       ));
     }
   }

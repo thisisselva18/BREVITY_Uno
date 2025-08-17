@@ -8,26 +8,27 @@ class UserProfileState extends Equatable {
   final UserProfileStatus status;
   final UserModel? user;
   final String? errorMessage;
-  final File? localProfileImage; // Add this line
+  final File? localProfileImage;
 
   const UserProfileState({
     this.status = UserProfileStatus.initial,
     this.user,
     this.errorMessage,
-    this.localProfileImage, // Add this line
+    this.localProfileImage,
   });
 
   UserProfileState copyWith({
     UserProfileStatus? status,
     UserModel? user,
     String? errorMessage,
-    File? localProfileImage, // Add this line
+    File? localProfileImage,
+    bool clearLocalImage = false, // Add this flag
   }) {
     return UserProfileState(
       status: status ?? this.status,
       user: user ?? this.user,
       errorMessage: errorMessage,
-      localProfileImage: localProfileImage ?? this.localProfileImage, // Add this line
+      localProfileImage: clearLocalImage ? null : (localProfileImage ?? this.localProfileImage),
     );
   }
 
@@ -39,5 +40,5 @@ class UserProfileState extends Equatable {
   bool get hasUser => user != null;
 
   @override
-  List<Object?> get props => [status, user, errorMessage, localProfileImage]; // Add localProfileImage here
+  List<Object?> get props => [status, user, errorMessage, localProfileImage];
 }
