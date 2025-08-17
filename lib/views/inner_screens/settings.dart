@@ -1,15 +1,15 @@
 import 'dart:ui';
 
+import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
+import 'package:brevity/controller/cubit/user_profile/user_profile_state.dart';
+import 'package:brevity/controller/services/auth_service.dart';
+import 'package:brevity/views/common_widgets/common_appbar.dart';
 import 'package:brevity/views/inner_screens/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:brevity/controller/cubit/user_profile/user_profile_cubit.dart';
-import 'package:brevity/controller/cubit/user_profile/user_profile_state.dart';
-import 'package:brevity/controller/services/auth_service.dart';
-import 'package:brevity/models/user_model.dart';
-import 'package:brevity/views/common_widgets/common_appbar.dart';
 import 'package:share_plus/share_plus.dart';
+
 import '../../controller/cubit/theme/theme_cubit.dart';
 import '../../controller/cubit/theme/theme_state.dart';
 import '../../controller/services/notification_service.dart';
@@ -451,7 +451,6 @@ class _SettingsScreenState extends State<SettingsScreen>
                       height: 200,
                       child: Row(
                         children: [
-                          // Hour picker
                           Expanded(
                             child: Column(
                               children: [
@@ -760,7 +759,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 gradient: LinearGradient(
                                   colors: [
                                     themeState.currentTheme.primaryColor,
-                                    Colors.purpleAccent,
+                                    themeState.currentTheme.primaryColor
+                                        .withAlpha(200),
                                   ],
                                 ),
                                 boxShadow: [

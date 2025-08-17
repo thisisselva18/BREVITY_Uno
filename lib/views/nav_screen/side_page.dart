@@ -118,7 +118,9 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
               physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverAppBar(
-                  backgroundColor: theme.colorScheme.surface.withAlpha((0.85 * 255).toInt()),
+                  backgroundColor: theme.colorScheme.surface.withAlpha(
+                    (0.85 * 255).toInt(),
+                  ),
                   expandedHeight: 155,
                   elevation: 0,
                   flexibleSpace: FlexibleSpaceBar(
@@ -138,21 +140,29 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                   builder: (context, state) {
                                     return CircleAvatar(
                                       radius: 24,
-                                      backgroundColor: _hasProfileImage(state, state.user)
-                                          ? Colors.transparent
-                                          : theme.colorScheme.secondaryContainer,
-                                      backgroundImage: _getProfileImage(state, state.user),
+                                      backgroundColor:
+                                          _hasProfileImage(state, state.user)
+                                              ? Colors.transparent
+                                              : theme.colorScheme.primary,
+                                      backgroundImage: _getProfileImage(
+                                        state,
+                                        state.user,
+                                      ),
                                       child: InkWell(
                                         onTap: () {
                                           context.push("/sidepage/profile");
                                         },
-                                        child: !_hasProfileImage(state, state.user)
-                                            ? Icon(
-                                          Icons.person,
-                                          size: 28,
-                                          color: theme.colorScheme.onSecondaryContainer,
-                                        )
-                                            : null,
+                                        child:
+                                            !_hasProfileImage(state, state.user)
+                                                ? Icon(
+                                                  Icons.person,
+                                                  size: 28,
+                                                  color:
+                                                      theme
+                                                          .colorScheme
+                                                          .onSecondaryContainer,
+                                                )
+                                                : null,
                                       ),
                                     );
                                   },
@@ -192,13 +202,15 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                 isDense: true,
                                 hintText: 'Search news topics...',
                                 hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.colorScheme.onSurface
-                                      .withAlpha((0.6 * 255).toInt()),
+                                  color: theme.colorScheme.onSurface.withAlpha(
+                                    (0.6 * 255).toInt(),
+                                  ),
                                 ),
                                 suffixIcon: IconButton(
                                   icon: const Icon(Icons.search),
-                                  color: theme.colorScheme.onSurface
-                                      .withAlpha((0.7 * 255).toInt()),
+                                  color: theme.colorScheme.onSurface.withAlpha(
+                                    (0.7 * 255).toInt(),
+                                  ),
                                   onPressed: _handleSearch,
                                 ),
                                 border: OutlineInputBorder(
@@ -226,7 +238,9 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          currentTheme.primaryColor.withAlpha((0.1 * 255).toInt()),
+                          currentTheme.primaryColor.withAlpha(
+                            (0.1 * 255).toInt(),
+                          ),
                           Colors.transparent,
                         ],
                       ),
@@ -456,50 +470,55 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
               color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: article == null
-                ? Center(
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    theme.brightness == Brightness.light
-                        ? Colors.black54
-                        : Colors.white70,
-                  ),
-                ),
-              ),
-            )
-                : ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: CachedNetworkImage(
-                imageUrl: article.urlToImage ?? '',
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Center(
-                  child: SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        theme.brightness == Brightness.light
-                            ? Colors.black54
-                            : Colors.white70,
+            child:
+                article == null
+                    ? Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            theme.brightness == Brightness.light
+                                ? Colors.black54
+                                : Colors.white70,
+                          ),
+                        ),
+                      ),
+                    )
+                    : ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: CachedNetworkImage(
+                        imageUrl: article.urlToImage,
+                        fit: BoxFit.cover,
+                        placeholder:
+                            (context, url) => Center(
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    theme.brightness == Brightness.light
+                                        ? Colors.black54
+                                        : Colors.white70,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        errorWidget:
+                            (context, url, error) => Container(
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              child: Icon(
+                                Icons.image_not_supported,
+                                color: theme.colorScheme.onSurface.withAlpha(
+                                  (0.5 * 255).toInt(),
+                                ),
+                                size: 30,
+                              ),
+                            ),
                       ),
                     ),
-                  ),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  child: Icon(
-                    Icons.image_not_supported,
-                    color: theme.colorScheme.onSurface.withAlpha((0.5 * 255).toInt()),
-                    size: 30,
-                  ),
-                ),
-              ),
-            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -521,7 +540,9 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
+                    color: theme.colorScheme.onSurface.withAlpha(
+                      (0.7 * 255).toInt(),
+                    ),
                   ),
                 ),
               ],
