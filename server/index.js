@@ -106,6 +106,12 @@ app.get('/auth/verify-email', verifyEmail);
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
+const port = process.env.PORT || 5000;
+
+app.listen(port, () => {
+    console.log(`Server started on http://localhost:${port}`);
+});
+
 // 404 handler
 app.use('*', (req, res) => {
     res.status(404).json({
