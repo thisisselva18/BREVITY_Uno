@@ -52,6 +52,10 @@ const userSchema = new mongoose.Schema({
         }
     }],
     lastLogin: Date,
+    bookmarked: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Article'
+    }],
     createdAt: {
         type: Date,
         default: Date.now
@@ -151,6 +155,25 @@ userSchema.methods.resetLoginAttempts = function () {
     return this.updateOne({
         $unset: { loginAttempts: 1, lockUntil: 1 }
     });
+};
+
+// Instance method to add bookmark
+userSchema.methods.addBookmark = function (articleId) {
+    if (!this.bookmarked.includes(articleId)) {
+        this.bookmarked.push(articleId);
+    }
+    return this.save();
+};
+
+// Instance method to remove bookmark
+userSchema.methods.removeBookmark = function (articleId) {
+    this.bookmarked = this.bookmarked.filter(id => !id.equals(articleId));
+    return this.save();
+};
+
+// Instance method to check if article is bookmarked
+userSchema.methods.isBookmarked = function (articleId) {
+    return this.bookmarked.some(id => id.equals(articleId));
 };
 
 module.exports = mongoose.model('User', userSchema);
