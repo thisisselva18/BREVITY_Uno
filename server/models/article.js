@@ -36,23 +36,17 @@ const articleSchema = new mongoose.Schema({
     },
     author: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 100
     },
     content: {
         type: String,
         required: true
-    },
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-        index: true
-    },
+    }
 });
 
-articleSchema.index({ userId: 1, url: 1 }, { unique: true });
+// Create unique index on URL to prevent duplicate articles
+articleSchema.index({ url: 1 }, { unique: true });
 
 articleSchema.virtual("timeAgo").get(function () {
     const now = new Date();
