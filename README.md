@@ -211,7 +211,7 @@ Your contributions, no matter how big or small, are what make this project thriv
 <br/>
 
 Want to see your name here? ✨  
-Check out our **[Contributing Guidelines](CONTRIBUTING.md)** and join our community of contributors today! 🚀
+Check out our **[Contributing Guidelines](.github/CONTRIBUTING.md)** and join our community of contributors today! 🚀
 
 ---
 
