@@ -189,6 +189,32 @@ We're constantly evolving and have some exciting ideas in the pipeline to make B
 
 ---
 
+## 👥 Our Valuable Contributors
+
+We are incredibly grateful to all the amazing contributors who have helped make **Brevity** better!  
+Your contributions, no matter how big or small, are what make this project thrive. 🙌  
+
+<br/>
+
+<div align="center">
+  <a href="https://github.com/Yash159357/BREVITY/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=Yash159357/BREVITY" alt="Contributors" />
+  </a>
+</div>
+
+<br/>
+
+<p align="center">
+  <i>Thank you to all our contributors for making Brevity amazing! 💝</i>
+</p>
+
+<br/>
+
+Want to see your name here? ✨  
+Check out our **[Contributing Guidelines](CONTRIBUTING.md)** and join our community of contributors today! 🚀
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions! Please read our [Contributing Guidelines](.github/CONTRIBUTING.md) before submitting a pull request.
