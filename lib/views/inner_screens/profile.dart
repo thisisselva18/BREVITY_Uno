@@ -187,17 +187,6 @@ class _ProfileScreenState extends State<ProfileScreen>
         }
       },
       builder: (context, state) {
-        if (state.status == UserProfileStatus.loading) {
-          return Scaffold(
-            backgroundColor: theme.colorScheme.surface,
-            body: Center(
-              child: CircularProgressIndicator(
-                color: currentTheme.primaryColor,
-              ),
-            ),
-          );
-        }
-
         if (state.status == UserProfileStatus.error) {
           return Scaffold(
             backgroundColor: theme.colorScheme.surface,
@@ -243,7 +232,24 @@ class _ProfileScreenState extends State<ProfileScreen>
                               child: Stack(
                                 alignment: Alignment.bottomRight,
                                 children: [
-                                  CircleAvatar(
+                                  state.status == UserProfileStatus.loading
+                                      ? CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: currentTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          theme.brightness == Brightness.light
+                                              ? Colors.black54
+                                              : Colors.white70,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                      : CircleAvatar(
                                     radius: 50,
                                     backgroundColor: _hasProfileImage(state, user)
                                         ? Colors.transparent

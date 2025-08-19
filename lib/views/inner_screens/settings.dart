@@ -697,10 +697,6 @@ class _SettingsScreenState extends State<SettingsScreen>
         builder: (context, themeState) {
           return BlocBuilder<UserProfileCubit, UserProfileState>(
             builder: (context, state) {
-              if (state.status == UserProfileStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
               if (state.status == UserProfileStatus.error) {
                 return Center(
                   child: Column(
@@ -749,7 +745,54 @@ class _SettingsScreenState extends State<SettingsScreen>
                         title: "",
                         themeColor: themeState.currentTheme.primaryColor,
                         particleAnimation: _particleAnimationController,
-                        child: Column(
+                        child: state.status == UserProfileStatus.loading
+                            ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: themeState.currentTheme.primaryColor.withAlpha(50),
+                              ),
+                              child: CircleAvatar(
+                                radius: 40,
+                                backgroundColor: themeState.currentTheme.primaryColor.withAlpha((0.2 * 255).toInt()),
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      theme.brightness == Brightness.light
+                                          ? Colors.black54
+                                          : Colors.white70,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Container(
+                              height: 20,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              height: 16,
+                              width: 180,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        )
+                            : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
@@ -775,22 +818,22 @@ class _SettingsScreenState extends State<SettingsScreen>
                               child: CircleAvatar(
                                 radius: 40,
                                 backgroundColor:
-                                    _hasProfileImage(state, state.user)
-                                        ? Colors.transparent
-                                        : themeState.currentTheme.primaryColor
-                                            .withAlpha((0.2 * 255).toInt()),
+                                _hasProfileImage(state, state.user)
+                                    ? Colors.transparent
+                                    : themeState.currentTheme.primaryColor
+                                    .withAlpha((0.2 * 255).toInt()),
                                 backgroundImage: _getProfileImage(
                                   state,
                                   state.user,
                                 ),
                                 child:
-                                    !_hasProfileImage(state, state.user)
-                                        ? Icon(
-                                          Icons.person,
-                                          size: 48,
-                                          color: Colors.white,
-                                        )
-                                        : null,
+                                !_hasProfileImage(state, state.user)
+                                    ? Icon(
+                                  Icons.person,
+                                  size: 48,
+                                  color: Colors.white,
+                                )
+                                    : null,
                               ),
                             ),
                             const SizedBox(height: 16),
