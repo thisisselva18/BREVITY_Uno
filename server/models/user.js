@@ -56,6 +56,30 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Article'
     }],
+    reactions: {
+        likes: [{
+            articleId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Article',
+                required: true
+            },
+            likedAt: {
+                type: Date,
+                default: Date.now
+            }
+        }],
+        dislikes: [{
+            articleId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Article',
+                required: true
+            },
+            dislikedAt: {
+                type: Date,
+                default: Date.now
+            }
+        }]
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -63,7 +87,7 @@ const userSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
-    }
+    },
 });
 
 // Indexes
@@ -174,6 +198,95 @@ userSchema.methods.removeBookmark = function (articleId) {
 // Instance method to check if article is bookmarked
 userSchema.methods.isBookmarked = function (articleId) {
     return this.bookmarked.some(id => id.equals(articleId));
+};
+
+// Instance methods to add like 
+userSchema.methods.addLike = function (articleId) {
+    // Remove any existing dislike first
+    const hadDislike = this.reactions.dislikes.some(dislike => dislike.articleId.equals(articleId));
+    if (hadDislike) {
+        this.reactions.dislikes = this.reactions.dislikes.filter(dislike => !dislike.articleId.equals(articleId));
+    }
+    
+    // Add like if it doesn't already exist
+    const hasLike = this.reactions.likes.some(like => like.articleId.equals(articleId));
+    if (!hasLike) {
+        this.reactions.likes.push({ articleId });
+    }
+    
+    return this.save();
+};
+
+// Instance methods to remove like
+userSchema.methods.removeLike = function (articleId) {
+    this.reactions.likes = this.reactions.likes.filter(like => !like.articleId.equals(articleId));
+    return this.save();
+};
+
+// Instance methods to add dislike
+userSchema.methods.addDislike = function (articleId) {
+    // Remove any existing like first
+    const hadLike = this.reactions.likes.some(like => like.articleId.equals(articleId));
+    if (hadLike) {
+        this.reactions.likes = this.reactions.likes.filter(like => !like.articleId.equals(articleId));
+    }
+    
+    // Add dislike if it doesn't already exist
+    const hasDislike = this.reactions.dislikes.some(dislike => dislike.articleId.equals(articleId));
+    if (!hasDislike) {
+        this.reactions.dislikes.push({ articleId });
+    }
+    
+    return this.save();
+};
+
+// Instance methods to remove dislike
+userSchema.methods.removeDislike = function (articleId) {
+    this.reactions.dislikes = this.reactions.dislikes.filter(dislike => !dislike.articleId.equals(articleId));
+    return this.save();
+};
+
+// Instance methods to fetch all reactions with populated article details
+userSchema.methods.getReactedNews = async function() {
+    await this.populate([
+        {
+            path: 'reactions.likes.articleId',
+        },
+        {
+            path: 'reactions.dislikes.articleId', 
+        }
+    ]);
+
+    const likedNews = this.reactions.likes
+        .filter(like => like.articleId) // Filter out any null references
+        .map(like => ({
+            headline: like.articleId.title,
+            source: like.articleId.sourceName,
+            description: like.articleId.description,
+            url: like.articleId.url,
+            publishedAt: like.articleId.publishedAt,
+            reactionType: 'like',
+            reactedAt: like.likedAt
+        }));
+
+    const dislikedNews = this.reactions.dislikes
+        .filter(dislike => dislike.articleId) // Filter out any null references
+        .map(dislike => ({
+            headline: dislike.articleId.title,
+            source: dislike.articleId.sourceName, 
+            description: dislike.articleId.description,
+            url: dislike.articleId.url,
+            publishedAt: dislike.articleId.publishedAt,
+            reactionType: 'dislike',
+            reactedAt: dislike.dislikedAt
+        }));
+
+    return {
+        totalLikes: likedNews.length,
+        totalDislikes: dislikedNews.length,
+        totalReactions: likedNews.length + dislikedNews.length,
+        reactions: [...likedNews, ...dislikedNews].sort((a, b) => b.reactedAt - a.reactedAt)
+    };
 };
 
 module.exports = mongoose.model('User', userSchema);
