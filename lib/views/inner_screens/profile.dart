@@ -287,22 +287,21 @@ class _ProfileScreenState extends State<ProfileScreen>
                           ],
                         ),
                         const SizedBox(height: 30),
-                        _buildProfileField(
+                        _buildProfileFieldCard(
                           icon: Icons.person,
-                          label: 'Full Name',
+                          title: 'Full Name',
                           controller: _nameController,
                           currentTheme: currentTheme,
+                          enabled: true,
                         ),
-                        const SizedBox(height: 20),
-                        _buildProfileField(
+                        _buildProfileFieldCard(
                           icon: Icons.email,
-                          label: 'Email Address',
+                          title: 'Email Address',
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           enabled: false,
                           currentTheme: currentTheme,
                         ),
-                        const SizedBox(height: 30),
                         _buildProfileOption(
                           icon: Icons.verified_user,
                           title: 'Email Verified',
@@ -382,9 +381,9 @@ class _ProfileScreenState extends State<ProfileScreen>
     return null;
   }
 
-  Widget _buildProfileField({
+  Widget _buildProfileFieldCard({
     required IconData icon,
-    required String label,
+    required String title,
     required TextEditingController controller,
     required AppTheme currentTheme,
     TextInputType keyboardType = TextInputType.text,
@@ -392,21 +391,44 @@ class _ProfileScreenState extends State<ProfileScreen>
   }) {
     final theme = Theme.of(context);
     return Container(
+      margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
-        color: theme.inputDecorationTheme.fillColor,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        enabled: enabled,
-        style: theme.textTheme.bodyLarge,
-        decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: currentTheme.primaryColor),
-          labelText: label,
-          labelStyle: TextStyle(color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt())),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            Icon(icon, color: currentTheme.primaryColor),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 4),
+                  TextFormField(
+                    controller: controller,
+                    keyboardType: keyboardType,
+                    enabled: enabled,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
+                    ),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
