@@ -478,8 +478,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     childDelegate:
                                         ListWheelChildBuilderDelegate(
                                           builder: (context, index) {
-                                            if (index < 0 || index > 23)
-                                              return null;
+                                            if (index < 0 || index > 23) return null;
                                             return Container(
                                               alignment: Alignment.center,
                                               child: Text(
@@ -545,8 +544,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     childDelegate:
                                         ListWheelChildBuilderDelegate(
                                           builder: (context, index) {
-                                            if (index < 0 || index > 11)
-                                              return null;
+                                            if (index < 0 || index > 11) return null;
                                             final minute = index * 5;
                                             return Container(
                                               alignment: Alignment.center,

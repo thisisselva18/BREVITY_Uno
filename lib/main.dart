@@ -349,8 +349,6 @@ void main() async {
   final bookmarkRepository = BookmarkServices();
   final newsService = NewsService();
 
-  await bookmarkRepository.initialize();
-
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

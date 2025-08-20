@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:brevity/models/article_model.dart';
 import 'package:brevity/utils/api_config.dart';
+import 'package:logger/logger.dart';
 
 // Custom exception classes for better error handling
 class NewsServiceException implements Exception {
@@ -418,8 +419,7 @@ class NewsService {
           validArticles.add(article);
         }
       } catch (e) {
-        // Log invalid article but continue processing others
-        print('Warning: Failed to parse article: $e');
+        Logger().w('Warning: Failed to parse article: $e');
         continue;
       }
     }
@@ -521,7 +521,7 @@ class NewsService {
         return MapEntry(category, articles);
       } catch (e) {
         // Return empty list for failed categories instead of failing entirely
-        print('Warning: Failed to fetch $category news: $e');
+        Logger().w('Warning: Failed to fetch $category news: $e');
         return MapEntry(category, <Article>[]);
       }
     });
