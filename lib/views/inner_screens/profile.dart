@@ -23,6 +23,9 @@ class _ProfileScreenState extends State<ProfileScreen>
   final TextEditingController _emailController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
   File? _selectedImage;
+  bool _isNameEditing = false;
+  String _originalName = '';
+  String _originalImageUrl = '';
 
   @override
   void initState() {
@@ -184,6 +187,10 @@ class _ProfileScreenState extends State<ProfileScreen>
         if (state.status == UserProfileStatus.loaded && state.user != null) {
           _nameController.text = state.user!.displayName;
           _emailController.text = state.user!.email;
+
+          // Store original values for comparison
+          _originalName = state.user!.displayName;
+          _originalImageUrl = state.user!.profileImageUrl ?? '';
         }
       },
       builder: (context, state) {
@@ -292,7 +299,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                           title: 'Full Name',
                           controller: _nameController,
                           currentTheme: currentTheme,
-                          enabled: true,
+                          enabled: _isNameEditing,
+                          onEditTap: () {
+                            setState(() {
+                              _isNameEditing = !_isNameEditing;
+                            });
+                          },
                         ),
                         _buildProfileFieldCard(
                           icon: Icons.email,
@@ -327,12 +339,16 @@ class _ProfileScreenState extends State<ProfileScreen>
                           onTap: () {},
                           currentTheme: currentTheme,
                         ),
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 20),
                         ElevatedButton(
-                          onPressed: _saveProfile,
+                          onPressed: _hasChanges() ? _saveProfile : null,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: currentTheme.primaryColor,
-                            foregroundColor: theme.colorScheme.onPrimary,
+                            backgroundColor: _hasChanges()
+                                ? currentTheme.primaryColor
+                                : theme.colorScheme.onSurface.withAlpha((0.12 * 255).toInt()),
+                            foregroundColor: _hasChanges()
+                                ? theme.colorScheme.onPrimary
+                                : theme.colorScheme.onSurface.withAlpha((0.38 * 255).toInt()),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 40,
                               vertical: 15,
@@ -359,6 +375,16 @@ class _ProfileScreenState extends State<ProfileScreen>
         );
       },
     );
+  }
+
+  bool _hasChanges() {
+    // Check if name has changed
+    bool nameChanged = _nameController.text.trim() != _originalName;
+
+    // Check if image has changed (new image selected or existing image removed)
+    bool imageChanged = _selectedImage != null;
+
+    return nameChanged || imageChanged;
   }
 
   bool _hasProfileImage(UserProfileState state, user) {
@@ -388,6 +414,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     required AppTheme currentTheme,
     TextInputType keyboardType = TextInputType.text,
     bool enabled = true,
+    VoidCallback? onEditTap,
   }) {
     final theme = Theme.of(context);
     return Container(
@@ -395,9 +422,17 @@ class _ProfileScreenState extends State<ProfileScreen>
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withAlpha((0.08 * 255).toInt()),
+            offset: const Offset(0, 2),
+            blurRadius: 8,
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
             Icon(icon, color: currentTheme.primaryColor),
@@ -411,23 +446,69 @@ class _ProfileScreenState extends State<ProfileScreen>
                     title,
                     style: theme.textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 4),
-                  TextFormField(
+                  const SizedBox(height: 6),
+                  enabled
+                      ? TextFormField(
                     controller: controller,
                     keyboardType: keyboardType,
-                    enabled: enabled,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    decoration: InputDecoration(
+                      border: enabled ? UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: currentTheme.primaryColor.withAlpha((0.3 * 255).toInt()),
+                        ),
+                      ) : InputBorder.none,
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: currentTheme.primaryColor,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                      isDense: true,
+                    ),
+                  )
+                      : Text(
+                    controller.text.isEmpty ? 'Loading...' : controller.text,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                      isDense: true,
                     ),
                   ),
                 ],
               ),
             ),
+            if (onEditTap != null)
+              GestureDetector(
+                onTap: () {
+                  if (enabled) {
+                    if (controller.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Name cannot be blank')),
+                      );
+                      return;
+                    }
+                  }
+                  onEditTap?.call();
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: enabled
+                        ? currentTheme.primaryColor.withAlpha((0.1 * 255).toInt())
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    enabled ? Icons.check : Icons.edit_outlined,
+                    size: 18,
+                    color: enabled
+                        ? currentTheme.primaryColor
+                        : currentTheme.primaryColor.withAlpha((0.7 * 255).toInt()),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -447,17 +528,42 @@ class _ProfileScreenState extends State<ProfileScreen>
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withAlpha((0.08 * 255).toInt()),
+            offset: const Offset(0, 2),
+            blurRadius: 8,
+            spreadRadius: 0,
+          ),
+        ],
       ),
-      child: ListTile(
-        leading: Icon(icon, color: currentTheme.primaryColor),
-        title: Text(title, style: theme.textTheme.titleMedium),
-        subtitle: Text(subtitle, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()))),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-          color: currentTheme.primaryColor,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            Icon(icon, color: currentTheme.primaryColor),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        onTap: onTap,
       ),
     );
   }
