@@ -565,7 +565,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   Widget _buildFormPanel() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isSmallScreen = MediaQuery.of(context).size.height < 700;
         final isTinyScreen = MediaQuery.of(context).size.height < 600;
 
         return AnimatedBuilder(
@@ -987,7 +986,7 @@ class _EnhancedOutlinedButtonState extends State<EnhancedOutlinedButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _hoverController;
   late Animation<double> _hoverAnim;
-  bool _isHovered = false;
+  bool isHovered = false;
 
   @override
   void initState() {
@@ -1008,8 +1007,8 @@ class _EnhancedOutlinedButtonState extends State<EnhancedOutlinedButton>
     super.dispose();
   }
 
-  void _onHover(bool isHovered) {
-    setState(() => _isHovered = isHovered);
+  void _onHover(bool hovered) {
+    setState(() => isHovered = hovered);
     if (isHovered) {
       _hoverController.forward();
     } else {
