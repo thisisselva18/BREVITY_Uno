@@ -1079,11 +1079,12 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   titleColor:
                                       themeState.currentTheme.primaryColor,
                                   onTap: () {
-                                    AuthService().signOut().then((value) {
-                                      if (context.mounted) {
-                                        context.go('/splash');
-                                      }
-                                    });
+                                    // first navigate to splash then log out
+                                    // splash screen checkts the auth state
+                                    if (context.mounted) {
+                                      context.go('/splash');
+                                    }
+                                    AuthService().signOut();
                                   },
                                 ),
                               ),
