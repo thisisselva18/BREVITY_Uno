@@ -155,7 +155,7 @@
 -   **APIs**: News API, Gemini API
 ---
 
-# 📁 Folder Structure
+## 📁 Folder Structure
 
 ```bash
 brevity/
@@ -189,12 +189,17 @@ We're constantly evolving and have some exciting ideas in the pipeline to make B
 
 ---
 
-## 👥 Our Valuable Contributors
+## 🤝 Contributing
 
-We are incredibly grateful to all the amazing contributors who have helped make **Brevity** better! 🙌  
-Your contributions, no matter how big or small, are what make this project thrive. 🚀  
+We welcome contributions! Please read our [Contributing Guidelines](.github/CONTRIBUTING.md) before submitting a pull request.
 
-<br/>
+<div>
+  <h2><img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f49e/512.webp" width="30" height="30"> Our Valuebale Contributors</h2>
+</div>
+
+
+  <i>Thank you to all our contributors for making Brevity amazing! 💝</i>
+
 
 <!-- readme: contributors -start -->
 <table>
@@ -343,21 +348,6 @@ Your contributions, no matter how big or small, are what make this project thriv
 	<tbody>
 </table>
 <!-- readme: contributors -end -->
-
-<br/>
-
-<p align="center">
-  <i>Thank you to all our contributors for making Brevity amazing! 💝</i>
-</p>
-
-Want to see your name here? ✨  
-Check out our **[Contributing Guidelines](.github/CONTRIBUTING.md)** and join our community today!
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please read our [Contributing Guidelines](.github/CONTRIBUTING.md) before submitting a pull request.
 
 ---
 
