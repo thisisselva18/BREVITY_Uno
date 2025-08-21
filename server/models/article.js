@@ -5,25 +5,21 @@ const articleSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        maxlength: 100
     },
     description: {
         type: String,
         required: true,
         trim: true,
-        maxlength: 500
     },
     url: {
         type: String,
         required: true,
         trim: true,
-        maxlength: 200
     },
     urlToImage: {
         type: String,
         required: true,
         trim: true,
-        maxlength: 200
     },
     publishedAt: {
         type: Date,
@@ -37,7 +33,6 @@ const articleSchema = new mongoose.Schema({
     author: {
         type: String,
         trim: true,
-        maxlength: 100
     },
     content: {
         type: String,
