@@ -10,7 +10,7 @@ const {
 const router = express.Router();
 
 // Routes
-router.put('/profile', authMiddleware, upload.single('profileImage'), updateProfile);
+router.patch('/profile', authMiddleware, upload.single('profileImage'), updateProfile);
 router.delete('/profile/image', authMiddleware, deleteProfileImage);
 router.delete('/deleteAccount', authMiddleware, deleteUserAccount);
 
