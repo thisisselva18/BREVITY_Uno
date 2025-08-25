@@ -160,6 +160,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
                     ),
                   ),
                   const Spacer(),
+                  // Contact Issue
                   IconButton(
                     icon: const Icon(
                       Icons.info_outline,
@@ -357,6 +358,7 @@ class _NewsCardState extends State<_NewsCard> {
                   ],
                 ),
                 const Gap(20),
+                // Bookmark Issue
                 _TappableHeadline(
                   title: widget.article.title,
                   article: widget.article,
