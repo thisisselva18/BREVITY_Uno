@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import '../../controller/cubit/theme/theme_cubit.dart';
 import '../../controller/services/tutorial_service.dart';
 import '../../models/theme_model.dart';
+import 'tutorial_screen.dart';
 
 // Enhanced Palette (matching auth design)
 const Color bgStart = Color(0xFF070B14);
@@ -335,7 +336,27 @@ class _IntroductionScreenState extends State<IntroductionScreen>
             itemBuilder: (context, index) => _buildPage(_pages[index]),
           ),
         ),
-
+        if (_currentPage == 1)
+          ScaleTransition(
+            scale: _pulseAnim,
+            child: Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                  backgroundColor: primaryB,
+                ),
+                child: const Text('Tutorial', style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const TutorialScreen()),
+                  );
+                },
+              ),
+            ),
+          ),
         // Bottom panel (matching auth design)
         _buildBottomPanel(),
       ],
