@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../controller/cubit/user_profile/user_profile_cubit.dart';
+import '../../controller/cubit/user_profile/user_profile_state.dart';
+
 class SidePage extends StatefulWidget {
   const SidePage({super.key});
 
@@ -28,6 +31,8 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _topNewsFuture = _newsService.fetchGeneralNews(page: 1, pageSize: 3);
+
+    context.read<UserProfileCubit>().loadUserProfile();
 
     _animationController = AnimationController(
       vsync: this,
@@ -57,6 +62,21 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
     _particleAnimationController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  bool _hasProfileImage(UserProfileState state, user) {
+    return state.localProfileImage != null ||
+        (user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty);
+  }
+
+  ImageProvider? _getProfileImage(UserProfileState state, user) {
+    if (state.localProfileImage != null) {
+      return FileImage(state.localProfileImage!);
+    }
+    if (user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty) {
+      return NetworkImage(user.profileImageUrl!);
+    }
+    return null;
   }
 
   void _handleSearch() {
@@ -98,7 +118,9 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
               physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverAppBar(
-                  backgroundColor: theme.colorScheme.surface.withAlpha((0.85 * 255).toInt()),
+                  backgroundColor: theme.colorScheme.surface.withAlpha(
+                    (0.85 * 255).toInt(),
+                  ),
                   expandedHeight: 155,
                   elevation: 0,
                   flexibleSpace: FlexibleSpaceBar(
@@ -114,18 +136,36 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                           children: [
                             Row(
                               children: [
-                                CircleAvatar(
-                                  backgroundColor:
-                                      theme.colorScheme.secondaryContainer,
-                                  radius: 24,
-                                  child: IconButton(
-                                    color:
-                                        theme.colorScheme.onSecondaryContainer,
-                                    icon: const Icon(Icons.person, size: 28),
-                                    onPressed: () {
-                                      context.push("/sidepage/profile");
-                                    },
-                                  ),
+                                BlocBuilder<UserProfileCubit, UserProfileState>(
+                                  builder: (context, state) {
+                                    return CircleAvatar(
+                                      radius: 24,
+                                      backgroundColor:
+                                          _hasProfileImage(state, state.user)
+                                              ? Colors.transparent
+                                              : theme.colorScheme.primary,
+                                      backgroundImage: _getProfileImage(
+                                        state,
+                                        state.user,
+                                      ),
+                                      child: InkWell(
+                                        onTap: () {
+                                          context.push("/sidepage/profile");
+                                        },
+                                        child:
+                                            !_hasProfileImage(state, state.user)
+                                                ? Icon(
+                                                  Icons.person,
+                                                  size: 28,
+                                                  color:
+                                                      theme
+                                                          .colorScheme
+                                                          .onSecondaryContainer,
+                                                )
+                                                : null,
+                                      ),
+                                    );
+                                  },
                                 ),
                                 const Spacer(),
                                 TextButton.icon(
@@ -162,13 +202,15 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                                 isDense: true,
                                 hintText: 'Search news topics...',
                                 hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.colorScheme.onSurface
-                                      .withAlpha((0.6 * 255).toInt()),
+                                  color: theme.colorScheme.onSurface.withAlpha(
+                                    (0.6 * 255).toInt(),
+                                  ),
                                 ),
                                 suffixIcon: IconButton(
                                   icon: const Icon(Icons.search),
-                                  color: theme.colorScheme.onSurface
-                                      .withAlpha((0.7 * 255).toInt()),
+                                  color: theme.colorScheme.onSurface.withAlpha(
+                                    (0.7 * 255).toInt(),
+                                  ),
                                   onPressed: _handleSearch,
                                 ),
                                 border: OutlineInputBorder(
@@ -196,7 +238,9 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          currentTheme.primaryColor.withAlpha((0.1 * 255).toInt()),
+                          currentTheme.primaryColor.withAlpha(
+                            (0.1 * 255).toInt(),
+                          ),
                           Colors.transparent,
                         ],
                       ),
@@ -425,16 +469,56 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
-              image: DecorationImage(
-                image:
-                    article?.urlToImage != null
-                        ? CachedNetworkImageProvider(article!.urlToImage)
-                        : const AssetImage('assets/placeholder.png')
-                            as ImageProvider,
-                fit: BoxFit.cover,
-                onError: (exception, stackTrace) {},
-              ),
             ),
+            child:
+                article == null
+                    ? Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            theme.brightness == Brightness.light
+                                ? Colors.black54
+                                : Colors.white70,
+                          ),
+                        ),
+                      ),
+                    )
+                    : ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: CachedNetworkImage(
+                        imageUrl: article.urlToImage,
+                        fit: BoxFit.cover,
+                        placeholder:
+                            (context, url) => Center(
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    theme.brightness == Brightness.light
+                                        ? Colors.black54
+                                        : Colors.white70,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        errorWidget:
+                            (context, url, error) => Container(
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              child: Icon(
+                                Icons.image_not_supported,
+                                color: theme.colorScheme.onSurface.withAlpha(
+                                  (0.5 * 255).toInt(),
+                                ),
+                                size: 30,
+                              ),
+                            ),
+                      ),
+                    ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -456,7 +540,9 @@ class _SidePageState extends State<SidePage> with TickerProviderStateMixin {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
+                    color: theme.colorScheme.onSurface.withAlpha(
+                      (0.7 * 255).toInt(),
+                    ),
                   ),
                 ),
               ],

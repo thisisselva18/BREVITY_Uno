@@ -211,7 +211,6 @@ class NotificationService {
 
       // Check if user has bookmarks
       final bookmarkService = BookmarkServices();
-      await bookmarkService.initialize();
       final bookmarks = await bookmarkService.getBookmarks();
 
       if (bookmarks.isEmpty) {

@@ -1,12 +1,30 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:brevity/controller/services/auth_service.dart';
+
+import '../common_widgets/auth_header.dart';
+
+// Enhanced Palette (consistent with login/signup)
+const Color bgStart = Color(0xFF070B14);
+const Color bgEnd = Color(0xFF0E1624);
+
+const Color primaryA = Color(0xFF3D4DFF);
+const Color primaryB = Color(0xFF29C0FF);
+
+const Color panelTop = Color(0xFF0F1724);
+const Color panelBottom = Color(0xFF111827);
+const Color mutedText = Color(0xFF9AA8BF);
+const Color successColor = Color(0xFF10B981);
+const Color warningColor = Color(0xFFF59E0B);
+const Color errorColor = Color(0xFFEF4444);
 
 class EmailVerificationScreen extends StatefulWidget {
   final String email;
   final bool isFromLogin;
-  
+
   const EmailVerificationScreen({
     super.key,
     required this.email,
@@ -21,72 +39,73 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     with TickerProviderStateMixin {
   bool _isCheckingVerification = false;
   bool _isResendingEmail = false;
-  
+
   // Timer related variables
   Timer? _resendTimer;
   Timer? _autoCheckTimer;
   int _resendCooldown = 0;
   int _resendAttempts = 0;
   static const List<int> _cooldownDurations = [30, 60, 120, 300]; // 30s, 1m, 2m, 5m
-  
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
-  late AnimationController _bounceController;
-  late AnimationController _pulseController;
 
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _bounceAnimation;
-  late Animation<double> _pulseAnimation;
+  // Animations (consistent with login/signup)
+  late final AnimationController _fadeController;
+  late final AnimationController _slideController;
+  late final AnimationController _floatController;
+  late final AnimationController _pulseController;
+  late final AnimationController _shakeController;
+
+  late final Animation<double> _floatAnim;
+  late final Animation<double> _pulseAnim;
+  late final Animation<double> _shakeAnim;
 
   @override
   void initState() {
     super.initState();
-    
-    // Initialize animation controllers
+
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
       vsync: this,
+      duration: const Duration(milliseconds: 850),
     );
-    
     _slideController = AnimationController(
-      duration: const Duration(milliseconds: 800),
       vsync: this,
+      duration: const Duration(milliseconds: 650),
     );
-    
-    _bounceController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+    _floatController = AnimationController(
       vsync: this,
+      duration: const Duration(milliseconds: 4200),
     );
-
     _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
       vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    );
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
     );
 
-    // Initialize animations
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    _floatAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
     );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
-    );
-
-    _bounceAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _bounceController, curve: Curves.elasticOut),
-    );
-
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+    _pulseAnim = Tween<double>(begin: 1.0, end: 1.04).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
+    _shakeAnim = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _shakeController, curve: Curves.elasticOut),
+    );
 
-    // Start animations
-    _startAnimations();
-    
+    _floatController.repeat(reverse: true);
+    _pulseController.repeat(reverse: true);
+
+    // Start entrance animations
+    Future.delayed(
+      const Duration(milliseconds: 160),
+          () => _fadeController.forward(),
+    );
+    Future.delayed(
+      const Duration(milliseconds: 300),
+          () => _slideController.forward(),
+    );
+
     // Start periodic check for email verification (every 10 seconds)
     if (AuthService().isAuthenticated) {
       _startPeriodicCheck();
@@ -96,22 +115,17 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   void _startPeriodicCheck() {
     _autoCheckTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
       if (!mounted || _isCheckingVerification) return;
-      
+
       try {
         await AuthService().refreshUser();
         final user = AuthService().currentUser;
-        
+
         if (user != null && user.emailVerified) {
           timer.cancel();
           if (!mounted) return;
-          
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Email verified successfully!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          
+
+          _showSuccessMessage('Email verified successfully!');
+
           // Navigate based on where user came from
           if (widget.isFromLogin) {
             context.go('/home/0');
@@ -128,35 +142,24 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     });
   }
 
-  void _startAnimations() async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    _fadeController.forward();
-    await Future.delayed(const Duration(milliseconds: 300));
-    _slideController.forward();
-    await Future.delayed(const Duration(milliseconds: 200));
-    _bounceController.forward();
-    
-    // Start pulse animation
-    _pulseController.repeat(reverse: true);
-  }
-
   @override
   void dispose() {
     _resendTimer?.cancel();
     _autoCheckTimer?.cancel();
     _fadeController.dispose();
     _slideController.dispose();
-    _bounceController.dispose();
+    _floatController.dispose();
     _pulseController.dispose();
+    _shakeController.dispose();
     super.dispose();
   }
 
   void _startResendCooldown() {
     // Get cooldown duration based on attempts, with a maximum
-    final duration = _resendAttempts < _cooldownDurations.length 
-        ? _cooldownDurations[_resendAttempts] 
+    final duration = _resendAttempts < _cooldownDurations.length
+        ? _cooldownDurations[_resendAttempts]
         : _cooldownDurations.last;
-    
+
     setState(() {
       _resendCooldown = duration;
     });
@@ -182,24 +185,128 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     return '${remainingSeconds}s';
   }
 
+  void _showSuccessMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle_rounded, color: successColor, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF1F2937),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.error_rounded, color: errorColor, size: 20),
+            const SizedBox(width: 8),
+            Expanded(child: Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            )),
+          ],
+        ),
+        backgroundColor: const Color(0xFF1F2937),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
+  void _showWarningMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.warning_rounded, color: warningColor, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF1F2937),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackButton() {
+    return Positioned(
+      top: 16,
+      left: 16,
+      child: SafeArea(
+        child: GestureDetector(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            _autoCheckTimer?.cancel();
+            context.go('/auth');
+          },
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: Colors.black.withAlpha((0.3 * 255).toInt()),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withAlpha((0.1 * 255).toInt()),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha((0.2 * 255).toInt()),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _checkVerification() async {
+    HapticFeedback.lightImpact();
     setState(() => _isCheckingVerification = true);
-    
+
     try {
       // Refresh user data from server
       await AuthService().refreshUser();
       final user = AuthService().currentUser;
-      
+
       if (user != null && user.emailVerified) {
         if (!mounted) return;
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Email verified successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        
+        HapticFeedback.mediumImpact();
+
+        _showSuccessMessage('Email verified successfully!');
+
         // Navigate based on where user came from
         if (widget.isFromLogin) {
           context.go('/home/0');
@@ -208,15 +315,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
         }
       } else {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Email not yet verified. Please check your email and click the verification link.'),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        HapticFeedback.lightImpact();
+        _showWarningMessage('Email not yet verified. Please check your\nemail and click the verification link.');
       }
     } catch (e) {
       if (!mounted) return;
+      HapticFeedback.heavyImpact();
+      _shakeController.forward().then((_) => _shakeController.reset());
+
       // More specific error handling
       String errorMessage = 'Error checking verification';
       if (e.toString().contains('Token expired') || e.toString().contains('401')) {
@@ -227,55 +333,64 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       } else if (e.toString().contains('Network') || e.toString().contains('connection')) {
         errorMessage = 'Network error. Please check your connection and try again.';
       }
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: Colors.red,
-        ),
-      );
+
+      _showErrorMessage(errorMessage);
     } finally {
       if (mounted) setState(() => _isCheckingVerification = false);
     }
   }
 
   Future<void> _resendVerificationEmail() async {
+    HapticFeedback.lightImpact();
+
     // Check if cooldown is active
     if (_resendCooldown > 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please wait ${_formatTime(_resendCooldown)} before resending'),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      _showWarningMessage('Please wait ${_formatTime(_resendCooldown)} before resending');
       return;
     }
 
     setState(() => _isResendingEmail = true);
-    
+
     try {
       await AuthService().resendVerificationEmail(widget.email);
-      
+
       // Increment attempts and start cooldown
       _resendAttempts++;
       _startResendCooldown();
-      
+
       if (!mounted) return;
+      HapticFeedback.mediumImpact();
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Verification email sent! Please check your inbox and spam folder.'),
-          backgroundColor: Colors.blue,
-          duration: Duration(seconds: 4),
+          content: Row(
+            children: [
+              Icon(Icons.send_rounded, color: primaryB, size: 20),
+              const SizedBox(width: 8),
+              const Text(
+                'Verification email sent! Please check your\ninbox and spam folder.',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          backgroundColor: const Color(0xFF1F2937),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          duration: const Duration(seconds: 4),
         ),
       );
     } catch (e) {
       if (!mounted) return;
-      
+      HapticFeedback.heavyImpact();
+      _shakeController.forward().then((_) => _shakeController.reset());
+
       String errorMessage = 'Error sending email';
       if (e.toString().contains('already verified')) {
         errorMessage = 'Email is already verified! Try refreshing or logging in again.';
         // Auto-check verification status
-        Future.delayed(Duration(seconds: 1), () => _checkVerification());
+        Future.delayed(const Duration(seconds: 1), () => _checkVerification());
       } else if (e.toString().contains('User not found')) {
         errorMessage = 'User not found. Please contact support.';
       } else if (e.toString().contains('Server error')) {
@@ -285,14 +400,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
       } else {
         errorMessage = 'Error sending email. Please try again.';
       }
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 4),
-        ),
-      );
+
+      _showErrorMessage(errorMessage);
     } finally {
       if (mounted) setState(() => _isResendingEmail = false);
     }
@@ -300,92 +409,288 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color.fromARGB(255, 4, 16, 54),
-              Color.fromARGB(255, 20, 25, 78),
-              Color.fromARGB(255, 27, 52, 105),
-            ],
-            stops: [0.0, 0.5, 1.0],
-          ),
+      backgroundColor: bgStart,
+      body: Stack(
+        children: [
+          Positioned.fill(child: _buildBackground(size)),
+          SafeArea(child: _buildPortraitLayout(size)),
+          _buildBackButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPortraitLayout(Size size) {
+    final isSmallScreen = size.height < 700;
+    final isTinyScreen = size.height < 600;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          children: [
+            // Responsive header height based on screen size
+            SizedBox(
+              height: isTinyScreen ? constraints.maxHeight * 0.25 :
+              isSmallScreen ? constraints.maxHeight * 0.3 :
+              constraints.maxHeight * 0.35,
+              child: AnimatedHeader(
+                title: 'Verify Your Email',
+                subtitle: widget.isFromLogin
+                    ? 'Check your email to continue'
+                    : 'Activate your Brevity account',
+                logoAssetPath: 'assets/logos/Brevity_white.png',
+                screenSize: size,
+                isLandscape: false,
+              ),
+            ),
+            Expanded(child: _buildFormPanel()),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildBackground(Size size) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [bgStart, bgEnd],
         ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              children: [
-                // Back button
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: IconButton(
-                      onPressed: () {
-                        // Stop auto-check timer when navigating away
-                        _autoCheckTimer?.cancel();
-                        context.go('/auth');
-                      },
-                      icon: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white,
-                        size: 24,
+      ),
+      child: Stack(
+        children: [
+          AnimatedBuilder(
+            animation: _floatAnim,
+            builder: (context, _) {
+              final t = _floatAnim.value;
+              final yOsc = math.sin(t * 2 * math.pi) * 20;
+              final xOsc = math.cos(t * 2 * math.pi) * 12;
+              return Positioned(
+                left: -40 + xOsc,
+                top: 80 + yOsc,
+                child: Transform.rotate(
+                  angle: 0.15 * math.sin(t * 2 * math.pi),
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      gradient: RadialGradient(
+                        center: const Alignment(-0.3, -0.4),
+                        radius: 1.2,
+                        colors: [
+                          primaryA.withAlpha((0.08 * 255).toInt()),
+                          primaryB.withAlpha((0.02 * 255).toInt()),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
                       ),
                     ),
                   ),
                 ),
-                
-                Expanded(
+              );
+            },
+          ),
+          AnimatedBuilder(
+            animation: Listenable.merge([_floatAnim, _pulseAnim]),
+            builder: (context, _) {
+              final f = _floatAnim.value;
+              final p = _pulseAnim.value;
+              final y = math.cos(f * 2 * math.pi + math.pi / 3) * 15;
+              final x = math.sin(f * 2 * math.pi + math.pi / 3) * 10;
+              return Positioned(
+                right: -20 + x,
+                top: 140 + y,
+                child: Transform.scale(
+                  scale: p,
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(80),
+                      gradient: RadialGradient(
+                        center: const Alignment(0.4, -0.2),
+                        radius: 1.0,
+                        colors: [
+                          primaryB.withAlpha((0.06 * 255).toInt()),
+                          primaryA.withAlpha((0.01 * 255).toInt()),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.6, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          ...List.generate(6, (i) {
+            return AnimatedBuilder(
+              animation: _floatAnim,
+              builder: (context, _) {
+                final offset = (i * math.pi / 3);
+                final x =
+                    50 + math.cos(_floatAnim.value * 2 * math.pi + offset) * 30;
+                final y =
+                    200 +
+                        math.sin(_floatAnim.value * 2 * math.pi + offset) * 20;
+                final opacity =
+                    (math.sin(_floatAnim.value * 2 * math.pi + offset) + 1) *
+                        0.02;
+
+                return Positioned(
+                  left: x,
+                  top: y,
+                  child: Container(
+                    width: 4,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: primaryB.withAlpha((opacity * 255).toInt()),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                );
+              },
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormPanel() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isTinyScreen = MediaQuery.of(context).size.height < 600;
+
+        return AnimatedBuilder(
+          animation: _shakeAnim,
+          builder: (context, child) {
+            final shakeOffset = math.sin(_shakeAnim.value * math.pi * 8) * 2;
+            return Transform.translate(
+              offset: Offset(shakeOffset, 0),
+              child: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [panelTop, panelBottom],
+                  ),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isTinyScreen ? 16 : 24,
+                    vertical: isTinyScreen ? 8 : 4,
+                  ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Animated Email Icon
-                      FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: SlideTransition(
-                          position: _slideAnimation,
+                      // Progress indicator
+                      LinearProgressIndicator(
+                        value: 0.6,
+                        backgroundColor: Colors.white.withAlpha((0.1 * 255).toInt()),
+                        valueColor: AlwaysStoppedAnimation(primaryB),
+                        minHeight: 2,
+                      ),
+
+                      SizedBox(height: isTinyScreen ? 12 : 20),
+
+                      // Status section - made more compact
+                      Flexible(
+                        flex: isTinyScreen ? 3 : 4,
+                        child: FadeTransition(
+                          opacity: _fadeController,
                           child: AnimatedBuilder(
-                            animation: _bounceAnimation,
-                            builder: (context, child) {
+                            animation: _pulseAnim,
+                            builder: (context, _) {
                               return Transform.scale(
-                                scale: _bounceAnimation.value,
-                                child: AnimatedBuilder(
-                                  animation: _pulseAnimation,
-                                  builder: (context, child) {
-                                    return Transform.scale(
-                                      scale: _pulseAnimation.value,
-                                      child: Container(
-                                        width: 120,
-                                        height: 120,
+                                scale: 1.0 + (_pulseAnim.value - 1.0) * 0.02,
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(isTinyScreen ? 12 : 20),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        primaryA.withAlpha((0.08 * 255).toInt()),
+                                        primaryB.withAlpha((0.04 * 255).toInt()),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: primaryB.withAlpha((0.2 * 255).toInt()),
+                                      width: 1,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: primaryA.withAlpha((0.1 * 255).toInt()),
+                                        blurRadius: 20,
+                                        spreadRadius: -5,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Status icon - responsive size
+                                      Container(
+                                        width: isTinyScreen ? 40 : 56,
+                                        height: isTinyScreen ? 40 : 56,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              Color.fromARGB(255, 26, 175, 255),
-                                              Color.fromARGB(255, 9, 121, 232),
-                                            ],
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [primaryA, primaryB],
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: const Color.fromARGB(255, 26, 175, 255)
-                                                  .withValues(alpha: 0.3),
-                                              blurRadius: 20,
-                                              spreadRadius: 5,
+                                              color: primaryB.withAlpha((0.3 * 255).toInt()),
+                                              blurRadius: 12,
+                                              offset: const Offset(0, 4),
                                             ),
                                           ],
                                         ),
-                                        child: const Icon(
-                                          Icons.email,
-                                          size: 60,
+                                        child: Icon(
+                                          Icons.schedule_rounded,
+                                          size: isTinyScreen ? 20 : 28,
                                           color: Colors.white,
                                         ),
                                       ),
-                                    );
-                                  },
+
+                                      SizedBox(height: isTinyScreen ? 8 : 16),
+
+                                      Text(
+                                        'Verification Pending',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: isTinyScreen ? 16 : 18,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: isTinyScreen ? 4 : 8),
+
+                                      Text(
+                                        'Almost there! Just one more step',
+                                        style: TextStyle(
+                                          color: mutedText,
+                                          fontSize: isTinyScreen ? 12 : 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               );
                             },
@@ -393,362 +698,415 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 40),
+                      SizedBox(height: isTinyScreen ? 8 : 16),
 
-                      // Title
+                      // Email display - more compact
                       FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: SlideTransition(
-                          position: _slideAnimation,
-                          child: ShaderMask(
-                            shaderCallback: (bounds) => const LinearGradient(
-                              colors: [
-                                Color.fromARGB(255, 26, 175, 255),
-                                Colors.white,
-                              ],
-                            ).createShader(bounds),
-                            child: const Text(
-                              'Verify Your Email',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Poppins',
-                                color: Colors.white,
+                        opacity: _fadeController,
+                        child: Container(
+                          padding: EdgeInsets.all(isTinyScreen ? 12 : 16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0B131A),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: primaryB.withAlpha((0.3 * 255).toInt()),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.email_outlined,
+                                color: primaryB,
+                                size: isTinyScreen ? 16 : 20,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Description
-                      FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: SlideTransition(
-                          position: _slideAnimation,
-                          child: Text(
-                            widget.isFromLogin
-                                ? 'We\'ve sent a verification link to\n${widget.email}\n\nPlease check your email and click the verification link, then try logging in again.'
-                                : 'We\'ve sent a verification link to\n${widget.email}\n\nPlease check your email and click the verification link to activate your account.',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white70,
-                              fontFamily: 'Poppins',
-                              height: 1.5,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 50),
-
-                      // Check Verification Button - Only show if token is stored (user is authenticated)
-                      // This allows checking verification after app restart or when token is available
-                      if (AuthService().isAuthenticated) ...[
-                        FadeTransition(
-                          opacity: _fadeAnimation,
-                          child: SlideTransition(
-                            position: _slideAnimation,
-                            child: AnimatedButton(
-                              onPressed: _isCheckingVerification ? null : _checkVerification,
-                              isLoading: _isCheckingVerification,
-                              text: 'Check Verification',
-                              loadingText: 'Checking...',
-                              delay: 600,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-
-                      // Resend Email Button
-                      FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: SlideTransition(
-                          position: _slideAnimation,
-                          child: AnimatedOutlinedButton(
-                            onPressed: (_isResendingEmail || _resendCooldown > 0) ? null : _resendVerificationEmail,
-                            isLoading: _isResendingEmail,
-                            text: _resendCooldown > 0 
-                                ? 'Resend in ${_formatTime(_resendCooldown)}'
-                                : 'Resend Verification Email',
-                            loadingText: 'Sending...',
-                            delay: widget.isFromLogin ? 600 : 800, // Adjust delay for login case
-                          ),
-                        ),
-                      ),
-
-                      // Back to Login Button - Only show for login case
-                      if (widget.isFromLogin) ...[
-                        const SizedBox(height: 20),
-                        FadeTransition(
-                          opacity: _fadeAnimation,
-                          child: SlideTransition(
-                            position: _slideAnimation,
-                            child: TextButton(
-                              onPressed: () => context.go('/auth'),
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.white70,
-                                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                              SizedBox(width: isTinyScreen ? 8 : 12),
+                              Expanded(
+                                child: Text(
+                                  widget.email,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: isTinyScreen ? 13 : 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                              child: const Text(
-                                'Back to Login',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins',
-                                  decoration: TextDecoration.underline,
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: isTinyScreen ? 8 : 12),
+
+                      // Description - more compact
+                      FadeTransition(
+                        opacity: _fadeController,
+                        child: Text(
+                          widget.isFromLogin
+                              ? 'Check your email and click the verification link, then try logging in again.'
+                              : 'We\'ve sent a verification link to your email. Check your inbox and spam folder.',
+                          style: TextStyle(
+                            fontSize: isTinyScreen ? 12 : 14,
+                            color: mutedText,
+                            height: 1.3,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: isTinyScreen ? 2 : 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+
+                      const Spacer(),
+
+                      // Buttons section
+                      Column(
+                        children: [
+                          // Check Verification Button
+                          if (AuthService().isAuthenticated) ...[
+                            FadeTransition(
+                              opacity: _fadeController,
+                              child: SizedBox(
+                                height: isTinyScreen ? 44 : 52,
+                                child: EnhancedButton(
+                                  onPressed: _isCheckingVerification ? null : _checkVerification,
+                                  isLoading: _isCheckingVerification,
+                                  text: 'CHECK VERIFICATION',
+                                  enabled: !_isCheckingVerification,
+                                  loadingText: 'Checking...',
                                 ),
                               ),
                             ),
+                            SizedBox(height: isTinyScreen ? 8 : 12),
+                          ],
+
+                          // Resend Email Button
+                          FadeTransition(
+                            opacity: _fadeController,
+                            child: SizedBox(
+                              height: isTinyScreen ? 44 : 52,
+                              child: EnhancedOutlinedButton(
+                                onPressed: (_isResendingEmail || _resendCooldown > 0) ? null : _resendVerificationEmail,
+                                isLoading: _isResendingEmail,
+                                text: _resendCooldown > 0
+                                    ? 'RESEND IN ${_formatTime(_resendCooldown).toUpperCase()}'
+                                    : 'RESEND EMAIL',
+                                loadingText: 'Sending...',
+                                enabled: !_isResendingEmail && _resendCooldown == 0,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+
+                      SizedBox(height: isTinyScreen ? 8 : 16),
                     ],
                   ),
                 ),
-              ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+// Enhanced Button (consistent with login/signup)
+class EnhancedButton extends StatefulWidget {
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final String text;
+  final bool enabled;
+  final String loadingText;
+
+  const EnhancedButton({
+    super.key,
+    required this.onPressed,
+    required this.isLoading,
+    required this.text,
+    this.enabled = true,
+    this.loadingText = 'Loading...',
+  });
+
+  @override
+  State<EnhancedButton> createState() => _EnhancedButtonState();
+}
+
+class _EnhancedButtonState extends State<EnhancedButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+  late Animation<double> _scaleAnim;
+  late Animation<double> _glowAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnim = Tween<double>(
+      begin: 1.0,
+      end: 0.98,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
+    _glowAnim = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isTinyScreen = screenSize.height < 600;
+
+    return GestureDetector(
+      onTapDown: widget.enabled && !widget.isLoading ? (_) => _animController.forward() : null,
+      onTapUp: widget.enabled && !widget.isLoading ? (_) => _animController.reverse() : null,
+      onTapCancel: widget.enabled && !widget.isLoading ? () => _animController.reverse() : null,
+      child: AnimatedBuilder(
+        animation: _animController,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnim.value,
+            child: Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: widget.enabled && !widget.isLoading
+                    ? const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [primaryA, primaryB],
+                )
+                    : LinearGradient(
+                  colors: [
+                    Colors.grey.withAlpha((0.3 * 255).toInt()),
+                    Colors.grey.withAlpha((0.2 * 255).toInt()),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: widget.enabled && !widget.isLoading
+                    ? [
+                  BoxShadow(
+                    color: primaryA.withAlpha(
+                      ((0.3 + (_glowAnim.value * 0.2)) * 255).toInt(),
+                    ),
+                    blurRadius: 12 + (_glowAnim.value * 8),
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+                    : null,
+              ),
+              child: ElevatedButton(
+                onPressed: widget.enabled && !widget.isLoading ? widget.onPressed : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                child: widget.isLoading
+                    ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: isTinyScreen ? 18 : 24,
+                      height: isTinyScreen ? 18 : 24,
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                    SizedBox(width: isTinyScreen ? 8 : 12),
+                    Flexible(
+                      child: Text(
+                        widget.loadingText,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: isTinyScreen ? 14 : 16,
+                          letterSpacing: -0.2,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                )
+                    : Text(
+                  widget.text,
+                  style: TextStyle(
+                    color: widget.enabled ? Colors.white : Colors.white54,
+                    fontWeight: FontWeight.w700,
+                    fontSize: isTinyScreen ? 14 : 16,
+                    letterSpacing: -0.2,
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 }
 
-// Custom animated button widget
-class AnimatedButton extends StatefulWidget {
+class EnhancedOutlinedButton extends StatefulWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
   final String text;
   final String loadingText;
-  final int delay;
+  final bool enabled;
 
-  const AnimatedButton({
+  const EnhancedOutlinedButton({
     super.key,
     required this.onPressed,
     required this.isLoading,
     required this.text,
-    required this.loadingText,
-    required this.delay,
+    this.loadingText = 'Loading...',
+    this.enabled = true,
   });
 
   @override
-  State<AnimatedButton> createState() => _AnimatedButtonState();
+  State<EnhancedOutlinedButton> createState() => _EnhancedOutlinedButtonState();
 }
 
-class _AnimatedButtonState extends State<AnimatedButton>
+class _EnhancedOutlinedButtonState extends State<EnhancedOutlinedButton>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+  late AnimationController _hoverController;
+  late Animation<double> _hoverAnim;
+  bool isHovered = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+    _hoverController = AnimationController(
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
-
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) _controller.forward();
-    });
+    _hoverAnim = CurvedAnimation(
+      parent: _hoverController,
+      curve: Curves.easeOut,
+    );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _hoverController.dispose();
     super.dispose();
+  }
+
+  void _onHover(bool hovered) {
+    setState(() => isHovered = hovered);
+    if (isHovered) {
+      _hoverController.forward();
+    } else {
+      _hoverController.reverse();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _scaleAnimation,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              gradient: const LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 9, 121, 232),
-                  Color.fromARGB(255, 26, 175, 255),
-                ],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color.fromARGB(255, 26, 175, 255)
-                      .withValues(alpha: 0.3),
-                  blurRadius: 15,
-                  spreadRadius: 2,
+    final screenSize = MediaQuery.of(context).size;
+    final isTinyScreen = screenSize.height < 600;
+
+    return MouseRegion(
+      onEnter: (_) => _onHover(true),
+      onExit: (_) => _onHover(false),
+      child: GestureDetector(
+        onTap: widget.enabled && !widget.isLoading ? widget.onPressed : null,
+        child: AnimatedBuilder(
+          animation: _hoverAnim,
+          builder: (context, child) {
+            return Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Color.lerp(
+                  Colors.transparent,
+                  primaryA.withAlpha((0.1 * 255).toInt()),
+                  _hoverAnim.value,
                 ),
-              ],
-            ),
-            child: ElevatedButton(
-              onPressed: widget.onPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Color.lerp(
+                    widget.enabled && !widget.isLoading
+                        ? primaryB.withAlpha((0.8 * 255).toInt())
+                        : Colors.grey.withAlpha((0.5 * 255).toInt()),
+                    primaryB,
+                    _hoverAnim.value,
+                  )!,
+                  width: 1.5,
                 ),
-                minimumSize: const Size(double.infinity, 55),
-              ),
-              child: widget.isLoading
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          widget.loadingText,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins',
-                          ),
-                        ),
-                      ],
-                    )
-                  : Text(
-                      widget.text,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins',
-                      ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: widget.enabled && !widget.isLoading
+                    ? [
+                  BoxShadow(
+                    color: primaryB.withAlpha(
+                      ((0.1 + (_hoverAnim.value * 0.2)) * 255).toInt(),
                     ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-// Custom animated outlined button widget
-class AnimatedOutlinedButton extends StatefulWidget {
-  final VoidCallback? onPressed;
-  final bool isLoading;
-  final String text;
-  final String loadingText;
-  final int delay;
-
-  const AnimatedOutlinedButton({
-    super.key,
-    required this.onPressed,
-    required this.isLoading,
-    required this.text,
-    required this.loadingText,
-    required this.delay,
-  });
-
-  @override
-  State<AnimatedOutlinedButton> createState() => _AnimatedOutlinedButtonState();
-}
-
-class _AnimatedOutlinedButtonState extends State<AnimatedOutlinedButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
-
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) _controller.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _scaleAnimation,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: OutlinedButton(
-            onPressed: widget.onPressed,
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(
-                color: Color.fromARGB(255, 26, 175, 255),
-                width: 2,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              minimumSize: const Size(double.infinity, 55),
-            ),
-            child: widget.isLoading
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: Color.fromARGB(255, 26, 175, 255),
-                          strokeWidth: 2,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        widget.loadingText,
-                        style: const TextStyle(
-                          color: Color.fromARGB(255, 26, 175, 255),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins',
-                        ),
-                      ),
-                    ],
-                  )
-                : Text(
-                    widget.text,
-                    style: const TextStyle(
-                      color: Color.fromARGB(255, 26, 175, 255),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Poppins',
-                    ),
+                    blurRadius: 8 + (_hoverAnim.value * 12),
+                    offset: const Offset(0, 4),
                   ),
-          ),
-        );
-      },
+                ]
+                    : null,
+              ),
+              child: Center(
+                child: widget.isLoading
+                    ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: isTinyScreen ? 16 : 20,
+                      height: isTinyScreen ? 16 : 20,
+                      child: CircularProgressIndicator(
+                        color: primaryB,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                    SizedBox(width: isTinyScreen ? 8 : 12),
+                    Flexible(
+                      child: Text(
+                        widget.loadingText,
+                        style: TextStyle(
+                          color: primaryB,
+                          fontWeight: FontWeight.w700,
+                          fontSize: isTinyScreen ? 14 : 16,
+                          letterSpacing: -0.2,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                )
+                    : Text(
+                  widget.text,
+                  style: TextStyle(
+                    color: widget.enabled
+                        ? primaryB
+                        : Colors.grey.withAlpha((0.7 * 255).toInt()),
+                    fontWeight: FontWeight.w700,
+                    fontSize: isTinyScreen ? 14 : 16,
+                    letterSpacing: -0.2,
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }
