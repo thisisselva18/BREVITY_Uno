@@ -992,12 +992,19 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   icon: Icons.schedule,
                                   title: 'Reminder Time',
                                   subtitle: _reminderTime,
-                                  themeColor:
-                                      themeState.currentTheme.primaryColor,
+                                  themeColor: _reminderEnabled
+                                      ? themeState.currentTheme.primaryColor
+                                      : theme.colorScheme.onSurface.withAlpha((0.3 * 255).toInt()),
+                                  titleColor: _reminderEnabled
+                                      ? null
+                                      : theme.colorScheme.onSurface.withAlpha((0.5 * 255).toInt()),
+                                  iconColor: _reminderEnabled
+                                      ? null
+                                      : theme.colorScheme.onSurface.withAlpha((0.3 * 255).toInt()),
                                   onTap:
-                                      _reminderEnabled
-                                          ? _showTimePickerDialog
-                                          : null,
+                                  _reminderEnabled
+                                      ? _showTimePickerDialog
+                                      : null,
                                 ),
                               ),
                               _buildAnimatedCard(
