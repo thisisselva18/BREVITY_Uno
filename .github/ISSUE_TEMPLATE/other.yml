@@ -1,0 +1,129 @@
+name: 🔧 Other
+description: For issues that don't fit into other categories
+title: "[OTHER] - "
+labels: ["needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for contributing to Brevity! If your issue doesn't fit into our other categories, please use this template.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Prerequisites
+      description: Please check the following before submitting
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have reviewed other issue templates and this doesn't fit any category
+          required: true
+        - label: I have read the project documentation and contributing guidelines
+          required: true
+
+  - type: dropdown
+    id: issue-category
+    attributes:
+      label: Issue Category
+      description: Which category best describes your issue?
+      options:
+        - Question - General questions about the project
+        - Discussion - Topic for community discussion
+        - Maintenance - Code cleanup, refactoring, dependencies
+        - Infrastructure - CI/CD, build process, deployment
+        - Security - Security concerns or vulnerabilities
+        - Legal - Licensing, compliance, legal matters
+        - Community - Events, outreach, community building
+        - Research - Investigation needed before implementation
+        - Meta - Issues about the project itself (governance, process)
+        - Other - None of the above categories fit
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Issue Description
+      description: Provide a clear and detailed description of your issue
+      placeholder: Describe your issue, question, or topic for discussion...
+    validations:
+      required: true
+
+  - type: textarea
+    id: context-background
+    attributes:
+      label: Context and Background
+      description: Provide relevant context or background information
+      placeholder: |
+        Help us understand:
+        - Why is this important?
+        - What led to this issue?
+        - Any relevant background information
+
+  - type: textarea
+    id: expected-outcome
+    attributes:
+      label: Expected Outcome
+      description: What would you like to see happen or what outcome are you looking for?
+      placeholder: Describe what you expect or hope to achieve...
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important or urgent is this issue?
+      options:
+        - Low - Can be addressed when time permits
+        - Medium - Should be addressed in reasonable timeframe
+        - High - Important for project success
+        - Critical - Urgent, needs immediate attention
+    validations:
+      required: true
+
+  - type: textarea
+    id: stakeholders
+    attributes:
+      label: Stakeholders
+      description: Who would be affected by or interested in this issue?
+      placeholder: |
+        List relevant stakeholders:
+        - End users
+        - Contributors
+        - Maintainers
+        - External partners
+        - etc.
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution (if applicable)
+      description: If you have ideas for addressing this issue, describe them here
+      placeholder: Describe any potential solutions or approaches you've considered...
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What other options have you considered?
+      placeholder: Describe alternative approaches or solutions you've thought about...
+
+  - type: textarea
+    id: resources-links
+    attributes:
+      label: Resources and Links
+      description: Include any relevant links, documents, or resources
+      placeholder: |
+        Provide relevant resources:
+        - Related issues or PRs
+        - Documentation links
+        - External references
+        - Research materials
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other information that would be helpful
+      placeholder: Include any other relevant details, screenshots, or context...

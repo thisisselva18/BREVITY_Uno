@@ -1,0 +1,153 @@
+name: ⚙️ Backend Feature
+description: Request a new backend feature or API enhancement
+title: "[BACKEND] - "
+labels: ["backend", "enhancement", "api"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for requesting a backend feature! Please provide technical details about your request.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Prerequisites
+      description: Please check the following before submitting
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have reviewed the API documentation
+          required: true
+        - label: This enhancement aligns with the app's architecture
+          required: true
+
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: Feature Type
+      description: What type of backend feature is this?
+      options:
+        - New API Endpoint - Create new REST/GraphQL endpoint
+        - Database Enhancement - Schema changes, new collections
+        - Authentication & Authorization - User management, permissions
+        - Data Processing - Background jobs, data transformation
+        - Integration - Third-party services, webhooks
+        - Performance - Caching, optimization, scaling
+        - Security - Encryption, validation, security features
+        - Analytics - Logging, monitoring, metrics
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature Description
+      description: Detailed description of the backend feature
+      placeholder: Describe what the backend feature should do...
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-requirements
+    attributes:
+      label: Technical Requirements
+      description: Specific technical requirements and constraints
+      placeholder: |
+        List technical requirements:
+        - Database changes needed
+        - API endpoints to create/modify
+        - Authentication requirements
+        - Performance considerations
+        - Third-party integrations
+    validations:
+      required: true
+
+  - type: textarea
+    id: api-specification
+    attributes:
+      label: API Specification
+      description: If this involves API changes, provide the specification
+      placeholder: |
+        Example:
+        POST /api/v1/feature
+        {
+          "param1": "string",
+          "param2": "number"
+        }
+        
+        Response:
+        {
+          "success": true,
+          "data": {...}
+        }
+
+  - type: textarea
+    id: database-changes
+    attributes:
+      label: Database Changes
+      description: Describe any database schema changes or new collections needed
+      placeholder: |
+        Describe database changes:
+        - New tables/collections
+        - Modified fields
+        - Indexes needed
+        - Migration requirements
+
+  - type: textarea
+    id: business-logic
+    attributes:
+      label: Business Logic
+      description: Explain the business logic and rules for this feature
+      placeholder: Describe the business rules, validation logic, and workflows...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How critical is this backend feature?
+      options:
+        - Low - Enhancement for future consideration
+        - Medium - Useful improvement
+        - High - Important for app functionality
+        - Critical - Required for core features
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Define what needs to be implemented for this feature to be complete
+      placeholder: |
+        - [ ] API endpoints implemented and tested
+        - [ ] Database schema updated
+        - [ ] Authentication/authorization working
+        - [ ] Error handling implemented
+        - [ ] Documentation updated
+        - [ ] Unit tests written
+
+  - type: textarea
+    id: security-considerations
+    attributes:
+      label: Security Considerations
+      description: Any security implications or requirements
+      placeholder: Describe authentication, authorization, data validation, or other security concerns...
+
+  - type: textarea
+    id: performance-impact
+    attributes:
+      label: Performance Impact
+      description: Expected impact on system performance
+      placeholder: Describe potential performance implications and mitigation strategies...
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other technical details, diagrams, or references
+      placeholder: Include architecture diagrams, related issues, or technical documentation...
