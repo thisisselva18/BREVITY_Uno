@@ -52,5 +52,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/logos/
+    - assets/gifs/
     - assets/icon/icon.png
     - .env
