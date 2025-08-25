@@ -142,7 +142,7 @@ class UserRepository {
   Future<UserModel> updateUserPartial(Map<String, dynamic> changedFields) async {
     try {
       final uri = Uri.parse('$_baseUrl/profile');
-      final request = http.MultipartRequest('PATCH', uri); // Changed from PUT to PATCH
+      final request = http.MultipartRequest('PUT', uri); // Changed from PUT to PATCH
 
       // Add auth header
       if (_accessToken != null) {
