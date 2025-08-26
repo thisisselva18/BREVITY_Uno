@@ -1,7 +1,7 @@
 name: 📚 Documentation Update
 description: Suggest improvements to documentation
 title: "[DOCS] - "
-labels: ["documentation", "enhancement", "GSSoC"]
+labels: ["documentation", "GSSoC"]
 assignees: []
 
 body:
