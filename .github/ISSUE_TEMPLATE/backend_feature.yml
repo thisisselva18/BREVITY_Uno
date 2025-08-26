@@ -1,7 +1,7 @@
 name: ⚙️ Backend Feature
 description: Request a new backend feature or API enhancement
 title: "[BACKEND] - "
-labels: ["backend", "enhancement", "api", "GSSoC"]
+labels: ["Backend","GSSoC"]
 assignees: []
 
 body:
@@ -29,10 +29,9 @@ body:
       label: Feature Type
       description: What type of backend feature is this?
       options:
-        - New API Endpoint - Create new REST/GraphQL endpoint
+        - New API Endpoint - Create new REST endpoint
         - Database Enhancement - Schema changes, new collections
         - Authentication & Authorization - User management, permissions
-        - Data Processing - Background jobs, data transformation
         - Integration - Third-party services, webhooks
         - Performance - Caching, optimization, scaling
         - Security - Encryption, validation, security features
