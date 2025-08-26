@@ -1,7 +1,7 @@
 name: ✨ New Feature Request
 description: Suggest a new feature for the app
-title: "[FEATURE] - "
-labels: ["enhancement", "feature-request"]
+title: "[FLUTTER] - "
+labels: ["Flutter", "GSSoC"]
 assignees: []
 
 body:
