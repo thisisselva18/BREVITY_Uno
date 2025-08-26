@@ -53,14 +53,11 @@ body:
   - type: textarea
     id: technical-requirements
     attributes:
-      label: Technical Requirements
-      description: Specific technical requirements and constraints
+      label: Acceptance Criteria
+      description: Specific requirements and constraints
       placeholder: |
-        List technical requirements:
-        - Database changes needed
-        - API endpoints to create/modify
-        - Authentication requirements
-        - Performance considerations
-        - Third-party integrations
+        List acceptance criteria:
+        - Code should follow the already existing architecture/format
+        - Above feature should be implemented and not have introduced additional bugs.
     validations:
       required: true
