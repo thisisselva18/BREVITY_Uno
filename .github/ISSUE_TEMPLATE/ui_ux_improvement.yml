@@ -1,7 +1,7 @@
 name: 🎨 UI/UX Improvements
 description: Suggest improvements to user interface or user experience
 title: "[UI/UX] - "
-labels: ["enhancement", "UI/UX"]
+labels: ["UI/UX", "GSSoC"]
 assignees: []
 
 body:
