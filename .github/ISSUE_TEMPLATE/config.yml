@@ -1,11 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: 💬 Discussions
-    url: https://github.com/pearlgrell/brevity/discussions
+    url: https://github.com/Yash159357/BREVITY/discussions
     about: Ask questions and discuss ideas with the community
   - name: 💡 Feature Ideas
-    url: https://github.com/pearlgrell/brevity/discussions/categories/ideas
+    url: https://discord.gg/nVKvVqWEwX
     about: Share and discuss feature ideas before creating formal requests
-  - name: 🆘 Get Help
-    url: https://github.com/pearlgrell/brevity/discussions/categories/q-a
-    about: Get help from the community
