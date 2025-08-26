@@ -1,18 +1,18 @@
-# Pull Request Template
+# 📌 Pull Request Template
 
-## Description
-<!-- Briefly describe the purpose of this PR and the problem it solves. -->
+## 📝 Description
+<!-- Clearly explain the purpose of this PR and the issue it solves. -->
 
-## Changes Made
-<!-- List major changes made in this PR. -->
+## 🔄 Changes Made
+<!-- List the key changes introduced in this PR. Use bullet points. -->
 
-## Screenshots / Logs
-<!-- Add relevant screenshots or logs to illustrate your changes. -->
+## 📸 Screenshots / 📜 Logs
+<!-- If your PR includes UI changes, attach screenshots. 
+If it fixes a bug, paste relevant logs for clarity. -->
 
-## Checklist
-- [ ] Code follows the project's style guidelines
-- [ ] Tests have been added/updated
-- [ ] Documentation has been updated (if applicable)
-- [ ] No new warnings/errors
-
-<!-- Please ensure all boxes are checked before requesting review. -->
+## ✅ Checklist
+- [ ] My code follows the project’s style guidelines
+- [ ] I have added/updated tests where necessary
+- [ ] I have updated documentation (if applicable)
+- [ ] No new warnings or errors are introduced
+- [ ] I have reviewed my code before requesting review
