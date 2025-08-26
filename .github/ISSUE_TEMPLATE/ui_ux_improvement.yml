@@ -1,7 +1,7 @@
 name: 🎨 UI/UX Improvements
 description: Suggest improvements to user interface or user experience
 title: "[UI/UX] - "
-labels: ["enhancement", "ui/ux", "design"]
+labels: ["enhancement", "ui/ux"]
 assignees: []
 
 body:
@@ -18,32 +18,8 @@ body:
       options:
         - label: I have searched existing issues to avoid duplicates
           required: true
-        - label: I have reviewed the current design guidelines
+        - label: I have reviewed the current design principles
           required: true
-
-  - type: dropdown
-    id: improvement-type
-    attributes:
-      label: Type of Improvement
-      description: What type of UI/UX improvement is this?
-      options:
-        - Visual Design - Colors, fonts, icons, layout
-        - User Experience - Navigation, flow, interactions
-        - Accessibility - Screen reader, contrast, keyboard navigation
-        - Mobile Responsiveness - Touch targets, responsive design
-        - Performance - Loading states, animations
-        - Consistency - Design system adherence
-    validations:
-      required: true
-
-  - type: textarea
-    id: current-behavior
-    attributes:
-      label: Current Behavior
-      description: Describe how the current UI/UX works
-      placeholder: Explain what currently happens...
-    validations:
-      required: true
 
   - type: textarea
     id: proposed-improvement
@@ -54,14 +30,6 @@ body:
     validations:
       required: true
 
-  - type: textarea
-    id: user-benefit
-    attributes:
-      label: User Benefit
-      description: How will this improvement benefit users?
-      placeholder: Explain the benefits for users...
-    validations:
-      required: true
 
   - type: textarea
     id: mockups-references
@@ -69,35 +37,3 @@ body:
       label: Mockups/References
       description: Share mockups, wireframes, or reference designs
       placeholder: Attach images or provide links to design references
-
-  - type: dropdown
-    id: affected-platforms
-    attributes:
-      label: Affected Platforms
-      description: Which platforms would this improvement affect?
-      multiple: true
-      options:
-        - Android
-        - iOS
-        - Web
-        - All platforms
-
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority
-      description: How important is this improvement?
-      options:
-        - Low - Nice to have
-        - Medium - Would improve user experience
-        - High - Important for usability
-        - Critical - Affects accessibility or core functionality
-    validations:
-      required: true
-
-  - type: textarea
-    id: additional-context
-    attributes:
-      label: Additional Context
-      description: Any additional information, research, or context
-      placeholder: Include user feedback, analytics data, or other relevant information
