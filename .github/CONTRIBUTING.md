@@ -509,7 +509,7 @@ Expected response:
 ## 💬 Community & Support <a id="community--support"></a>
 
 ### Getting Help
-- 💬 **Discord**: Join our [Discord community](https://discord.gg/fS6AbcUW)
+- 💬 **Discord**: Join our [Discord community](https://discord.gg/csnXFwPGUb)
 - 🐛 **Issues**: Create a [GitHub issue](https://github.com/Yash159357/BREVITY/issues/new)
 
 ### Community Guidelines
