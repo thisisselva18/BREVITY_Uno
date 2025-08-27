@@ -1,11 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:math' as math;
+
 import '../../controller/cubit/theme/theme_cubit.dart';
 import '../../controller/services/tutorial_service.dart';
 import '../../models/theme_model.dart';
-import 'tutorial_screen.dart';
 
 // Enhanced Palette (matching auth design)
 const Color bgStart = Color(0xFF070B14);
@@ -32,16 +33,12 @@ class _IntroductionScreenState extends State<IntroductionScreen>
   AppTheme _selectedTheme = AppTheme.defaultTheme;
   bool _isDarkMode = true;
 
-  // Animation controllers
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
+  // Animation controllers - removed slide and fade controllers that were causing issues
   late AnimationController _floatController;
   late AnimationController _pulseController;
   late AnimationController _particleController;
 
-  // Animations
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+  // Animations - keeping only the background animations
   late Animation<double> _floatAnim;
   late Animation<double> _pulseAnim;
 
@@ -49,19 +46,32 @@ class _IntroductionScreenState extends State<IntroductionScreen>
     IntroPage(
       title: 'Welcome to\nBrevity',
       subtitle: 'Your Smart News Companion',
-      description: 'Get AI-curated news briefs in 50-60 words. Stay informed without information overload.',
+      description:
+          'Skip the long reads, not the knowledge. Get straight to the point with intelligent, 60-word summaries of the world\'s top stories.',
       icon: Icons.newspaper_outlined,
     ),
+
+    IntroPage(
+      title: 'A Feed\nJust For You',
+      subtitle: 'Tailored to Your Tastes',
+      description:
+          'Like and dislike stories to shape your personal news feed. The more you engage, the smarter it gets.',
+      icon: Icons.tune_outlined,
+    ),
+
     IntroPage(
       title: 'AI-Powered\nInsights',
-      subtitle: 'Intelligent News Assistant',
-      description: 'Ask detailed questions about any story with our advanced AI assistant for context-aware answers.',
+      subtitle: 'Go Beyond the Headlines',
+      description:
+          'Have questions? Ask our AI assistant about any news story for detailed, context-aware answers.',
       icon: Icons.psychology_outlined,
     ),
+
     IntroPage(
       title: 'Personalize\nYour Experience',
       subtitle: 'Themes & Customization',
-      description: 'Choose your preferred theme and customize your reading experience with multiple color options.',
+      description:
+          'Choose your preferred theme and customize your reading experience with multiple color options.',
       icon: Icons.palette_outlined,
     ),
   ];
@@ -73,16 +83,6 @@ class _IntroductionScreenState extends State<IntroductionScreen>
   }
 
   void _initAnimations() {
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 850),
-    );
-
-    _slideController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 650),
-    );
-
     _floatController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 4200),
@@ -98,52 +98,22 @@ class _IntroductionScreenState extends State<IntroductionScreen>
       duration: const Duration(seconds: 5),
     );
 
-    _fadeAnimation = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
+    _floatAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOut,
-    ));
+    _pulseAnim = Tween<double>(begin: 1.0, end: 1.04).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
 
-    _floatAnim = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _floatController,
-      curve: Curves.easeInOut,
-    ));
-
-    _pulseAnim = Tween<double>(
-      begin: 1.0,
-      end: 1.04,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
-
-    // Start animations
+    // Start background animations
     _floatController.repeat(reverse: true);
     _pulseController.repeat(reverse: true);
     _particleController.repeat();
-
-    Future.delayed(const Duration(milliseconds: 160), () {
-      if (mounted) _fadeController.forward();
-    });
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted) _slideController.forward();
-    });
   }
 
   @override
   void dispose() {
-    _fadeController.dispose();
-    _slideController.dispose();
     _floatController.dispose();
     _pulseController.dispose();
     _particleController.dispose();
@@ -153,14 +123,10 @@ class _IntroductionScreenState extends State<IntroductionScreen>
 
   void _onPageChanged(int page) {
     setState(() => _currentPage = page);
-    _slideController.reset();
-    _slideController.forward();
   }
 
   void _showThemeSelectionScreen() {
     setState(() => _showThemeSelection = true);
-    _slideController.reset();
-    _slideController.forward();
   }
 
   void _completeIntro() async {
@@ -206,9 +172,10 @@ class _IntroductionScreenState extends State<IntroductionScreen>
 
           // Main Content
           SafeArea(
-            child: _showThemeSelection
-                ? _buildThemeSelectionScreen()
-                : _buildIntroPages(size),
+            child:
+                _showThemeSelection
+                    ? _buildThemeSelectionScreen()
+                    : _buildIntroPages(size),
           ),
         ],
       ),
@@ -300,9 +267,14 @@ class _IntroductionScreenState extends State<IntroductionScreen>
               animation: _floatAnim,
               builder: (context, _) {
                 final offset = (i * math.pi / 3);
-                final x = 50 + math.cos(_floatAnim.value * 2 * math.pi + offset) * 30;
-                final y = 200 + math.sin(_floatAnim.value * 2 * math.pi + offset) * 20;
-                final opacity = (math.sin(_floatAnim.value * 2 * math.pi + offset) + 1) * 0.02;
+                final x =
+                    50 + math.cos(_floatAnim.value * 2 * math.pi + offset) * 30;
+                final y =
+                    200 +
+                    math.sin(_floatAnim.value * 2 * math.pi + offset) * 20;
+                final opacity =
+                    (math.sin(_floatAnim.value * 2 * math.pi + offset) + 1) *
+                    0.02;
 
                 return Positioned(
                   left: x,
@@ -327,129 +299,140 @@ class _IntroductionScreenState extends State<IntroductionScreen>
   Widget _buildIntroPages(Size size) {
     return Column(
       children: [
-        // Page Content
+        // Page Content with smooth custom transitions
         Expanded(
           child: PageView.builder(
             controller: _pageController,
             onPageChanged: _onPageChanged,
             itemCount: _pages.length,
-            itemBuilder: (context, index) => _buildPage(_pages[index]),
+            itemBuilder: (context, index) => _buildPage(_pages[index], index),
           ),
         ),
-        if (_currentPage == 1)
-          ScaleTransition(
-            scale: _pulseAnim,
-            child: Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                  backgroundColor: primaryB,
-                ),
-                child: const Text('Tutorial', style: TextStyle(color: Colors.white)),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const TutorialScreen()),
-                  );
-                },
-              ),
-            ),
-          ),
-        // Bottom panel (matching auth design)
         _buildBottomPanel(),
       ],
     );
   }
 
-  Widget _buildPage(IntroPage page) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Icon with animation
-              AnimatedBuilder(
-                animation: _pulseAnim,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _pulseAnim.value,
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            primaryA.withAlpha((0.2 * 255).toInt()),
-                            primaryB.withAlpha((0.1 * 255).toInt()),
-                          ],
+  Widget _buildPage(IntroPage page, int pageIndex) {
+    return AnimatedBuilder(
+      animation: _pageController,
+      builder: (context, child) {
+        double value = 1.0;
+        double scale = 1.0;
+        double opacity = 1.0;
+        double horizontalTranslation = 0.0;
+
+        if (_pageController.position.haveDimensions) {
+          final size = MediaQuery.of(context).size;
+          value = (_pageController.page ?? 0.0) - pageIndex;
+          horizontalTranslation = value * -size.width / 2.5;
+
+          scale = (1 - (value.abs() * 0.2)).clamp(0.8, 1.0);
+          opacity = (1 - (value.abs() * 0.5)).clamp(0.0, 1.0);
+        } else {
+          if (pageIndex != _currentPage) {
+            opacity = 0.0;
+            scale = 0.8;
+          }
+        }
+
+        return Transform.translate(
+          offset: Offset(horizontalTranslation, 0),
+          child: Transform.scale(
+            scale: scale,
+            child: Opacity(
+              opacity: opacity,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedBuilder(
+                      animation: _pulseAnim,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: _pulseAnim.value,
+                          child: Container(
+                            width: 90,
+                            height: 90,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  primaryA.withAlpha((0.2 * 255).toInt()),
+                                  primaryB.withAlpha((0.1 * 255).toInt()),
+                                ],
+                              ),
+                              border: Border.all(
+                                color: primaryA.withAlpha((0.3 * 255).toInt()),
+                                width: 1,
+                              ),
+                            ),
+                            child: Icon(
+                              page.icon,
+                              size: 44,
+                              color: Colors.white,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // Title with subtle animation
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white.withOpacity(
+                          opacity > 0.8 ? 1.0 : 0.7,
                         ),
-                        border: Border.all(
-                          color: primaryA.withAlpha((0.3 * 255).toInt()),
-                          width: 1,
-                        ),
+                        letterSpacing: -0.5,
                       ),
-                      child: Icon(
-                        page.icon,
-                        size: 40,
-                        color: Colors.white,
+                      child: Text(page.title, textAlign: TextAlign.center),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Subtitle
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: primaryB.withOpacity(opacity > 0.8 ? 1.0 : 0.6),
+                      ),
+                      child: Text(page.subtitle, textAlign: TextAlign.center),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Description
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white.withAlpha(
+                          ((0.8 * opacity) * 255).toInt(),
+                        ),
+                        height: 1.5,
+                      ),
+                      child: Text(
+                        page.description,
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  );
-                },
-              ),
-
-              const SizedBox(height: 32),
-
-              // Title
-              Text(
-                page.title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  letterSpacing: -0.5,
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 12),
-
-              // Subtitle
-              Text(
-                page.subtitle,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: primaryB,
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Description
-              Text(
-                page.description,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.white.withAlpha((0.8 * 255).toInt()),
-                  height: 1.5,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -479,11 +462,12 @@ class _IntroductionScreenState extends State<IntroductionScreen>
                 duration: const Duration(milliseconds: 300),
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 width: _currentPage == index ? 24 : 8,
-                height: 4,
+                height: 5,
                 decoration: BoxDecoration(
-                  color: _currentPage == index
-                      ? primaryB
-                      : Colors.white.withAlpha((0.3 * 255).toInt()),
+                  color:
+                      _currentPage == index
+                          ? primaryB
+                          : Colors.white.withAlpha((0.3 * 255).toInt()),
                   borderRadius: BorderRadius.circular(2),
                 ),
               );
@@ -511,7 +495,7 @@ class _IntroductionScreenState extends State<IntroductionScreen>
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: Container(
@@ -521,7 +505,7 @@ class _IntroductionScreenState extends State<IntroductionScreen>
                     end: Alignment.bottomRight,
                     colors: [primaryA, primaryB],
                   ),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
                       color: primaryA.withAlpha((0.3 * 255).toInt()),
@@ -563,10 +547,13 @@ class _IntroductionScreenState extends State<IntroductionScreen>
       ),
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
+        child: AnimatedOpacity(
+          opacity: _showThemeSelection ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 400),
+          child: AnimatedSlide(
+            offset: _showThemeSelection ? Offset.zero : const Offset(0, 0.1),
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeOutQuart,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -577,10 +564,13 @@ class _IntroductionScreenState extends State<IntroductionScreen>
                       onPressed: () {
                         setState(() {
                           _showThemeSelection = false;
-                          _currentPage = 0;
                         });
                       },
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+                      icon: const Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
                     const Spacer(),
                   ],
@@ -663,10 +653,7 @@ class _IntroductionScreenState extends State<IntroductionScreen>
           decoration: BoxDecoration(
             color: const Color(0xFF0B131A),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color(0xFF1F2937),
-              width: 1,
-            ),
+            border: Border.all(color: const Color(0xFF1F2937), width: 1),
           ),
           child: Row(
             children: [
@@ -693,16 +680,22 @@ class _IntroductionScreenState extends State<IntroductionScreen>
     );
   }
 
-  Widget _buildModeOption(String title, IconData icon, bool isDark, bool isSelected) {
+  Widget _buildModeOption(
+    String title,
+    IconData icon,
+    bool isDark,
+    bool isSelected,
+  ) {
     return GestureDetector(
       onTap: () => setState(() => _isDarkMode = isDark),
       child: Container(
         // Removed AnimatedContainer - this makes the change instant
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         decoration: BoxDecoration(
-          gradient: isSelected
-              ? const LinearGradient(colors: [primaryA, primaryB])
-              : null,
+          gradient:
+              isSelected
+                  ? const LinearGradient(colors: [primaryA, primaryB])
+                  : null,
           color: isSelected ? null : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
@@ -732,35 +725,39 @@ class _IntroductionScreenState extends State<IntroductionScreen>
     return Wrap(
       spacing: 16,
       runSpacing: 16,
-      children: AppTheme.availableThemes.map((theme) {
-        final isSelected = _selectedTheme.name == theme.name;
-        return GestureDetector(
-          onTap: () => setState(() => _selectedTheme = theme),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: theme.primaryColor,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isSelected ? Colors.white : Colors.transparent,
-                width: 3,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: theme.primaryColor.withAlpha(isSelected ? (0.4 * 255).toInt() : (0.2 * 255).toInt()),
-                  blurRadius: isSelected ? 12 : 6,
-                  spreadRadius: isSelected ? 2 : 0,
+      children:
+          AppTheme.availableThemes.map((theme) {
+            final isSelected = _selectedTheme.name == theme.name;
+            return GestureDetector(
+              onTap: () => setState(() => _selectedTheme = theme),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: theme.primaryColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected ? Colors.white : Colors.transparent,
+                    width: 3,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.primaryColor.withAlpha(
+                        isSelected ? (0.4 * 255).toInt() : (0.2 * 255).toInt(),
+                      ),
+                      blurRadius: isSelected ? 12 : 6,
+                      spreadRadius: isSelected ? 2 : 0,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: isSelected
-                ? const Icon(Icons.check, color: Colors.white, size: 24)
-                : null,
-          ),
-        );
-      }).toList(),
+                child:
+                    isSelected
+                        ? const Icon(Icons.check, color: Colors.white, size: 24)
+                        : null,
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -820,7 +817,11 @@ class _IntroductionScreenState extends State<IntroductionScreen>
                     color: _selectedTheme.primaryColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.article, color: Colors.white, size: 20),
+                  child: const Icon(
+                    Icons.article,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
