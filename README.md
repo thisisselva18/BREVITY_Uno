@@ -360,8 +360,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ✨ Get In Touch
 
-We're excited to connect with you! Whether you have questions, ideas, or just want to be part of our journey, here’s how you can reach us.
-
 ### 🧑‍💻 Project Admins
 
 <table>
