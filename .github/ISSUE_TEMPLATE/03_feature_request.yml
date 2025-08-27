@@ -1,0 +1,44 @@
+name: ✨ New Feature Request
+description: Suggest a new feature for the Flutter app
+title: "[FLUTTER] - "
+labels: ["Flutter", "GSSoC"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature! Please provide detailed information about your request.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Prerequisites
+      description: Please check the following before submitting
+      options:
+        - label: I have searched existing issues and discussions
+          required: true
+        - label: This feature doesn't already exist in the app
+          required: true
+        - label: This feature aligns with the app's purpose and goals
+          required: true
+
+  - type: textarea
+    id: feature-summary
+    attributes:
+      label: Feature Summary
+      description: A brief, clear summary of the feature you're requesting
+      placeholder: Summarize the feature in one or two sentences...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What conditions must be met for this feature to be considered complete?
+      placeholder: |
+        Define what "done" looks like:
+        - [ ] Criteria 1
+        - [ ] Criteria 2
+        - [ ] Criteria 3

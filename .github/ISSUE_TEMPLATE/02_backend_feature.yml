@@ -1,0 +1,62 @@
+name: ⚙️ Backend Feature
+description: Request a new backend feature or API enhancement
+title: "[BACKEND] - "
+labels: ["Backend","GSSoC"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for requesting a backend feature! Please provide technical details about your request.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Prerequisites
+      description: Please check the following before submitting
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have reviewed the API documentation
+          required: true
+        - label: This enhancement aligns with the app's architecture
+          required: true
+
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: Feature Type
+      description: What type of backend feature is this?
+      options:
+        - New API Endpoint - Create new REST endpoint
+        - Database Enhancement - Schema changes, new collections
+        - Authentication & Authorization - User management, permissions
+        - Integration - Third-party services, webhooks
+        - Performance - Caching, optimization, scaling
+        - Security - Encryption, validation, security features
+        - Analytics - Logging, monitoring, metrics
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature Description
+      description: Detailed description of the backend feature
+      placeholder: Describe what the backend feature should do...
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-requirements
+    attributes:
+      label: Acceptance Criteria
+      description: Specific requirements and constraints
+      placeholder: |
+        List acceptance criteria:
+        - Code should follow the already existing architecture/format
+        - Above feature should be implemented and not have introduced additional bugs.
+    validations:
+      required: true

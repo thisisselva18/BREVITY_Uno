@@ -1,0 +1,41 @@
+name: 🐛 Bug Report
+description: Create a report to help us improve the app
+title: "[BUG] - "
+labels: ["bug", "needs-triage", "GSSoC"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please provide as much detail as possible.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Prerequisites
+      description: By submitting this issue, you agree to follow our Code of Conduct
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have read the project documentation
+          required: true
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: Describe the bug...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce (Video/Screenshot)
+      description: Steps to reproduce the behavior
+      placeholder: |
+        ...
+    validations:
+      required: true

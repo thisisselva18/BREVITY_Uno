@@ -1,0 +1,39 @@
+name: 🎨 UI/UX Improvements
+description: Suggest improvements to user interface or user experience
+title: "[UI/UX] - "
+labels: ["UI/UX", "GSSoC"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting UI/UX improvements! Your feedback helps make Brevity better for everyone.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Prerequisites
+      description: Please check the following before submitting
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have reviewed the current design principles
+          required: true
+
+  - type: textarea
+    id: proposed-improvement
+    attributes:
+      label: Proposed Improvement
+      description: Describe your suggested improvement in detail
+      placeholder: Explain your proposed changes...
+    validations:
+      required: true
+
+
+  - type: textarea
+    id: mockups-references
+    attributes:
+      label: Mockups/References
+      description: Share mockups, wireframes, or reference designs
+      placeholder: Attach images or provide links to design references

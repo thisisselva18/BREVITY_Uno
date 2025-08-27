@@ -322,15 +322,19 @@ final _routes = GoRouter(
   },
 );
 
+
 void main() async {
-  // Task: At the start of main(), log that the app is starting.
-  Log.i('App is starting...');
+  Log.i('App is starting...'); // Log start of main()
 
   try {
+    // WidgetsFlutterBinding.ensureInitialized() MUST be the very first call
     WidgetsFlutterBinding.ensureInitialized();
     Log.i('WidgetsFlutterBinding ensured.');
 
-    // Task: Implement detailed logging in main.dart to track app initialization
+    // Load environment variables immediately after binding is ensured
+    await dotenv.load(fileName: ".env");
+    Log.i('Environment variables loaded from .env.');
+
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     Log.i('Firebase initialized.');
 
@@ -340,8 +344,9 @@ void main() async {
     tz.initializeTimeZones();
     Log.i('Timezone data initialized.');
 
-    await dotenv.load(fileName: ".env");
-    Log.i('Environment variables loaded from .env.');
+    // Initialize AuthService and NotificationService after dotenv and Firebase
+    await AuthService().initializeAuth();
+    Log.i('AuthService initialized.');
 
     final bookmarkRepository = BookmarkServices();
     final newsService = NewsService();
@@ -353,8 +358,7 @@ void main() async {
     ]);
     Log.i('Preferred orientations set.');
 
-    // Task: Add logs before runApp() and confirm once it has started.
-    Log.i('Preparing to call runApp()...');
+    Log.i('Preparing to call runApp()...'); // Log before runApp()
     runApp(
       MultiRepositoryProvider(
         providers: [
@@ -373,11 +377,8 @@ void main() async {
       ),
     );
     Log.i('runApp() has been called and widget tree is being built.');
-
-    // Task: At the end of main(), log that initialization is complete.
-    Log.i('Initialization is complete.');
+    Log.i('Initialization is complete.'); // Log end of main()
   } catch (e, stacktrace) {
-    // Task: If errors occur in initialization, catch and log them with stack trace.
     Log.e('An error occurred during app initialization: $e', e, stacktrace);
   }
 }
@@ -387,7 +388,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Task: log widget tree setup and lifecycle events.
     Log.i('MyApp build method called.');
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, state) {

@@ -1,0 +1,67 @@
+name: ⚡ Performance Optimization
+description: Report performance issues or suggest optimizations
+title: "[PERFORMANCE] - "
+labels: ["Optimization", "GSSoC"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve Brevity's performance! Please provide detailed information about the performance issue or optimization opportunity.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Prerequisites
+      description: Please check the following before submitting
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have verified this is a performance issue, not a bug
+          required: true
+
+  - type: dropdown
+    id: performance-category
+    attributes:
+      label: Performance Category
+      description: What type of performance issue is this?
+      options:
+        - App Startup - Slow app launch or initialization
+        - UI Responsiveness - Laggy interactions, slow animations
+        - Network Performance - Slow API calls, inefficient requests
+        - Database Performance - Slow queries, inefficient data access
+        - Rendering Performance - Slow screen rendering, frame drops
+        - Background Processing - Inefficient background tasks
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: performance-issue
+    attributes:
+      label: Performance Issue Description
+      description: Describe the performance problem in detail
+      placeholder: Explain what performance issue you're experiencing...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this performance issue?
+      placeholder: |
+        1. Open the app
+        2. Navigate to...
+        3. Perform action...
+        4. Notice performance issue
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information about the performance issue
+      placeholder: Include logs, crash reports, or other technical details...

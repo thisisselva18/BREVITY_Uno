@@ -1,0 +1,46 @@
+name: "🌍 Website Issue"
+description: "Report a problem or suggest an improvement for the website"
+title: "[WEBSITE] - "
+labels:
+  - "Website"
+  - "GSSoC"
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a website issue! Please provide as much detail as possible so we can fix or improve it quickly.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: "Prerequisites"
+      description: "Before submitting, please confirm:"
+      options:
+        - label: "I have searched existing website-related issues to avoid duplicates"
+          required: true
+        - label: "This issue is specifically about the website (not the app)"
+          required: true
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: "Issue Description"
+      description: "Clearly describe the website problem or improvement suggestion"
+      placeholder: "Example: The navbar overlaps content on mobile..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: "Proposed Solution"
+      description: "Explain your suggested fix or approach to solve this issue"
+      placeholder: |
+        Example:
+        - Update the CSS to adjust navbar spacing
+        - Add a mobile breakpoint for responsive layout
+        - Replace broken link with the correct URL
+    validations:
+      required: true

@@ -1,0 +1,57 @@
+name: 📚 Documentation Update
+description: Suggest improvements to documentation
+title: "[DOCS] - "
+labels: ["documentation", "GSSoC"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve our documentation! Clear documentation helps everyone contribute to and use Brevity effectively.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Prerequisites
+      description: Please check the following before submitting
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have reviewed the current documentation
+          required: true
+
+  - type: dropdown
+    id: documentation-type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation needs updating?
+      options:
+        - README - Main project README file
+        - API Documentation - REST API or GraphQL documentation
+        - Setup Guide - Installation and setup instructions
+        - Contributing Guide - Guidelines for contributors
+        - User Guide - How to use the app features
+        - Developer Guide - Technical documentation for developers
+        - Code Comments - Inline code documentation
+        - Architecture - System design and architecture docs
+        - Troubleshooting - Common issues and solutions
+        - Changelog - Release notes and version history
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-issue
+    attributes:
+      label: Issue Description
+      description: What's wrong with the current documentation?
+      placeholder: |
+        Describe the problem:
+        - Missing information
+        - Outdated content
+        - Unclear explanations
+        - Incorrect instructions
+        - Poor organization
+    validations:
+      required: true
