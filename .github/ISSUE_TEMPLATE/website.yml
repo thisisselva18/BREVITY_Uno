@@ -1,10 +1,9 @@
-name: 🌍 Website Issue
-description: Report a problem or suggest an improvement for the website
+name: "🌍 Website Issue"
+description: "Report a problem or suggest an improvement for the website"
 title: "[WEBSITE] - "
 labels:
-  - website
-  - needs-triage
-  - GSSoC
+  - "website"
+  - "GSSoC"
 assignees: []
 
 body:
@@ -16,30 +15,30 @@ body:
   - type: checkboxes
     id: terms
     attributes:
-      label: Prerequisites
-      description: Before submitting, please confirm:
+      label: "Prerequisites"
+      description: "Before submitting, please confirm:"
       options:
-        - label: I have searched existing website-related issues to avoid duplicates
+        - label: "I have searched existing website-related issues to avoid duplicates"
           required: true
-        - label: I have cleared cache/cookies or tested in incognito mode
+        - label: "I have cleared cache/cookies or tested in incognito mode"
           required: false
-        - label: This issue is specifically about the website (not the app)
+        - label: "This issue is specifically about the website (not the app)"
           required: true
 
   - type: textarea
     id: issue-description
     attributes:
-      label: Issue Description
-      description: Clearly describe the website problem or improvement suggestion
-      placeholder: Example: The navbar overlaps content on mobile...
+      label: "Issue Description"
+      description: "Clearly describe the website problem or improvement suggestion"
+      placeholder: "Example: The navbar overlaps content on mobile..."
     validations:
       required: true
 
   - type: textarea
     id: steps-to-reproduce
     attributes:
-      label: Steps to Reproduce (if applicable)
-      description: Steps to reproduce the problem (screenshots or video help a lot)
+      label: "Steps to Reproduce (if applicable)"
+      description: "Steps to reproduce the problem (screenshots or video help a lot)"
       placeholder: |
         1. Go to '...'
         2. Click on '...'
@@ -51,17 +50,17 @@ body:
   - type: input
     id: browser
     attributes:
-      label: Browser & Device Info
-      description: Provide browser name, version, and device/OS
-      placeholder: Example: Chrome 116 on Windows 11
+      label: "Browser & Device Info"
+      description: "Provide browser name, version, and device/OS"
+      placeholder: "Example: Chrome 116 on Windows 11"
     validations:
       required: false
 
   - type: textarea
     id: expected-behavior
     attributes:
-      label: Expected Behavior
-      description: What did you expect to happen?
-      placeholder: Example: The navbar should collapse into a hamburger menu on mobile.
+      label: "Expected Behavior"
+      description: "What did you expect to happen?"
+      placeholder: "Example: The navbar should collapse into a hamburger menu on mobile."
     validations:
       required: false
