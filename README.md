@@ -78,7 +78,7 @@
   <tr>
     <td align="center">
       <a href="http://www.youtube.com/watch?v=1T-qu-lke-I" target="_blank">
-        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/video.jepg" width="250"/>
+        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Video.jpeg" width="250"/>
         <br/>
         <b>BrevityVideo1</b>
       </a>
@@ -86,7 +86,7 @@
     </td>
     <td align="center">
       <a href="http://www.youtube.com/watch?v=tuf-qZ3jiEY" target="_blank">
-        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/video.jepg" width="250"/>
+        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Video.jpeg" width="250"/>
         <br/>
         <b>BrevityVideo2</b>
       </a>
@@ -94,7 +94,7 @@
     </td>
      <td align="center">
       <a href="http://www.youtube.com/watch?v=7Xda11xPDwE" target="_blank">
-        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/video.jepg" width="250"/>
+        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Video.jpeg" width="250"/>
         <br/>
         <b>BrevityVideo3</b>
       </a>
