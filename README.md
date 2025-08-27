@@ -121,19 +121,20 @@
 ## 🌟 Features
 
 ### Core Features
-- **AI Chatbot** 🤖 - Get instant answers to all your questions related to the news.
-- **Infinite Scrolling** 🔄 - Never hit "the end" – keep scrolling for more stories!
-- **Side Page Navigation** 📚 - Bookmark articles, adjust settings, and access more details with ease.
-- **Theming Support** 🎨 - Users can personalize their reading experience by selecting from up to 8 themes.
-- **Bookmark News** ⭐ - Easily bookmark news articles, with local and backend storage for seamless access across devices.
-- **Search News** 🔍 - Quickly find news articles based on keywords or categories.
-- **Shareability** 🤝 - Effortlessly share the app with friends using share_plus.
+- **Personalized News Feed** ❤️ - Like and dislike articles to shape your personal news feed. Our smart algorithm learns what you love and delivers more of it!
+- **AI-Powered Q&A** 🤖 - Get instant summaries and ask questions about any news article with our integrated AI.
+- **Listen on the Go** 🎧 - Turn any news article into an audio experience with our Text-to-Speech feature. Perfect for your commute, workout, or when you're busy.
+- **Share With a Tap** 🔗 - Effortlessly share compelling stories with friends and family across your favorite social platforms.
+- **Seamless Social Login** 🔐 - Get started in seconds with secure and easy sign-in using Google via OAuth.
+- **Infinite Scrolling** 🔄 - Dive into an endless, dynamically loading stream of news. Your discovery never has to stop.
+- **Powerful Search** 🔍 - Quickly find news articles by keywords, topics, or categories with our fast and intuitive search.
+- **Customizable Themes** 🎨 - Make the app yours! Personalize your reading experience by selecting from 8 beautiful themes, including a battery-saving dark mode.
 
 ### Technical Highlights
-- **State Management** ⚡ – Uses flutter_bloc for efficient, scalable, and predictable state handling.
-- **Dynamic Routing** 🚦 – Seamless navigation with go_router for a smooth user experience.
-- **Optimized Caching** 📶 – Uses cached_network_image for efficient image loading and reduced data usage.
-- **Engaging Animations** 🎬 – Implements shimmer effects and smooth transitions for a delightful UI.
+- **Scalable Backend API** 🌐 – Powered by a robust and secure backend built with Node.js, Express, and MongoDB, designed for high performance and real-time data delivery.
+- **Predictable State Management** ⚡ – Built with flutter_bloc for a decoupled, testable, and highly scalable state layer.
+- **Optimized Caching** 📶 – Leverages cached_network_image and advanced caching strategies to minimize data usage and ensure instant image loading.
+- **Polished & Engaging UI** ✨ – Utilizes custom animations, shimmer loading effects, and a meticulous design to create intuitive user experience.
 - **Modular Architecture** 🏗️ – Clean and maintainable codebase with a well-structured project setup.
 
 ---
@@ -149,9 +150,9 @@
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vscode/vscode-original.svg" alt="VS Code" width="50" height="50"/>
 </p>
 
--   **Frontend**: Flutter, Dart, BLoC for state management
--   **Backend**: Node.js, Express.js, Mongoose, Multer, Firebase
--   **Local Storage**: Shared Preferences
+-   **Frontend**: Flutter, Dart, BLoC, Shared Preferences
+-   **Website**: HTML, CSS, JS
+-   **Backend**: Node.js, Express.js, Mongoose, Cloudinary, Firebase, JWT, Passport
 -   **APIs**: News API, Gemini API
 ---
 
@@ -159,33 +160,25 @@
 
 ```bash
 brevity/
-├── android/            # Android-specific configuration
-├── assets/             # Images, logos, etc.
-├── ios/                # iOS project files
-├── lib/                # Flutter main code (controllers, models, views)
-├── linux/              # Linux support
-├── macos/              # macOS support
-├── server/             # Node.js + MongoDB backend
-├── test/               # Test files
-├── web/                # Web support and assets
-├── windows/            # Windows support
-├── pubspec.yaml        # Flutter dependencies
-├── README.md           # Project documentation
-└── .gitignore          # Git ignore rules
+├── .github/             # GitHub workflows, CI/CD pipelines, issue/PR templates
+├── assets/              # Project-wide static assets (images, logos, icons, etc.)
+├── flutter/             # Mobile app source code (Dart, BLoC, models, views, controllers)
+├── server/              # Backend (Node.js, Express.js, MongoDB, APIs, authentication)
+├── website/             # Frontend website (HTML, CSS, JavaScript)
+├── README.md            # Main project documentation and setup guide
+└── .gitignore           # Git ignore rules for node_modules, build files, etc.
 ```
 ## 🔮 Future Plans
 
 We're constantly evolving and have some exciting ideas in the pipeline to make Brevity even more engaging and trustworthy:
 
--   **Multi-Language Support** 🌍 - Expanding our reach by offering the app in multiple languages.
--   **Robust Backend** 🔒 - Implementing email verification and forget password functionality.
--   **Improved Chatbot Response** 🧠 - Enhancing the chatbot's ability to provide accurate and helpful information.
--   **App Rating and Sharing** ⭐🤝 - Allowing users to rate the app and easily share it with others.
--   **User Preference Feed** ⚙️ - Enabling users to customize their news feed based on personal preferences.
--   **Text-to-Speech** 🗣️ - Adding an option for news articles to be read aloud.
--   **Reactions and Likes** 👍 - Introducing features for users to react to and like news content.
--   **Light Mode** ☀️ - Providing an alternative light theme option for personalized viewing.
--   **Notifications** 🔔 - Implementing a notification system to keep users updated.
+- **60-word Summaries** ✍️ - Every article condensed into a crisp, 60-word summary for quick insights, saving you even more time.
+- **Smart Notifications** 🔔 - Personalized alerts for breaking news and topics you care about, delivering crucial updates.
+- **Offline Access** 📥 - Save articles for later and read them anytime, anywhere, even without an internet connection.
+- **Multi-Language Support** 🌍 - Expanding our reach by offering news content and the app interface in multiple languages.
+- **Daily Audio Briefings** 🎙️ - Curated daily news playlists and podcast-style summaries to start your day informed.
+- **Enhanced AI Chat** 🧠 - Continuously improving our AI's speed, accuracy, and conversational abilities for even better answers.
+- **Website** 💻 - A companion website for all information about brevity.
 
 ---
 
