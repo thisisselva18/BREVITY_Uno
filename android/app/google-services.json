@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "627461571018",
-    "project_id": "news-ai-914981",
-    "storage_bucket": "news-ai-914981.firebasestorage.app"
+    "project_number": "405346496278",
+    "project_id": "dev-elevate-1968c",
+    "storage_bucket": "dev-elevate-1968c.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:627461571018:android:c000c9d300277cdeff8f33",
+        "mobilesdk_app_id": "1:405346496278:android:5b25bd45b2acddf4ad2a37",
         "android_client_info": {
           "package_name": "com.unity.brevity"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBCdTg_6cWfqkTiv4VJuhs3VovUQfpLBdw"
+          "current_key": "AIzaSyBO90pveCmQSEYTTKerX8aI3p8MZwOOAVc"
         }
       ],
       "services": {
