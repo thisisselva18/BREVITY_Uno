@@ -1,7 +1,9 @@
 name: 🌍 Website Issue
 description: Report a problem or suggest an improvement for the website
 title: "[WEBSITE] - "
-labels: ["website", "needs-triage", "GSSoC"]
+labels: 
+  - website
+  - GSSoC
 assignees: []
 
 body:
