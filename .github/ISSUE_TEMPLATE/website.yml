@@ -2,7 +2,7 @@ name: "🌍 Website Issue"
 description: "Report a problem or suggest an improvement for the website"
 title: "[WEBSITE] - "
 labels:
-  - "website"
+  - "Website"
   - "GSSoC"
 assignees: []
 
@@ -20,8 +20,6 @@ body:
       options:
         - label: "I have searched existing website-related issues to avoid duplicates"
           required: true
-        - label: "I have cleared cache/cookies or tested in incognito mode"
-          required: false
         - label: "This issue is specifically about the website (not the app)"
           required: true
 
@@ -34,33 +32,15 @@ body:
     validations:
       required: true
 
-  - type: textarea
-    id: steps-to-reproduce
+    - type: textarea
+    id: proposed-solution
     attributes:
-      label: "Steps to Reproduce (if applicable)"
-      description: "Steps to reproduce the problem (screenshots or video help a lot)"
+      label: "Proposed Solution"
+      description: "Explain your suggested fix or approach to solve this issue"
       placeholder: |
-        1. Go to '...'
-        2. Click on '...'
-        3. Scroll to '...'
-        4. See error
+        Example:
+        - Update the CSS to adjust navbar spacing
+        - Add a mobile breakpoint for responsive layout
+        - Replace broken link with the correct URL
     validations:
-      required: false
-
-  - type: input
-    id: browser
-    attributes:
-      label: "Browser & Device Info"
-      description: "Provide browser name, version, and device/OS"
-      placeholder: "Example: Chrome 116 on Windows 11"
-    validations:
-      required: false
-
-  - type: textarea
-    id: expected-behavior
-    attributes:
-      label: "Expected Behavior"
-      description: "What did you expect to happen?"
-      placeholder: "Example: The navbar should collapse into a hamburger menu on mobile."
-    validations:
-      required: false
+      required: true
