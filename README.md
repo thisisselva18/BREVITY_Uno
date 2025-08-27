@@ -78,7 +78,7 @@
   <tr>
     <td align="center">
       <a href="http://www.youtube.com/watch?v=1T-qu-lke-I" target="_blank">
-        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/splash_screen.jpg" width="250"/>
+        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/video.jepg" width="250"/>
         <br/>
         <b>BrevityVideo1</b>
       </a>
@@ -86,7 +86,7 @@
     </td>
     <td align="center">
       <a href="http://www.youtube.com/watch?v=tuf-qZ3jiEY" target="_blank">
-        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/splash_screen.jpg" width="250"/>
+        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/video.jepg" width="250"/>
         <br/>
         <b>BrevityVideo2</b>
       </a>
@@ -94,7 +94,7 @@
     </td>
      <td align="center">
       <a href="http://www.youtube.com/watch?v=7Xda11xPDwE" target="_blank">
-        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/splash_screen.jpg" width="250"/>
+        <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/video.jepg" width="250"/>
         <br/>
         <b>BrevityVideo3</b>
       </a>
@@ -106,13 +106,14 @@
 <details>
 <summary>📱 View App Screenshots</summary>
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/auth_screen.jpg" width="22%"/>
-  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/intro_screen.jpg" alt="Analytics Screen" width="22%"/>
-  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/home_screen.jpg" alt="Transactions Screen" width="22%"/>
-  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/side_page.jpg" alt="Profile Screen" width="22%"/>
-  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/settings.jpg" alt="Profile Screen" width="22%"/>
-  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/search_screen.jpg" alt="Profile Screen" width="22%"/>
-  <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/bookmark_screen.jpg" alt="Profile Screen" width="22%"/>
+	<img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Brevity.png" width="22%"/>
+	<img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Login.png" alt="Profile Screen" width="22%"/>
+	<img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Theme.png" alt="Profile Screen" width="22%"/>
+	<img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Home.png" alt="Transactions Screen" width="22%"/>
+	<img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Chatbot.png" alt="Analytics Screen" width="22%"/>
+	<img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/EOS.png" alt="Profile Screen" width="22%"/>
+	<img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Search.png" alt="Profile Screen" width="22%"/>
+
 </p>
 </details>
 
