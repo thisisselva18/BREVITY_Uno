@@ -16,7 +16,6 @@ import 'package:brevity/views/inner_screens/settings.dart';
 import 'package:brevity/views/intro_screen/intro_screen.dart';
 import 'package:brevity/views/inner_screens/bookmark.dart';
 import 'package:brevity/views/nav_screen/home.dart';
-import 'package:brevity/utils/logger.dart';
 import 'package:brevity/views/nav_screen/side_page.dart';
 import 'package:brevity/views/splash_screen.dart';
 import 'package:brevity/controller/services/bookmark_services.dart';
@@ -30,6 +29,7 @@ import 'package:brevity/controller/services/auth_service.dart';
 import 'package:brevity/controller/bloc/news_scroll_bloc/news_scroll_bloc.dart';
 import 'package:brevity/controller/cubit/theme/theme_state.dart';
 import 'package:brevity/models/theme_model.dart';
+// ADD THESE IMPORTS
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:brevity/controller/services/notification_service.dart';
 
@@ -91,11 +91,11 @@ final _routes = GoRouter(
         key: state.pageKey,
         child: const SidePage(),
         transitionsBuilder: (
-          context,
-          animation,
-          secondaryAnimation,
-          child,
-        ) {
+            context,
+            animation,
+            secondaryAnimation,
+            child,
+            ) {
           const begin = Offset(-1.0, 0.0);
           const end = Offset.zero;
           const curve = Curves.easeInOut;
@@ -111,17 +111,17 @@ final _routes = GoRouter(
       ),
       routes: [
         GoRoute(
-          path: 'bookmark',
+          path: '/bookmark',
           name: 'bookmark',
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const BookmarkScreen(),
             transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+                ) {
               // Combine scale and fade animations
               return Align(
                 alignment: Alignment.center,
@@ -143,17 +143,17 @@ final _routes = GoRouter(
           ),
         ),
         GoRoute(
-          path: 'settings',
+          path: 'settings', // CORRECTED: Removed leading '/'
           name: 'settings',
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const SettingsScreen(),
             transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+                ) {
               return Align(
                 alignment: Alignment.center,
                 child: FadeTransition(
@@ -174,17 +174,17 @@ final _routes = GoRouter(
           ),
         ),
         GoRoute(
-          path: 'profile',
+          path: 'profile', // CORRECTED: Removed leading '/'
           name: 'profile',
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const ProfileScreen(),
             transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+                ) {
               return Align(
                 alignment: Alignment.center,
                 child: FadeTransition(
@@ -205,19 +205,19 @@ final _routes = GoRouter(
           ),
         ),
         GoRoute(
-          path: 'searchResults',
+          path: 'searchResults', // CORRECTED: Removed leading '/'
           name: 'searchResults',
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: SearchResultsScreen(
-              query: state.uri.queryParameters['query']!,
+              query: state.uri.queryParameters['query']!, // Only query parameter
             ),
             transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+                ) {
               // Combine scale and fade animations
               return Align(
                 alignment: Alignment.center,
@@ -273,11 +273,11 @@ final _routes = GoRouter(
         key: state.pageKey,
         child: ChatScreen(article: state.extra as Article),
         transitionsBuilder: (
-          context,
-          animation,
-          secondaryAnimation,
-          child,
-        ) {
+            context,
+            animation,
+            secondaryAnimation,
+            child,
+            ) {
           // Combine scale and fade animations
           return Align(
             alignment: Alignment.center,
@@ -299,102 +299,92 @@ final _routes = GoRouter(
       ),
     ),
   ],
+  // Add redirect logic to handle authentication state
   redirect: (context, state) {
+    // Allow access to splash screen
     if (state.matchedLocation == '/splash') return null;
 
+    // Check for routes that should be accessible without authentication
     final allowedPaths = ['/auth', '/intro', '/email-verification'];
     if (allowedPaths.contains(state.matchedLocation)) return null;
 
+    // Get the AuthService instance
     final authService = AuthService();
 
+    // If user is not signed in, redirect to auth
     if (!authService.isAuthenticated) {
       return '/auth';
     }
 
+    // If user is authenticated but email is not verified, redirect to email verification
     if (authService.isAuthenticated && !authService.isEmailVerified) {
       final currentUser = authService.currentUser;
       if (currentUser != null) {
-        return '/email-verification?email=${Uri.encodeComponent(currentUser.email!)}&isFromLogin=true';
+        return '/email-verification?email=${Uri.encodeComponent(currentUser.email)}&isFromLogin=true';
       }
     }
 
+    // Allow access to authenticated routes
     return null;
   },
 );
 
-
 void main() async {
-  Log.i('App is starting...'); // Log start of main()
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-  try {
-    // WidgetsFlutterBinding.ensureInitialized() MUST be the very first call
-    WidgetsFlutterBinding.ensureInitialized();
-    Log.i('WidgetsFlutterBinding ensured.');
+  // ADD THIS: Initialize timezone data
+  tz.initializeTimeZones();
 
-    // Load environment variables immediately after binding is ensured
-    await dotenv.load(fileName: ".env");
-    Log.i('Environment variables loaded from .env.');
+  // Initialize your AuthService
+  await AuthService().initializeAuth();
 
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    Log.i('Firebase initialized.');
+  // ADD THIS: Initialize notification service
+  final notificationService = NotificationService();
+  await notificationService.initialize();
 
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    Log.i('System UI mode set to immersiveSticky.');
+  await dotenv.load(fileName: ".env");
 
-    tz.initializeTimeZones();
-    Log.i('Timezone data initialized.');
+  final bookmarkRepository = BookmarkServices();
+  final newsService = NewsService();
 
-    // Initialize AuthService and NotificationService after dotenv and Firebase
-    await AuthService().initializeAuth();
-    Log.i('AuthService initialized.');
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
-    final bookmarkRepository = BookmarkServices();
-    final newsService = NewsService();
-    Log.i('BookmarkServices and NewsService instances created.');
-
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-    Log.i('Preferred orientations set.');
-
-    Log.i('Preparing to call runApp()...'); // Log before runApp()
-    runApp(
-      MultiRepositoryProvider(
+  runApp(
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: newsService),
+        RepositoryProvider.value(value: bookmarkRepository),
+      ],
+      child: MultiBlocProvider(
         providers: [
-          RepositoryProvider.value(value: newsService),
-          RepositoryProvider.value(value: bookmarkRepository),
+          BlocProvider(create: (context) => NewsBloc(newsService: newsService)),
+          BlocProvider(create: (context) => BookmarkBloc(bookmarkRepository)),
+          BlocProvider(create: (context) => UserProfileCubit()),
+          BlocProvider(create: (context) => ThemeCubit()..initializeTheme()),
         ],
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (context) => NewsBloc(newsService: newsService)),
-            BlocProvider(create: (context) => BookmarkBloc(bookmarkRepository)),
-            BlocProvider(create: (context) => UserProfileCubit()),
-            BlocProvider(create: (context) => ThemeCubit()..initializeTheme()),
-          ],
-          child: const MyApp(),
-        ),
+        child: const MyApp(),
       ),
-    );
-    Log.i('runApp() has been called and widget tree is being built.');
-    Log.i('Initialization is complete.'); // Log end of main()
-  } catch (e, stacktrace) {
-    Log.e('An error occurred during app initialization: $e', e, stacktrace);
-  }
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    Log.i('MyApp build method called.');
+    // UPDATED: Wrap with BlocBuilder to react to theme changes
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, state) {
         return MaterialApp.router(
           title: 'Brevity',
           debugShowCheckedModeBanner: false,
           routerConfig: _routes,
+          // UPDATED: Apply the dynamic theme from the ThemeCubit state
           theme: createAppTheme(state.currentTheme),
         );
       },
