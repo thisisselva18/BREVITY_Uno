@@ -85,15 +85,15 @@
       <p>Login & SignUp</p>
     </td>
     <td align="center">
-      <a href="http://www.youtube.com/watch?v=tuf-qZ3jiEY" target="_blank">
+      <a href="https://youtube.com/shorts/C1DUbo6K_2Y?feature=share" target="_blank">
         <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Video.jpeg" width="250"/>
         <br/>
         <b>BrevityVideo2</b>
       </a>
-      <p>Main Features</p>
+      <p>Home Screen and Chatbot</p>
     </td>
      <td align="center">
-      <a href="http://www.youtube.com/watch?v=7Xda11xPDwE" target="_blank">
+      <a href="https://youtube.com/shorts/wUJMbrjznGQ?feature=share" target="_blank">
         <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Video.jpeg" width="250"/>
         <br/>
         <b>BrevityVideo3</b>
