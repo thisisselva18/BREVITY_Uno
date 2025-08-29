@@ -1,12 +1,14 @@
+import 'dart:convert';
 import 'dart:ui';
+
 import 'package:brevity/controller/bloc/chat_bloc/chat_bloc.dart';
 import 'package:brevity/controller/cubit/theme/theme_cubit.dart';
 import 'package:brevity/controller/services/gemini_service.dart';
 import 'package:brevity/models/article_model.dart';
+import 'package:brevity/models/theme_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:brevity/models/theme_model.dart';
 
 class ChatScreen extends StatefulWidget {
   final Article article;
@@ -68,6 +70,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  String _sanitizeText(String? text) {
+    if (text == null) return '';
+    try {
+      return utf8.decode(utf8.encode(text), allowMalformed: true);
+    } catch (e) {
+      return text.replaceAll(
+        RegExp(r'[^\x20-\x7E\u00A0-\uD7FF\uE000-\uFFFD]'),
+        '',
+      );
+    }
   }
 
   Future<void> _showReportDialog(int messageIndex) async {
@@ -333,41 +347,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 _buildGlassAppBar(appTheme),
                 _buildFloatingArticleCard(appTheme),
                 Expanded(child: _buildMessageList(appTheme)),
-                _buildAIDisclaimer(appTheme),
                 _buildGlassInputField(appTheme),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAIDisclaimer(AppTheme appTheme) {
-    final theme = Theme.of(context);
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: appTheme.primaryColor.withOpacity(0.2)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.info_outline, color: appTheme.primaryColor, size: 16),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'AI-generated content. For reference only.',
-              style: TextStyle(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -550,7 +534,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       ),
                       const Gap(6),
                       Text(
-                        widget.article.title,
+                        _sanitizeText(widget.article.title),
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w500,
                           height: 1.4,
@@ -809,7 +793,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     ],
                   ),
                   child: Text(
-                    message,
+                    _sanitizeText(message),
                     style: TextStyle(
                       color: theme.colorScheme.onPrimary,
                       fontSize: 15,
@@ -909,12 +893,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             child:
                                 shouldAnimate
                                     ? TypewriterText(
-                                      text: message.trimRight(),
+                                      text: _sanitizeText(message.trimRight()),
                                       style: theme.textTheme.bodyLarge!
                                           .copyWith(height: 1.4),
                                     )
                                     : Text(
-                                      message.trimRight(),
+                                      _sanitizeText(message.trimRight()),
                                       style: theme.textTheme.bodyLarge!
                                           .copyWith(height: 1.4),
                                     ),
