@@ -1,14 +1,12 @@
 import java.util.Properties
 import java.io.FileInputStream
 
-// This block should ideally be outside the 'android' block, at the top level of the build.gradle.kts file.
-// It sets up the keystore properties that will be used by the signingConfigs.
+
 val keystoreProperties = Properties()
 val keyPropertiesFile = rootProject.file("key.properties")
 if (keyPropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keyPropertiesFile))
 } else {
-    // It's good practice to throw an error if the file is missing, especially for release builds.
     throw GradleException("key.properties not found! Please create it in the 'android' directory of your Flutter project and add your signing information.")
 }
 
