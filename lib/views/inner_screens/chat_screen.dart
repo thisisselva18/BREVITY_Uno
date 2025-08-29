@@ -24,6 +24,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   late Animation<Offset> _slideAnimation;
   bool _isComposing = false;
   String _pendingMessage = '';
+  final Set<int> _reportedMessages = {};
 
   @override
   void initState() {
@@ -69,6 +70,239 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<void> _showReportDialog(int messageIndex) async {
+    // Persistent dialog-local state (declared outside StatefulBuilder)
+    String? selectedOption;
+    final TextEditingController customReasonController =
+        TextEditingController();
+    bool showCustomField = false;
+    String customError = '';
+
+    final appTheme = context.read<ThemeCubit>().currentTheme;
+    final theme = Theme.of(context);
+
+    // Await the dialog so we can dispose the controller afterwards.
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            // Helper to validate current custom text
+            void validateCustom() {
+              final text = customReasonController.text.trim();
+              if (!showCustomField) {
+                customError = '';
+              } else if (text.isEmpty) {
+                customError = 'Please enter a reason (max 50 characters)';
+              } else if (text.length > 50) {
+                customError = 'Maximum allowed is 50 characters';
+              } else {
+                customError = '';
+              }
+            }
+
+            final canSubmit =
+                selectedOption != null &&
+                (!showCustomField ||
+                    (customReasonController.text.trim().isNotEmpty &&
+                        customReasonController.text.trim().length <= 50));
+
+            return Dialog(
+              backgroundColor: theme.colorScheme.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: theme.dividerColor.withOpacity(0.2),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Report Content',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: theme.colorScheme.onSurface,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Please select the reason for reporting:',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Radio options (uses the helper below)
+                      ..._buildReportOptions(appTheme, theme, selectedOption, (
+                        option,
+                      ) {
+                        setState(() {
+                          selectedOption = option;
+                          showCustomField = option == 'Other';
+                          if (!showCustomField) {
+                            customReasonController.clear();
+                            customError = '';
+                          }
+                        });
+                      }),
+
+                      const SizedBox(height: 12),
+
+                      // Conditional custom field for "Other"
+                      if (showCustomField) ...[
+                        TextField(
+                          controller: customReasonController,
+                          maxLength: 50,
+                          autofocus: true,
+                          onChanged: (v) {
+                            setState(() {
+                              validateCustom();
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Please specify (max 50 characters)',
+                            errorText: customError.isEmpty ? null : customError,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: theme.dividerColor),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: appTheme.primaryColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.7,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          ElevatedButton(
+                            onPressed:
+                                canSubmit
+                                    ? () {
+                                      // Optionally capture the reason:
+                                      final reason =
+                                          showCustomField
+                                              ? customReasonController.text
+                                                  .trim()
+                                              : selectedOption;
+                                      // Mark message as reported
+                                      _reportedMessages.add(messageIndex);
+                                      Navigator.of(context).pop();
+                                      // You can also forward `reason` to your backend here if needed.
+                                      _showReportConfirmation(appTheme, theme);
+                                    }
+                                    : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  canSubmit
+                                      ? appTheme.primaryColor
+                                      : theme.disabledColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Submit Report',
+                              style: TextStyle(
+                                color: theme.colorScheme.onPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    // Dispose controller after dialog closes
+    customReasonController.dispose();
+  }
+
+  // RadioListTile-based options builder. Returns a list of widgets to be
+  // inserted into the dialog. This supports accessibility and simplifies
+  // the selection logic.
+  List<Widget> _buildReportOptions(
+    AppTheme appTheme,
+    ThemeData theme,
+    String? selectedOption,
+    void Function(String) onOptionSelected,
+  ) {
+    final options = [
+      'Bullying/Harassment',
+      'Inaccurate Information',
+      'Offensive Content',
+      'Spam',
+      'Other',
+    ];
+
+    return options.map((option) {
+      return RadioListTile<String>(
+        value: option,
+        groupValue: selectedOption,
+        onChanged: (val) {
+          if (val != null) onOptionSelected(val);
+        },
+        title: Text(
+          option,
+          style: TextStyle(color: theme.colorScheme.onSurface),
+        ),
+        activeColor: appTheme.primaryColor,
+        contentPadding: EdgeInsets.zero,
+      );
+    }).toList();
+  }
+
+  void _showReportConfirmation(AppTheme appTheme, ThemeData theme) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Thank you for your report. We will review this content.',
+          style: TextStyle(color: theme.colorScheme.onPrimary),
+        ),
+        backgroundColor: appTheme.primaryColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appTheme = context.read<ThemeCubit>().currentTheme;
@@ -99,11 +333,41 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 _buildGlassAppBar(appTheme),
                 _buildFloatingArticleCard(appTheme),
                 Expanded(child: _buildMessageList(appTheme)),
+                _buildAIDisclaimer(appTheme),
                 _buildGlassInputField(appTheme),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAIDisclaimer(AppTheme appTheme) {
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: appTheme.primaryColor.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: appTheme.primaryColor, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'AI-generated content. For reference only.',
+              style: TextStyle(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                fontSize: 12,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -336,6 +600,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             shouldAnimate:
                                 index ==
                                 state.chatWindow.conversations.length - 1,
+                            messageIndex: index,
                           ),
                           const Gap(24),
                         ],
@@ -362,6 +627,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       conversation.response,
                       appTheme,
                       shouldAnimate: false,
+                      messageIndex: index,
                     ),
                     const Gap(24),
                   ],
@@ -445,13 +711,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   color: appTheme.primaryColor.withAlpha((0.5 * 255).toInt()),
                   size: 60,
                 ),
-                Gap(20),
+                const Gap(20),
                 Text(
                   'Start a conversation about the article!',
                   style: TextStyle(color: Colors.white70, fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
-                Gap(10),
+                const Gap(10),
                 Text(
                   'Your chat history will appear here.',
                   style: TextStyle(color: Colors.white54, fontSize: 12),
@@ -564,6 +830,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     String message,
     AppTheme appTheme, {
     bool shouldAnimate = false,
+    required int messageIndex,
   }) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
@@ -605,52 +872,105 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       ),
                     ],
                   ),
-                  child: Row(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          gradient: RadialGradient(
-                            colors: [
-                              appTheme.primaryColor.withAlpha(
-                                (0.4 * 255).toInt(),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              gradient: RadialGradient(
+                                colors: [
+                                  appTheme.primaryColor.withAlpha(
+                                    (0.4 * 255).toInt(),
+                                  ),
+                                  appTheme.primaryColor.withAlpha(
+                                    (0.2 * 255).toInt(),
+                                  ),
+                                ],
                               ),
-                              appTheme.primaryColor.withAlpha(
-                                (0.2 * 255).toInt(),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: appTheme.primaryColor.withAlpha(
+                                  (0.5 * 255).toInt(),
+                                ),
                               ),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: appTheme.primaryColor.withAlpha(
-                              (0.5 * 255).toInt(),
+                            ),
+                            child: Icon(
+                              Icons.auto_awesome,
+                              color: appTheme.primaryColor,
+                              size: 18,
                             ),
                           ),
-                        ),
-                        child: Icon(
-                          Icons.auto_awesome,
-                          color: appTheme.primaryColor,
-                          size: 18,
-                        ),
+                          const Gap(16),
+                          Expanded(
+                            child:
+                                shouldAnimate
+                                    ? TypewriterText(
+                                      text: message.trimRight(),
+                                      style: theme.textTheme.bodyLarge!
+                                          .copyWith(height: 1.4),
+                                    )
+                                    : Text(
+                                      message.trimRight(),
+                                      style: theme.textTheme.bodyLarge!
+                                          .copyWith(height: 1.4),
+                                    ),
+                          ),
+                        ],
                       ),
-                      const Gap(16),
-                      Expanded(
-                        child:
-                            shouldAnimate
-                                ? TypewriterText(
-                                  text: message.trimRight(),
-                                  style: theme.textTheme.bodyLarge!.copyWith(
-                                    height: 1.4,
+                      const SizedBox(height: 12),
+                      if (!_reportedMessages.contains(messageIndex))
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: PopupMenuButton<String>(
+                            icon: Icon(
+                              Icons.more_vert,
+                              size: 18,
+                              color: theme.colorScheme.onSurface.withOpacity(
+                                0.6,
+                              ),
+                            ),
+                            itemBuilder:
+                                (BuildContext context) => [
+                                  PopupMenuItem<String>(
+                                    value: 'report',
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.flag_outlined,
+                                          size: 18,
+                                          color: theme.colorScheme.onSurface,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Report',
+                                          style: TextStyle(
+                                            color: theme.colorScheme.onSurface,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                )
-                                : Text(
-                                  message.trimRight(),
-                                  style: theme.textTheme.bodyLarge!.copyWith(
-                                    height: 1.4,
-                                  ),
-                                ),
-                      ),
+                                ],
+                            onSelected: (value) {
+                              if (value == 'report') {
+                                _showReportDialog(messageIndex);
+                              }
+                            },
+                          ),
+                        )
+                      else
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Icon(
+                            Icons.flag,
+                            size: 18,
+                            color: Colors.orange,
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -887,6 +1207,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 if (message.isNotEmpty) {
                                   final currentState =
                                       context.read<ChatBloc>().state;
+                                  FocusScope.of(context).unfocus();
                                   if (currentState is ChatLoaded) {
                                     _pendingMessage = message;
                                     context.read<ChatBloc>().add(
