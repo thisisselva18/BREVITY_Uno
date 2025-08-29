@@ -77,7 +77,7 @@
 <table>
   <tr>
     <td align="center">
-      <a href="http://www.youtube.com/watch?v=1T-qu-lke-I" target="_blank">
+      <a href="https://youtube.com/shorts/W4c6BxAAhHM?feature=share" target="_blank">
         <img src="https://raw.githubusercontent.com/Yash159357/NewsAI/main/assets/logos/hidden_images/Video.jpeg" width="250"/>
         <br/>
         <b>BrevityVideo1</b>
